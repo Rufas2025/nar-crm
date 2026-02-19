@@ -204,6 +204,7 @@ export default function LeadsPage() {
       email: form.email || null,
       telefone: form.telefone || null,
       empresa: form.empresa || null,
+      inep: form.inep || null,
       lead_status: form.lead_status,
       notas: form.notas || null,
       user_id: authUser.id,
