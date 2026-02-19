@@ -37,9 +37,9 @@ export default function LeadsPage() {
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
-    name: "",
+    nome: "",
     email: "",
-    phone: "",
+    telefone: "",
     empresa: "",
     lead_status: "novo",
     valor: "",
@@ -67,7 +67,7 @@ export default function LeadsPage() {
     setFiltered(
       leads.filter(
         (l) =>
-          l.name.toLowerCase().includes(q) ||
+          l.nome.toLowerCase().includes(q) ||
           (l.empresa ?? "").toLowerCase().includes(q) ||
           (l.email ?? "").toLowerCase().includes(q)
       )
@@ -79,9 +79,9 @@ export default function LeadsPage() {
     setSaving(true);
     setError(null);
     const { error } = await supabase.from("leads").insert({
-      name: form.name,
+      nome: form.nome,
       email: form.email || null,
-      phone: form.phone || null,
+      telefone: form.telefone || null,
       empresa: form.empresa || null,
       lead_status: form.lead_status,
       valor: form.valor ? parseFloat(form.valor) : null,
@@ -90,7 +90,7 @@ export default function LeadsPage() {
     });
     if (error) { setError(error.message); setSaving(false); return; }
     setShowModal(false);
-    setForm({ name: "", email: "", phone: "", empresa: "", lead_status: "novo", valor: "", notas: "" });
+    setForm({ nome: "", email: "", telefone: "", empresa: "", lead_status: "novo", valor: "", notas: "" });
     fetchLeads();
     setSaving(false);
   }
@@ -142,7 +142,7 @@ export default function LeadsPage() {
                 className="grid grid-cols-[1fr_1fr_1fr_120px_40px] px-6 py-4 items-center hover:bg-accent/40 transition-colors duration-150 cursor-pointer group"
                 onClick={() => navigate(`/leads/${lead.id}`)}
               >
-                <p className="text-sm font-medium text-foreground truncate">{lead.name}</p>
+                <p className="text-sm font-medium text-foreground truncate">{lead.nome}</p>
                 <p className="text-sm text-muted-foreground truncate">{lead.empresa || "—"}</p>
                 <p className="text-sm text-muted-foreground truncate">{lead.email || "—"}</p>
                 <span className={`text-xs font-medium px-2.5 py-1 rounded-full w-fit ${statusColor[lead.lead_status] || "text-muted-foreground bg-muted"}`}>
@@ -170,7 +170,7 @@ export default function LeadsPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5 col-span-2">
                   <label className="text-xs text-muted-foreground">Nome *</label>
-                  <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required className="h-10 rounded-xl bg-input border-border text-sm" placeholder="Nome completo" />
+                  <Input value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} required className="h-10 rounded-xl bg-input border-border text-sm" placeholder="Nome completo" />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs text-muted-foreground">E-mail</label>
@@ -178,7 +178,7 @@ export default function LeadsPage() {
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs text-muted-foreground">Telefone</label>
-                  <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="h-10 rounded-xl bg-input border-border text-sm" placeholder="(11) 99999-9999" />
+                  <Input value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} className="h-10 rounded-xl bg-input border-border text-sm" placeholder="(11) 99999-9999" />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs text-muted-foreground">Empresa</label>

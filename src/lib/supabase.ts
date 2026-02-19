@@ -8,9 +8,9 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 export type Lead = {
   id: string;
   user_id: string;
-  name: string;
+  nome: string;
   email: string | null;
-  phone: string | null;
+  telefone: string | null;
   empresa: string | null;
   lead_status: string;
   valor: number | null;

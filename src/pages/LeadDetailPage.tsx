@@ -117,7 +117,7 @@ export default function LeadDetailPage() {
           <div className="bg-card border border-border rounded-2xl p-6 shadow-[0_2px_16px_rgba(0,0,0,0.3)]">
             <div className="flex items-start justify-between mb-5">
               <div>
-                <h1 className="text-xl font-semibold text-foreground tracking-tight">{lead.name}</h1>
+                <h1 className="text-xl font-semibold text-foreground tracking-tight">{lead.nome}</h1>
                 {lead.empresa && (
                   <p className="text-sm text-muted-foreground flex items-center gap-1.5 mt-1">
                     <Building2 className="w-3.5 h-3.5" strokeWidth={1.5} />{lead.empresa}
@@ -135,9 +135,9 @@ export default function LeadDetailPage() {
                   <Mail className="w-3.5 h-3.5" strokeWidth={1.5} />{lead.email}
                 </p>
               )}
-              {lead.phone && (
+              {lead.telefone && (
                 <p className="text-sm text-muted-foreground flex items-center gap-2">
-                  <Phone className="w-3.5 h-3.5" strokeWidth={1.5} />{lead.phone}
+                  <Phone className="w-3.5 h-3.5" strokeWidth={1.5} />{lead.telefone}
                 </p>
               )}
               {lead.valor != null && (
