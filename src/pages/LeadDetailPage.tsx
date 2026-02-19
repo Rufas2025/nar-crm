@@ -16,8 +16,9 @@ import {
 
 const STATUS_OPTIONS = [
   { value: "novo", label: "Novo" },
-  { value: "em_andamento", label: "Em Andamento" },
-  { value: "convertido", label: "Convertido" },
+  { value: "em_contato", label: "Em Contato" },
+  { value: "qualificado", label: "Qualificado" },
+  { value: "fechado", label: "Fechado" },
   { value: "perdido", label: "Perdido" },
 ];
 
@@ -31,8 +32,9 @@ const INTERACTION_TYPES = [
 
 const statusColor: Record<string, string> = {
   novo: "text-primary bg-primary/10",
-  em_andamento: "text-yellow-400 bg-yellow-400/10",
-  convertido: "text-green-400 bg-green-400/10",
+  em_contato: "text-yellow-400 bg-yellow-400/10",
+  qualificado: "text-blue-400 bg-blue-400/10",
+  fechado: "text-green-400 bg-green-400/10",
   perdido: "text-destructive bg-destructive/10",
 };
 
