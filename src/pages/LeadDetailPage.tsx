@@ -1,0 +1,238 @@
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { supabase, Lead, Interaction } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  ArrowLeft,
+  MessageSquare,
+  Phone,
+  Mail,
+  Plus,
+  Loader2,
+  Building2,
+} from "lucide-react";
+
+const STATUS_OPTIONS = [
+  { value: "novo", label: "Novo" },
+  { value: "em_andamento", label: "Em Andamento" },
+  { value: "convertido", label: "Convertido" },
+  { value: "perdido", label: "Perdido" },
+];
+
+const INTERACTION_TYPES = [
+  { value: "ligacao", label: "Ligação" },
+  { value: "email", label: "E-mail" },
+  { value: "reuniao", label: "Reunião" },
+  { value: "whatsapp", label: "WhatsApp" },
+  { value: "outro", label: "Outro" },
+];
+
+const statusColor: Record<string, string> = {
+  novo: "text-primary bg-primary/10",
+  em_andamento: "text-yellow-400 bg-yellow-400/10",
+  convertido: "text-green-400 bg-green-400/10",
+  perdido: "text-destructive bg-destructive/10",
+};
+
+export default function LeadDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [lead, setLead] = useState<Lead | null>(null);
+  const [interactions, setInteractions] = useState<Interaction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState("");
+  const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [newNote, setNewNote] = useState("");
+  const [newType, setNewType] = useState("ligacao");
+  const [savingNote, setSavingNote] = useState(false);
+
+  async function fetchData() {
+    const [leadRes, intRes] = await Promise.all([
+      supabase.from("leads").select("*").eq("id", id!).single(),
+      supabase.from("interactions").select("*").eq("lead_id", id!).order("created_at", { ascending: false }),
+    ]);
+    if (leadRes.data) { setLead(leadRes.data); setStatus(leadRes.data.status); }
+    if (intRes.data) setInteractions(intRes.data);
+    setLoading(false);
+  }
+
+  useEffect(() => { fetchData(); }, [id]);
+
+  async function handleStatusUpdate(newStatus: string) {
+    setUpdatingStatus(true);
+    await supabase.from("leads").update({ status: newStatus }).eq("id", id!);
+    setStatus(newStatus);
+    setUpdatingStatus(false);
+  }
+
+  async function handleAddInteraction(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newNote.trim()) return;
+    setSavingNote(true);
+    await supabase.from("interactions").insert({
+      lead_id: id,
+      user_id: user?.id,
+      type: newType,
+      note: newNote.trim(),
+    });
+    setNewNote("");
+    fetchData();
+    setSavingNote(false);
+  }
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (!lead) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <p className="text-muted-foreground text-sm">Lead não encontrado.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex-1 p-8 max-w-4xl">
+      {/* Back */}
+      <button
+        onClick={() => navigate("/leads")}
+        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
+      >
+        <ArrowLeft className="w-4 h-4" strokeWidth={1.5} />
+        Voltar para Leads
+      </button>
+
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
+        {/* Left */}
+        <div className="flex flex-col gap-5">
+          {/* Lead card */}
+          <div className="bg-card border border-border rounded-2xl p-6 shadow-[0_2px_16px_rgba(0,0,0,0.3)]">
+            <div className="flex items-start justify-between mb-5">
+              <div>
+                <h1 className="text-xl font-semibold text-foreground tracking-tight">{lead.name}</h1>
+                {lead.company && (
+                  <p className="text-sm text-muted-foreground flex items-center gap-1.5 mt-1">
+                    <Building2 className="w-3.5 h-3.5" strokeWidth={1.5} />{lead.company}
+                  </p>
+                )}
+              </div>
+              <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusColor[status] || "text-muted-foreground bg-muted"}`}>
+                {STATUS_OPTIONS.find((s) => s.value === status)?.label || status}
+              </span>
+            </div>
+
+            <div className="flex flex-col gap-2 mb-5">
+              {lead.email && (
+                <p className="text-sm text-muted-foreground flex items-center gap-2">
+                  <Mail className="w-3.5 h-3.5" strokeWidth={1.5} />{lead.email}
+                </p>
+              )}
+              {lead.phone && (
+                <p className="text-sm text-muted-foreground flex items-center gap-2">
+                  <Phone className="w-3.5 h-3.5" strokeWidth={1.5} />{lead.phone}
+                </p>
+              )}
+            </div>
+
+            {lead.notes && (
+              <div className="bg-secondary/50 rounded-xl p-4">
+                <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1.5">Notas</p>
+                <p className="text-sm text-foreground">{lead.notes}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Interactions */}
+          <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-[0_2px_16px_rgba(0,0,0,0.3)]">
+            <div className="px-6 py-4 border-b border-border flex items-center gap-2">
+              <MessageSquare className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
+              <h2 className="text-sm font-semibold text-foreground">Interações</h2>
+              <span className="ml-auto text-xs text-muted-foreground">{interactions.length}</span>
+            </div>
+            <div className="divide-y divide-border max-h-80 overflow-y-auto">
+              {interactions.length === 0 ? (
+                <p className="text-sm text-muted-foreground px-6 py-6 text-center">Sem interações registradas.</p>
+              ) : (
+                interactions.map((int) => (
+                  <div key={int.id} className="px-6 py-4">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                        {INTERACTION_TYPES.find((t) => t.value === int.type)?.label || int.type}
+                      </span>
+                      <span className="text-xs text-muted-foreground ml-auto">
+                        {new Date(int.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                      </span>
+                    </div>
+                    <p className="text-sm text-foreground">{int.note}</p>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Right sidebar */}
+        <div className="flex flex-col gap-5">
+          {/* Status update */}
+          <div className="bg-card border border-border rounded-2xl p-5 shadow-[0_2px_16px_rgba(0,0,0,0.3)]">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-3">Atualizar Status</p>
+            <div className="flex flex-col gap-2">
+              {STATUS_OPTIONS.map((s) => (
+                <button
+                  key={s.value}
+                  onClick={() => handleStatusUpdate(s.value)}
+                  disabled={updatingStatus}
+                  className={`w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
+                    ${status === s.value
+                      ? "bg-primary text-primary-foreground shadow-[0_4px_12px_hsl(var(--primary)/0.3)]"
+                      : "bg-secondary/50 text-foreground hover:bg-secondary"
+                    }`}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Add interaction */}
+          <div className="bg-card border border-border rounded-2xl p-5 shadow-[0_2px_16px_rgba(0,0,0,0.3)]">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-3">Nova Interação</p>
+            <form onSubmit={handleAddInteraction} className="flex flex-col gap-3">
+              <select
+                value={newType}
+                onChange={(e) => setNewType(e.target.value)}
+                className="h-10 rounded-xl bg-input border border-border text-sm text-foreground px-3 focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                {INTERACTION_TYPES.map((t) => (
+                  <option key={t.value} value={t.value}>{t.label}</option>
+                ))}
+              </select>
+              <Textarea
+                value={newNote}
+                onChange={(e) => setNewNote(e.target.value)}
+                placeholder="Descreva a interação…"
+                rows={3}
+                className="rounded-xl bg-input border-border text-sm resize-none"
+              />
+              <Button
+                type="submit"
+                disabled={savingNote || !newNote.trim()}
+                className="h-9 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium transition-all flex items-center gap-2"
+              >
+                {savingNote ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <><Plus className="w-3.5 h-3.5" strokeWidth={1.5} />Registrar</>}
+              </Button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
