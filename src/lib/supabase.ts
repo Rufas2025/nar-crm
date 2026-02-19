@@ -15,6 +15,12 @@ export type Lead = {
   lead_status: string;
   valor: number | null;
   notas: string | null;
+  maturidade_decisao: string | null;
+  score_estrategico: number | null;
+  proximo_passo: string | null;
+  data_decisao_prevista: string | null;
+  ultimo_contato_at: string | null;
+  stakeholders_mapeados: boolean | null;
   created_at: string;
   updated_at: string | null;
 };
