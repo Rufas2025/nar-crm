@@ -168,7 +168,8 @@ export default function LeadsPage() {
       if (q && !(
         l.nome.toLowerCase().includes(q) ||
         (l.empresa ?? "").toLowerCase().includes(q) ||
-        (l.email ?? "").toLowerCase().includes(q)
+        (l.email ?? "").toLowerCase().includes(q) ||
+        (l.inep ?? "").toLowerCase().includes(q)
       )) return false;
 
       if (filters.status && l.lead_status !== filters.status) return false;
