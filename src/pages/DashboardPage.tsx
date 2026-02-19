@@ -86,7 +86,7 @@ export default function DashboardPage() {
             leads.slice(0, 5).map((lead) => (
               <div key={lead.id} className="flex items-center px-6 py-4 hover:bg-accent/40 transition-colors duration-150">
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-foreground">{lead.name}</p>
+                  <p className="text-sm font-medium text-foreground">{lead.nome}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">{lead.empresa || lead.email || "—"}</p>
                 </div>
                 <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusColor[lead.lead_status] || "text-muted-foreground bg-muted"}`}>
