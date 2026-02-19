@@ -11,9 +11,10 @@ export type Lead = {
   name: string;
   email: string | null;
   phone: string | null;
-  company: string | null;
-  status: string;
-  notes: string | null;
+  empresa: string | null;
+  lead_status: string;
+  valor: number | null;
+  notas: string | null;
   created_at: string;
   updated_at: string | null;
 };
