@@ -39,9 +39,9 @@ export default function DashboardPage() {
   }, []);
 
   const total = leads.length;
-  const novo = leads.filter((l) => l.status === "novo").length;
-  const emAndamento = leads.filter((l) => l.status === "em_andamento").length;
-  const convertido = leads.filter((l) => l.status === "convertido").length;
+  const novo = leads.filter((l) => l.lead_status === "novo").length;
+  const emAndamento = leads.filter((l) => l.lead_status === "em_andamento").length;
+  const convertido = leads.filter((l) => l.lead_status === "convertido").length;
 
   const cards = [
     { label: "Total de Leads", value: total, icon: Users, color: "text-primary" },
@@ -87,10 +87,10 @@ export default function DashboardPage() {
               <div key={lead.id} className="flex items-center px-6 py-4 hover:bg-accent/40 transition-colors duration-150">
                 <div className="flex-1">
                   <p className="text-sm font-medium text-foreground">{lead.name}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{lead.company || lead.email || "—"}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{lead.empresa || lead.email || "—"}</p>
                 </div>
-                <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusColor[lead.status] || "text-muted-foreground bg-muted"}`}>
-                  {statusLabel[lead.status] || lead.status}
+                <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusColor[lead.lead_status] || "text-muted-foreground bg-muted"}`}>
+                  {statusLabel[lead.lead_status] || lead.lead_status}
                 </span>
               </div>
             ))

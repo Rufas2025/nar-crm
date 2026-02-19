@@ -40,9 +40,10 @@ export default function LeadsPage() {
     name: "",
     email: "",
     phone: "",
-    company: "",
-    status: "novo",
-    notes: "",
+    empresa: "",
+    lead_status: "novo",
+    valor: "",
+    notas: "",
   });
   const [error, setError] = useState<string | null>(null);
 
@@ -67,7 +68,7 @@ export default function LeadsPage() {
       leads.filter(
         (l) =>
           l.name.toLowerCase().includes(q) ||
-          (l.company ?? "").toLowerCase().includes(q) ||
+          (l.empresa ?? "").toLowerCase().includes(q) ||
           (l.email ?? "").toLowerCase().includes(q)
       )
     );
@@ -78,12 +79,18 @@ export default function LeadsPage() {
     setSaving(true);
     setError(null);
     const { error } = await supabase.from("leads").insert({
-      ...form,
+      name: form.name,
+      email: form.email || null,
+      phone: form.phone || null,
+      empresa: form.empresa || null,
+      lead_status: form.lead_status,
+      valor: form.valor ? parseFloat(form.valor) : null,
+      notas: form.notas || null,
       user_id: user?.id,
     });
     if (error) { setError(error.message); setSaving(false); return; }
     setShowModal(false);
-    setForm({ name: "", email: "", phone: "", company: "", status: "novo", notes: "" });
+    setForm({ name: "", email: "", phone: "", empresa: "", lead_status: "novo", valor: "", notas: "" });
     fetchLeads();
     setSaving(false);
   }
@@ -136,10 +143,10 @@ export default function LeadsPage() {
                 onClick={() => navigate(`/leads/${lead.id}`)}
               >
                 <p className="text-sm font-medium text-foreground truncate">{lead.name}</p>
-                <p className="text-sm text-muted-foreground truncate">{lead.company || "—"}</p>
+                <p className="text-sm text-muted-foreground truncate">{lead.empresa || "—"}</p>
                 <p className="text-sm text-muted-foreground truncate">{lead.email || "—"}</p>
-                <span className={`text-xs font-medium px-2.5 py-1 rounded-full w-fit ${statusColor[lead.status] || "text-muted-foreground bg-muted"}`}>
-                  {STATUS_OPTIONS.find((s) => s.value === lead.status)?.label || lead.status}
+                <span className={`text-xs font-medium px-2.5 py-1 rounded-full w-fit ${statusColor[lead.lead_status] || "text-muted-foreground bg-muted"}`}>
+                  {STATUS_OPTIONS.find((s) => s.value === lead.lead_status)?.label || lead.lead_status}
                 </span>
                 <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" strokeWidth={1.5} />
               </div>
@@ -175,13 +182,17 @@ export default function LeadsPage() {
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs text-muted-foreground">Empresa</label>
-                  <Input value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} className="h-10 rounded-xl bg-input border-border text-sm" placeholder="Empresa Ltda." />
+                  <Input value={form.empresa} onChange={(e) => setForm({ ...form, empresa: e.target.value })} className="h-10 rounded-xl bg-input border-border text-sm" placeholder="Empresa Ltda." />
                 </div>
                 <div className="flex flex-col gap-1.5">
+                  <label className="text-xs text-muted-foreground">Valor (R$)</label>
+                  <Input type="number" value={form.valor} onChange={(e) => setForm({ ...form, valor: e.target.value })} className="h-10 rounded-xl bg-input border-border text-sm" placeholder="0,00" />
+                </div>
+                <div className="flex flex-col gap-1.5 col-span-2">
                   <label className="text-xs text-muted-foreground">Status</label>
                   <select
-                    value={form.status}
-                    onChange={(e) => setForm({ ...form, status: e.target.value })}
+                    value={form.lead_status}
+                    onChange={(e) => setForm({ ...form, lead_status: e.target.value })}
                     className="h-10 rounded-xl bg-input border border-border text-sm text-foreground px-3 focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     {STATUS_OPTIONS.map((s) => (
@@ -191,7 +202,7 @@ export default function LeadsPage() {
                 </div>
                 <div className="flex flex-col gap-1.5 col-span-2">
                   <label className="text-xs text-muted-foreground">Notas</label>
-                  <Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="rounded-xl bg-input border-border text-sm resize-none" rows={3} placeholder="Observações sobre o lead…" />
+                  <Textarea value={form.notas} onChange={(e) => setForm({ ...form, notas: e.target.value })} className="rounded-xl bg-input border-border text-sm resize-none" rows={3} placeholder="Observações sobre o lead…" />
                 </div>
               </div>
 

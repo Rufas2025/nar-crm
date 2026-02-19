@@ -54,7 +54,7 @@ export default function LeadDetailPage() {
       supabase.from("leads").select("*").eq("id", id!).single(),
       supabase.from("interactions").select("*").eq("lead_id", id!).order("created_at", { ascending: false }),
     ]);
-    if (leadRes.data) { setLead(leadRes.data); setStatus(leadRes.data.status); }
+    if (leadRes.data) { setLead(leadRes.data); setStatus(leadRes.data.lead_status); }
     if (intRes.data) setInteractions(intRes.data);
     setLoading(false);
   }
@@ -63,7 +63,7 @@ export default function LeadDetailPage() {
 
   async function handleStatusUpdate(newStatus: string) {
     setUpdatingStatus(true);
-    await supabase.from("leads").update({ status: newStatus }).eq("id", id!);
+    await supabase.from("leads").update({ lead_status: newStatus }).eq("id", id!);
     setStatus(newStatus);
     setUpdatingStatus(false);
   }
@@ -118,9 +118,9 @@ export default function LeadDetailPage() {
             <div className="flex items-start justify-between mb-5">
               <div>
                 <h1 className="text-xl font-semibold text-foreground tracking-tight">{lead.name}</h1>
-                {lead.company && (
+                {lead.empresa && (
                   <p className="text-sm text-muted-foreground flex items-center gap-1.5 mt-1">
-                    <Building2 className="w-3.5 h-3.5" strokeWidth={1.5} />{lead.company}
+                    <Building2 className="w-3.5 h-3.5" strokeWidth={1.5} />{lead.empresa}
                   </p>
                 )}
               </div>
@@ -140,12 +140,19 @@ export default function LeadDetailPage() {
                   <Phone className="w-3.5 h-3.5" strokeWidth={1.5} />{lead.phone}
                 </p>
               )}
+              {lead.valor != null && (
+                <p className="text-sm text-muted-foreground flex items-center gap-2">
+                  <span className="text-xs font-medium text-green-400 bg-green-400/10 px-2 py-0.5 rounded-full">
+                    R$ {Number(lead.valor).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                  </span>
+                </p>
+              )}
             </div>
 
-            {lead.notes && (
+            {lead.notas && (
               <div className="bg-secondary/50 rounded-xl p-4">
                 <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1.5">Notas</p>
-                <p className="text-sm text-foreground">{lead.notes}</p>
+                <p className="text-sm text-foreground">{lead.notas}</p>
               </div>
             )}
           </div>
