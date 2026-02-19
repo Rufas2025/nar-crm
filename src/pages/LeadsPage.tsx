@@ -137,17 +137,20 @@ export default function LeadsPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [form, setForm] = useState({
     nome: "", email: "", telefone: "", empresa: "",
-    lead_status: "novo", valor: "", notas: "",
+    lead_status: "novo", inep: "", notas: "",
   });
   const [error, setError] = useState<string | null>(null);
 
   async function fetchLeads() {
     setLoading(true);
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    if (!authUser) { setLoading(false); return; }
     const { data } = await supabase
       .from("leads")
       .select("*")
-      .order("score_estrategico", { ascending: false })
-      .order("data_decisao_prevista", { ascending: true });
+      .eq("user_id", authUser.id)
+      .order("score_estrategico", { ascending: false, nullsFirst: false })
+      .order("data_decisao_prevista", { ascending: true, nullsFirst: false });
     if (data) setLeads(data);
     setLoading(false);
   }
@@ -202,13 +205,12 @@ export default function LeadsPage() {
       telefone: form.telefone || null,
       empresa: form.empresa || null,
       lead_status: form.lead_status,
-      valor: form.valor ? parseFloat(form.valor) : null,
       notas: form.notas || null,
       user_id: authUser.id,
     });
     if (error) { setError(error.message); setSaving(false); return; }
     setShowModal(false);
-    setForm({ nome: "", email: "", telefone: "", empresa: "", lead_status: "novo", valor: "", notas: "" });
+    setForm({ nome: "", email: "", telefone: "", empresa: "", lead_status: "novo", inep: "", notas: "" });
     fetchLeads();
     setSaving(false);
   }
@@ -512,12 +514,23 @@ export default function LeadsPage() {
                   <Input value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} className="h-10 rounded-xl bg-input border-border text-sm" placeholder="(11) 99999-9999" />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-muted-foreground">Empresa</label>
-                  <Input value={form.empresa} onChange={(e) => setForm({ ...form, empresa: e.target.value })} className="h-10 rounded-xl bg-input border-border text-sm" placeholder="Empresa Ltda." />
+                  <label className="text-xs text-muted-foreground">Instituição de Ensino</label>
+                  <Input value={form.empresa} onChange={(e) => setForm({ ...form, empresa: e.target.value })} className="h-10 rounded-xl bg-input border-border text-sm" placeholder="Nome da instituição" />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-muted-foreground">Valor (R$)</label>
-                  <Input type="number" value={form.valor} onChange={(e) => setForm({ ...form, valor: e.target.value })} className="h-10 rounded-xl bg-input border-border text-sm" placeholder="0,00" />
+                  <label className="text-xs text-muted-foreground">INEP</label>
+                  <Input
+                    type="text"
+                    inputMode="numeric"
+                    value={form.inep}
+                    onChange={(e) => {
+                      const v = e.target.value.replace(/\D/g, "");
+                      setForm({ ...form, inep: v });
+                    }}
+                    className="h-10 rounded-xl bg-input border-border text-sm"
+                    placeholder="Digite o código INEP da escola"
+                    minLength={7}
+                  />
                 </div>
                 <div className="flex flex-col gap-1.5 col-span-2">
                   <label className="text-xs text-muted-foreground">Status</label>
