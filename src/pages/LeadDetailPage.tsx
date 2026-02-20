@@ -1,19 +1,23 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { supabase, Lead, Interaction, LeadProduct } from "@/lib/supabase";
+import { supabase, Lead, LeadProduct } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
   ArrowLeft,
-  MessageSquare,
   Phone,
   Mail,
+  MessageSquare,
+  Video,
+  FileText,
   Plus,
   Loader2,
-  Building2,
+  MapPin,
   Package2,
 } from "lucide-react";
+
+// ─── Constants ────────────────────────────────────────────────────────────────
 
 const STATUS_OPTIONS = [
   { value: "novo", label: "Novo" },
@@ -24,11 +28,11 @@ const STATUS_OPTIONS = [
 ];
 
 const INTERACTION_TYPES = [
-  { value: "ligacao", label: "Ligação" },
-  { value: "email", label: "E-mail" },
-  { value: "reuniao", label: "Reunião" },
-  { value: "whatsapp", label: "WhatsApp" },
-  { value: "outro", label: "Outro" },
+  { value: "ligacao", label: "Ligação", icon: Phone },
+  { value: "email", label: "E-mail", icon: Mail },
+  { value: "reuniao", label: "Reunião", icon: Video },
+  { value: "whatsapp", label: "WhatsApp", icon: MessageSquare },
+  { value: "outro", label: "Outro", icon: FileText },
 ];
 
 const PRODUCTS = [
@@ -39,10 +43,10 @@ const PRODUCTS = [
 ];
 
 const PRODUCT_COLORS: Record<string, string> = {
-  eduinfo:  "text-blue-400 bg-blue-400/10 border-blue-400/25",
-  gennera:  "text-violet-400 bg-violet-400/10 border-violet-400/25",
-  ecoclear: "text-green-400 bg-green-400/10 border-green-400/25",
-  vibeflow: "text-orange-400 bg-orange-400/10 border-orange-400/25",
+  eduinfo:  "text-blue-400/90 bg-blue-400/8 border-blue-400/20",
+  gennera:  "text-violet-400/90 bg-violet-400/8 border-violet-400/20",
+  ecoclear: "text-emerald-400/90 bg-emerald-400/8 border-emerald-400/20",
+  vibeflow: "text-amber-400/90 bg-amber-400/8 border-amber-400/20",
 };
 
 const statusColor: Record<string, string> = {
@@ -53,12 +57,43 @@ const statusColor: Record<string, string> = {
   perdido: "text-destructive bg-destructive/10",
 };
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type Activity = {
+  id: string;
+  lead_id: string;
+  user_id: string;
+  type: string;
+  note: string;
+  created_at: string;
+};
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function formatActivityDate(iso: string) {
+  const d = new Date(iso);
+  const day = d.getDate().toString().padStart(2, "0");
+  const month = d.toLocaleString("pt-BR", { month: "short" }).replace(".", "");
+  const month2 = month.charAt(0).toUpperCase() + month.slice(1);
+  const hours = d.getHours().toString().padStart(2, "0");
+  const minutes = d.getMinutes().toString().padStart(2, "0");
+  return `${day} ${month2} · ${hours}:${minutes}`;
+}
+
+function getInteractionIcon(type: string) {
+  const found = INTERACTION_TYPES.find((t) => t.value === type);
+  return found ? found.icon : FileText;
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
 export default function LeadDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+
   const [lead, setLead] = useState<Lead | null>(null);
-  const [interactions, setInteractions] = useState<Interaction[]>([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
   const [products, setProducts] = useState<LeadProduct[]>([]);
   const [togglingProduct, setTogglingProduct] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -68,15 +103,24 @@ export default function LeadDetailPage() {
   const [newType, setNewType] = useState("ligacao");
   const [savingNote, setSavingNote] = useState(false);
 
+  async function fetchActivities() {
+    const { data } = await supabase
+      .from("activities")
+      .select("*")
+      .eq("lead_id", id!)
+      .order("created_at", { ascending: false })
+      .limit(3);
+    if (data) setActivities(data);
+  }
+
   async function fetchData() {
-    const [leadRes, intRes, prodRes] = await Promise.all([
+    const [leadRes, prodRes] = await Promise.all([
       supabase.from("leads").select("*").eq("id", id!).single(),
-      supabase.from("interactions").select("*").eq("lead_id", id!).order("created_at", { ascending: false }),
       supabase.from("lead_products").select("*").eq("lead_id", id!),
     ]);
     if (leadRes.data) { setLead(leadRes.data); setStatus(leadRes.data.lead_status); }
-    if (intRes.data) setInteractions(intRes.data);
     if (prodRes.data) setProducts(prodRes.data);
+    await fetchActivities();
     setLoading(false);
   }
 
@@ -110,14 +154,14 @@ export default function LeadDetailPage() {
     e.preventDefault();
     if (!newNote.trim()) return;
     setSavingNote(true);
-    await supabase.from("interactions").insert({
+    await supabase.from("activities").insert({
       lead_id: id,
       user_id: user?.id,
       type: newType,
       note: newNote.trim(),
     });
     setNewNote("");
-    fetchData();
+    await fetchActivities();
     setSavingNote(false);
   }
 
@@ -139,6 +183,11 @@ export default function LeadDetailPage() {
 
   const linkedProducts = products.map((p) => p.produto);
 
+  // Parse city/state from empresa or notas — try lead fields
+  const cidadeUf = [lead.inep ? `INEP ${lead.inep}` : null]
+    .filter(Boolean)
+    .join(" · ");
+
   return (
     <div className="flex-1 p-8 max-w-4xl">
       {/* Back */}
@@ -150,28 +199,41 @@ export default function LeadDetailPage() {
         Voltar para Leads
       </button>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
-        {/* Left */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
+        {/* ── Left column ── */}
         <div className="flex flex-col gap-5">
-          {/* Lead card */}
-          <div className="bg-card border border-border rounded-2xl p-6 shadow-[0_2px_16px_rgba(0,0,0,0.3)]">
-            <div className="flex items-start justify-between mb-5">
-              <div>
-                <h1 className="text-xl font-semibold text-foreground tracking-tight">{lead.nome}</h1>
-                {lead.empresa && (
-                  <p className="text-sm text-muted-foreground flex items-center gap-1.5 mt-1">
-                    <Building2 className="w-3.5 h-3.5" strokeWidth={1.5} />{lead.empresa}
+
+          {/* Lead header card */}
+          <div className="bg-card border border-border rounded-2xl p-6 shadow-[0_2px_16px_rgba(0,0,0,0.25)]">
+            <div className="flex items-start justify-between gap-4 mb-5">
+              <div className="min-w-0">
+                {/* Line 1 — Institution (primary) */}
+                <h1 className="text-[22px] font-semibold text-foreground tracking-tight leading-tight truncate">
+                  {lead.empresa || lead.nome}
+                </h1>
+
+                {/* Line 2 — City/UF or INEP (contextual) */}
+                {cidadeUf && (
+                  <p className="text-xs text-muted-foreground/70 flex items-center gap-1 mt-1">
+                    <MapPin className="w-3 h-3" strokeWidth={1.5} />
+                    {cidadeUf}
                   </p>
                 )}
+
+                {/* Line 3 — Decisor name */}
+                {lead.empresa && lead.nome && (
+                  <p className="text-sm text-muted-foreground mt-1.5">{lead.nome}</p>
+                )}
+
                 {/* Product tags */}
                 {linkedProducts.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mt-2.5">
+                  <div className="flex flex-wrap gap-1.5 mt-3">
                     {linkedProducts.map((p) => {
                       const prod = PRODUCTS.find((x) => x.value === p);
                       return (
                         <span
                           key={p}
-                          className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${PRODUCT_COLORS[p] || "text-muted-foreground bg-muted border-border"}`}
+                          className={`text-[10px] font-medium px-2.5 py-0.5 rounded-full border ${PRODUCT_COLORS[p] || "text-muted-foreground bg-muted border-border"}`}
                         >
                           {prod?.label || p}
                         </span>
@@ -180,73 +242,88 @@ export default function LeadDetailPage() {
                   </div>
                 )}
               </div>
-              <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusColor[status] || "text-muted-foreground bg-muted"}`}>
+
+              {/* Status badge */}
+              <span className={`shrink-0 text-xs font-medium px-2.5 py-1 rounded-full ${statusColor[status] || "text-muted-foreground bg-muted"}`}>
                 {STATUS_OPTIONS.find((s) => s.value === status)?.label || status}
               </span>
             </div>
 
-            <div className="flex flex-col gap-2 mb-5">
+            {/* Contact info */}
+            <div className="flex flex-col gap-1.5 mb-5">
               {lead.email && (
                 <p className="text-sm text-muted-foreground flex items-center gap-2">
-                  <Mail className="w-3.5 h-3.5" strokeWidth={1.5} />{lead.email}
+                  <Mail className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />{lead.email}
                 </p>
               )}
               {lead.telefone && (
                 <p className="text-sm text-muted-foreground flex items-center gap-2">
-                  <Phone className="w-3.5 h-3.5" strokeWidth={1.5} />{lead.telefone}
+                  <Phone className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />{lead.telefone}
                 </p>
               )}
               {lead.valor != null && (
-                <p className="text-sm text-muted-foreground flex items-center gap-2">
-                  <span className="text-xs font-medium text-green-400 bg-green-400/10 px-2 py-0.5 rounded-full">
-                    R$ {Number(lead.valor).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                  </span>
-                </p>
+                <span className="self-start text-xs font-medium text-green-400 bg-green-400/10 px-2 py-0.5 rounded-full">
+                  R$ {Number(lead.valor).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                </span>
               )}
             </div>
 
+            {/* Strategic notes */}
             {lead.notas && (
-              <div className="bg-secondary/50 rounded-xl p-4">
-                <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1.5">Notas</p>
-                <p className="text-sm text-foreground">{lead.notas}</p>
+              <div className="bg-secondary/40 rounded-xl p-4">
+                <p className="text-xs text-muted-foreground/60 uppercase tracking-widest mb-1.5">Notas estratégicas</p>
+                <p className="text-sm text-foreground/80 leading-relaxed">{lead.notas}</p>
               </div>
             )}
           </div>
 
-          {/* Interactions */}
-          <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-[0_2px_16px_rgba(0,0,0,0.3)]">
-            <div className="px-6 py-4 border-b border-border flex items-center gap-2">
-              <MessageSquare className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
-              <h2 className="text-sm font-semibold text-foreground">Interações</h2>
-              <span className="ml-auto text-xs text-muted-foreground">{interactions.length}</span>
+          {/* ── Activities block ── */}
+          <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-[0_2px_16px_rgba(0,0,0,0.25)]">
+            <div className="px-6 pt-5 pb-4 border-b border-border/60">
+              <h2 className="text-sm font-semibold text-foreground">Últimas Interações</h2>
             </div>
-            <div className="divide-y divide-border max-h-80 overflow-y-auto">
-              {interactions.length === 0 ? (
-                <p className="text-sm text-muted-foreground px-6 py-6 text-center">Sem interações registradas.</p>
-              ) : (
-                interactions.map((int) => (
-                  <div key={int.id} className="px-6 py-4">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-                        {INTERACTION_TYPES.find((t) => t.value === int.type)?.label || int.type}
-                      </span>
-                      <span className="text-xs text-muted-foreground ml-auto">
-                        {new Date(int.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
-                      </span>
+
+            {activities.length === 0 ? (
+              <p className="text-xs text-muted-foreground/60 px-6 py-8 text-center">
+                Nenhuma interação registrada ainda.
+              </p>
+            ) : (
+              <div className="px-6 py-4 flex flex-col gap-5">
+                {activities.map((act, idx) => {
+                  const Icon = getInteractionIcon(act.type);
+                  const typeLabel = INTERACTION_TYPES.find((t) => t.value === act.type)?.label || act.type;
+                  return (
+                    <div key={act.id}>
+                      <div className="flex items-start gap-3">
+                        {/* Icon */}
+                        <div className="mt-0.5 w-7 h-7 rounded-lg bg-secondary/60 flex items-center justify-center shrink-0">
+                          <Icon className="w-3.5 h-3.5 text-muted-foreground" strokeWidth={1.5} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-xs font-medium text-foreground/80">{typeLabel}</span>
+                            <span className="text-[11px] text-muted-foreground/60">{formatActivityDate(act.created_at)}</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground leading-relaxed">{act.note}</p>
+                        </div>
+                      </div>
+                      {idx < activities.length - 1 && (
+                        <div className="mt-5 h-px bg-border/40" />
+                      )}
                     </div>
-                    <p className="text-sm text-foreground">{int.note}</p>
-                  </div>
-                ))
-              )}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Right sidebar */}
+        {/* ── Right sidebar ── */}
         <div className="flex flex-col gap-5">
+
           {/* Status update */}
-          <div className="bg-card border border-border rounded-2xl p-5 shadow-[0_2px_16px_rgba(0,0,0,0.3)]">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-3">Atualizar Status</p>
+          <div className="bg-card border border-border rounded-2xl p-5 shadow-[0_2px_16px_rgba(0,0,0,0.25)]">
+            <p className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-widest mb-3">Atualizar Status</p>
             <div className="flex flex-col gap-2">
               {STATUS_OPTIONS.map((s) => (
                 <button
@@ -255,8 +332,8 @@ export default function LeadDetailPage() {
                   disabled={updatingStatus}
                   className={`w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
                     ${status === s.value
-                      ? "bg-primary text-primary-foreground shadow-[0_4px_12px_hsl(var(--primary)/0.3)]"
-                      : "bg-secondary/50 text-foreground hover:bg-secondary"
+                      ? "bg-primary text-primary-foreground shadow-[0_4px_12px_hsl(var(--primary)/0.25)]"
+                      : "bg-secondary/40 text-foreground/70 hover:bg-secondary hover:text-foreground"
                     }`}
                 >
                   {s.label}
@@ -265,11 +342,11 @@ export default function LeadDetailPage() {
             </div>
           </div>
 
-          {/* Products multi-select */}
-          <div className="bg-card border border-border rounded-2xl p-5 shadow-[0_2px_16px_rgba(0,0,0,0.3)]">
+          {/* Products */}
+          <div className="bg-card border border-border rounded-2xl p-5 shadow-[0_2px_16px_rgba(0,0,0,0.25)]">
             <div className="flex items-center gap-2 mb-3">
-              <Package2 className="w-3.5 h-3.5 text-muted-foreground" strokeWidth={1.5} />
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Produtos</p>
+              <Package2 className="w-3.5 h-3.5 text-muted-foreground/60" strokeWidth={1.5} />
+              <p className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-widest">Produtos</p>
             </div>
             <div className="flex flex-col gap-2">
               {PRODUCTS.map((prod) => {
@@ -283,16 +360,16 @@ export default function LeadDetailPage() {
                     className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium border transition-all duration-200
                       ${active
                         ? `${PRODUCT_COLORS[prod.value]} shadow-sm`
-                        : "bg-secondary/50 text-muted-foreground border-border hover:bg-secondary hover:text-foreground"
+                        : "bg-secondary/40 text-muted-foreground border-border/60 hover:bg-secondary hover:text-foreground"
                       }`}
                   >
                     <span>{prod.label}</span>
                     {isToggling ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin opacity-60" />
                     ) : active ? (
-                      <span className="w-4 h-4 rounded-full bg-current opacity-20 flex items-center justify-center">
-                        <span className="w-2 h-2 rounded-full bg-current opacity-100" />
-                      </span>
+                      <div className="w-4 h-4 rounded-full bg-current opacity-20 flex items-center justify-center">
+                        <div className="w-2 h-2 rounded-full bg-current opacity-100" />
+                      </div>
                     ) : null}
                   </button>
                 );
@@ -301,13 +378,13 @@ export default function LeadDetailPage() {
           </div>
 
           {/* Add interaction */}
-          <div className="bg-card border border-border rounded-2xl p-5 shadow-[0_2px_16px_rgba(0,0,0,0.3)]">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-3">Nova Interação</p>
+          <div className="bg-card border border-border rounded-2xl p-5 shadow-[0_2px_16px_rgba(0,0,0,0.25)]">
+            <p className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-widest mb-3">Nova Interação</p>
             <form onSubmit={handleAddInteraction} className="flex flex-col gap-3">
               <select
                 value={newType}
                 onChange={(e) => setNewType(e.target.value)}
-                className="h-10 rounded-xl bg-input border border-border text-sm text-foreground px-3 focus:outline-none focus:ring-2 focus:ring-primary"
+                className="h-10 rounded-xl bg-input border border-border text-sm text-foreground px-3 focus:outline-none focus:ring-1 focus:ring-primary"
               >
                 {INTERACTION_TYPES.map((t) => (
                   <option key={t.value} value={t.value}>{t.label}</option>
@@ -325,7 +402,10 @@ export default function LeadDetailPage() {
                 disabled={savingNote || !newNote.trim()}
                 className="h-9 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium transition-all flex items-center gap-2"
               >
-                {savingNote ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <><Plus className="w-3.5 h-3.5" strokeWidth={1.5} />Registrar</>}
+                {savingNote
+                  ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  : <><Plus className="w-3.5 h-3.5" strokeWidth={1.5} />Registrar</>
+                }
               </Button>
             </form>
           </div>
