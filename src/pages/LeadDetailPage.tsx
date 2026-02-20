@@ -250,7 +250,7 @@ export default function LeadDetailPage() {
             </div>
 
             {/* Contact info */}
-            <div className="flex flex-col gap-1.5 mb-5">
+            <div className="flex flex-col gap-1.5">
               {lead.email && (
                 <p className="text-sm text-muted-foreground flex items-center gap-2">
                   <Mail className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />{lead.email}
@@ -261,20 +261,13 @@ export default function LeadDetailPage() {
                   <Phone className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />{lead.telefone}
                 </p>
               )}
-              {lead.valor != null && (
-                <span className="self-start text-xs font-medium text-green-400 bg-green-400/10 px-2 py-0.5 rounded-full">
-                  R$ {Number(lead.valor).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                </span>
+              {(lead.cidade || lead.uf) && (
+                <p className="text-sm text-muted-foreground flex items-center gap-2">
+                  <MapPin className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />
+                  {[lead.cidade, lead.uf].filter(Boolean).join(" · ")}
+                </p>
               )}
             </div>
-
-            {/* Strategic notes */}
-            {lead.notas && (
-              <div className="bg-secondary/40 rounded-xl p-4">
-                <p className="text-xs text-muted-foreground/60 uppercase tracking-widest mb-1.5">Notas estratégicas</p>
-                <p className="text-sm text-foreground/80 leading-relaxed">{lead.notas}</p>
-              </div>
-            )}
           </div>
 
           {/* ── Activities block ── */}

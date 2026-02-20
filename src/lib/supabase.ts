@@ -16,6 +16,8 @@ export type Lead = {
   lead_status: string;
   valor: number | null;
   notas: string | null;
+  cidade: string | null;
+  uf: string | null;
   maturidade_decisao: string | null;
   score_estrategico: number | null;
   proximo_passo: string | null;
