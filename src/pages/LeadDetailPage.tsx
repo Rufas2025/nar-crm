@@ -232,9 +232,43 @@ export default function LeadDetailPage() {
   }
 
   async function handleStatusUpdate(newStatus: string) {
+    if (!id) return;
     setUpdatingStatus(true);
-    await supabase.from("leads").update({ lead_status: newStatus }).eq("id", id!);
-    setStatus(newStatus);
+
+    const { error, count } = await supabase
+      .from("leads")
+      .update({ lead_status: newStatus })
+      .eq("id", id)
+      .select("id")
+      .then((res) => ({ ...res, count: res.data?.length ?? 0 }));
+
+    if (error) {
+      console.error("[handleStatusUpdate] Erro ao atualizar status:", error);
+      setUpdatingStatus(false);
+      return;
+    }
+
+    if (count === 0) {
+      console.error("[handleStatusUpdate] Nenhuma linha atualizada — verifique permissões RLS ou o ID do lead.");
+      setUpdatingStatus(false);
+      return;
+    }
+
+    // Refetch lead do banco para garantir persistência
+    const { data: refreshed } = await supabase
+      .from("leads")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (refreshed) {
+      setLead(refreshed);
+      setStatus(refreshed.lead_status);
+    }
+
+    // Notifica pipeline para atualizar também
+    window.dispatchEvent(new CustomEvent("leads:refresh"));
+
     setUpdatingStatus(false);
   }
 
