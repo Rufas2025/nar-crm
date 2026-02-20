@@ -278,6 +278,7 @@ export default function LeadDetailPage() {
       leadUpdate.proximo_passo_descricao = newProximoPasso.trim();
     }
     if (newProximoPassoAt) {
+      // newProximoPassoAt is in "YYYY-MM-DDTHH:mm" — safe to pass to Date constructor
       leadUpdate.proximo_passo_at = new Date(newProximoPassoAt).toISOString();
     }
 
@@ -588,6 +589,7 @@ export default function LeadDetailPage() {
                   type="datetime-local"
                   value={newProximoPassoAt}
                   onChange={(e) => setNewProximoPassoAt(e.target.value)}
+                  onKeyDown={(e) => e.preventDefault()}
                   className="h-9 w-full rounded-xl bg-input/80 border border-border/60 text-sm text-foreground px-3 focus:outline-none focus:ring-1 focus:ring-primary"
                 />
               </div>
