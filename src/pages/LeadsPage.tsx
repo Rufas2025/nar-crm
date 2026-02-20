@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase, Lead, LeadProduct } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+
 import {
   Plus, Search, ChevronRight, X, Loader2,
   CheckCircle2, AlertTriangle, AlertCircle,
@@ -145,7 +145,7 @@ export default function LeadsPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [form, setForm] = useState({
     nome: "", email: "", telefone: "", empresa: "",
-    lead_status: "novo", inep: "", notas: "",
+    lead_status: "novo", inep: "", cidade: "", uf: "",
   });
   const [error, setError] = useState<string | null>(null);
 
@@ -226,12 +226,13 @@ export default function LeadsPage() {
       empresa: form.empresa || null,
       inep: form.inep || null,
       lead_status: form.lead_status,
-      notas: form.notas || null,
+      cidade: form.cidade || null,
+      uf: form.uf || null,
       user_id: authUser.id,
     });
     if (error) { setError(error.message); setSaving(false); return; }
     setShowModal(false);
-    setForm({ nome: "", email: "", telefone: "", empresa: "", lead_status: "novo", inep: "", notas: "" });
+    setForm({ nome: "", email: "", telefone: "", empresa: "", lead_status: "novo", inep: "", cidade: "", uf: "" });
     fetchLeads();
     setSaving(false);
   }
@@ -580,9 +581,22 @@ export default function LeadsPage() {
                     {STATUS_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
                   </select>
                 </div>
-                <div className="flex flex-col gap-1.5 col-span-2">
-                  <label className="text-xs text-muted-foreground">Notas</label>
-                  <Textarea value={form.notas} onChange={(e) => setForm({ ...form, notas: e.target.value })} className="rounded-xl bg-input border-border text-sm resize-none" rows={3} placeholder="Observações sobre o lead…" />
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs text-muted-foreground">Cidade</label>
+                  <Input value={form.cidade} onChange={(e) => setForm({ ...form, cidade: e.target.value })} className="h-10 rounded-xl bg-input border-border text-sm" placeholder="Ex: Campinas" />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs text-muted-foreground">UF</label>
+                  <select
+                    value={form.uf}
+                    onChange={(e) => setForm({ ...form, uf: e.target.value })}
+                    className="h-10 rounded-xl bg-input border border-border text-sm text-foreground px-3 focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                    <option value="">Selecionar</option>
+                    {["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"].map((uf) => (
+                      <option key={uf} value={uf}>{uf}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
