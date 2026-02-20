@@ -204,7 +204,7 @@ export default function LeadDetailPage() {
     setSavingLead(true);
     setEditLeadError(null);
 
-    const { error } = await supabase
+    const { data: updated, error } = await supabase
       .from("leads")
       .update({
         nome: editForm.nome,
@@ -216,7 +216,9 @@ export default function LeadDetailPage() {
         uf: editForm.uf || null,
         lead_status: editForm.lead_status,
       })
-      .eq("id", lead.id);
+      .eq("id", lead.id)
+      .select("*")
+      .single();
 
     if (error) {
       setEditLeadError(error.message);
@@ -224,11 +226,20 @@ export default function LeadDetailPage() {
       return;
     }
 
-    // Update local state
-    setLead((prev) => prev ? { ...prev, ...editForm } : prev);
-    setStatus(editForm.lead_status);
+    if (!updated) {
+      setEditLeadError("Nenhuma linha atualizada. Verifique permissões.");
+      setSavingLead(false);
+      return;
+    }
+
+    // Atualizar estado local com dado confirmado pelo banco
+    setLead(updated);
+    setStatus(updated.lead_status);
     setShowEditLead(false);
     setSavingLead(false);
+
+    // Sincronizar Pipeline
+    window.dispatchEvent(new CustomEvent("leads:refresh"));
   }
 
   async function handleStatusUpdate(newStatus: string) {
@@ -236,12 +247,13 @@ export default function LeadDetailPage() {
     console.log("[handleStatusUpdate] Iniciando update:", { id, newStatus, userId: user.id });
     setUpdatingStatus(true);
 
+    // Usar returning=* para confirmar que a linha foi realmente alterada
     const { data, error } = await supabase
       .from("leads")
       .update({ lead_status: newStatus })
       .eq("id", id)
-      .eq("user_id", user.id)
-      .select("id");
+      .select("*")
+      .single();
 
     console.log("[handleStatusUpdate] Resultado do update:", { data, error });
 
@@ -251,27 +263,17 @@ export default function LeadDetailPage() {
       return;
     }
 
-    if (!data || data.length === 0) {
-      console.error("[handleStatusUpdate] Nenhuma linha atualizada — RLS pode estar bloqueando.");
-      // Mesmo sem rowCount, atualiza estado local otimisticamente
-      setStatus(newStatus);
-      setLead((prev) => prev ? { ...prev, lead_status: newStatus } : prev);
+    if (!data) {
+      console.error("[handleStatusUpdate] Nenhuma linha retornada — RLS pode estar bloqueando.");
       setUpdatingStatus(false);
       return;
     }
 
-    // Refetch completo para confirmar persistência
-    const { data: refreshed } = await supabase
-      .from("leads")
-      .select("*")
-      .eq("id", id)
-      .single();
+    // Banco confirmou — atualizar estado local com dado real do banco
+    setLead(data);
+    setStatus(data.lead_status);
 
-    if (refreshed) {
-      setLead(refreshed);
-      setStatus(refreshed.lead_status);
-    }
-
+    // Notificar Pipeline para refetch completo
     window.dispatchEvent(new CustomEvent("leads:refresh"));
     setUpdatingStatus(false);
   }
