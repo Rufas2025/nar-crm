@@ -279,17 +279,48 @@ export default function LeadDetailPage() {
   async function handleToggleProduct(produto: string) {
     setTogglingProduct(produto);
     const already = products.find((p) => p.produto === produto);
+
     if (already) {
-      await supabase.from("lead_products").delete().eq("id", already.id);
-      setProducts((prev) => prev.filter((p) => p.id !== already.id));
+      // DELETE: remover vínculo existente
+      console.log("[handleToggleProduct] Removendo produto:", { id: already.id, lead_id: id, produto });
+      const { error, count } = await supabase
+        .from("lead_products")
+        .delete({ count: "exact" })
+        .eq("id", already.id)
+        .eq("lead_id", id!);
+
+      console.log("[handleToggleProduct] Resultado delete:", { error, count });
+
+      if (error) {
+        console.error("[handleToggleProduct] Erro ao remover produto:", error);
+      } else {
+        setProducts((prev) => prev.filter((p) => p.id !== already.id));
+      }
     } else {
-      const { data } = await supabase
+      // INSERT: criar vínculo — apenas se não existe (evitar duplicidade)
+      const duplicate = products.find((p) => p.produto === produto);
+      if (duplicate) {
+        console.warn("[handleToggleProduct] Produto já vinculado, ignorando insert.");
+        setTogglingProduct(null);
+        return;
+      }
+
+      console.log("[handleToggleProduct] Adicionando produto:", { lead_id: id, produto });
+      const { data, error } = await supabase
         .from("lead_products")
         .insert({ lead_id: id, produto })
         .select()
         .single();
-      if (data) setProducts((prev) => [...prev, data]);
+
+      console.log("[handleToggleProduct] Resultado insert:", { data, error });
+
+      if (error) {
+        console.error("[handleToggleProduct] Erro ao adicionar produto:", error);
+      } else if (data) {
+        setProducts((prev) => [...prev, data]);
+      }
     }
+
     setTogglingProduct(null);
   }
 
