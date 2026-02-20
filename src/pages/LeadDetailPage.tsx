@@ -81,6 +81,20 @@ type Activity = {
   created_at: string;
 };
 
+// ─── Próximo Passo helpers ────────────────────────────────────────────────────
+
+function proximoPassoStatus(at: string | null): { label: string; sub: string; color: string } | null {
+  if (!at) return null;
+  const now = new Date();
+  const target = new Date(at);
+  const diffMs = target.getTime() - now.setHours(0, 0, 0, 0);
+  const diffDays = Math.ceil(diffMs / 86400000);
+  if (diffDays < 0) return { label: "Atrasado", sub: `há ${Math.abs(diffDays)} dia${Math.abs(diffDays) !== 1 ? "s" : ""}`, color: "text-destructive bg-destructive/10 border-destructive/25" };
+  if (diffDays === 0) return { label: "Em dia", sub: "Hoje", color: "text-green-400 bg-green-400/10 border-green-400/25" };
+  if (diffDays === 1) return { label: "Em dia", sub: "Amanhã", color: "text-green-400 bg-green-400/10 border-green-400/25" };
+  return { label: "Em dia", sub: `Em ${diffDays} dias`, color: "text-green-400 bg-green-400/10 border-green-400/25" };
+}
+
 type EditLeadForm = {
   nome: string;
   email: string;
@@ -126,6 +140,10 @@ export default function LeadDetailPage() {
   const [newNote, setNewNote] = useState("");
   const [newType, setNewType] = useState("ligacao");
   const [savingNote, setSavingNote] = useState(false);
+
+  // Nova interação — próximo passo fields
+  const [newProximoPasso, setNewProximoPasso] = useState("");
+  const [newProximoPassoAt, setNewProximoPassoAt] = useState("");
 
   // Edit activity modal state
   const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
@@ -249,16 +267,34 @@ export default function LeadDetailPage() {
       descricao: newNote.trim(),
     });
 
-    // Update lead: ultimo_contato_at + proximo_passo
-    await supabase
-      .from("leads")
-      .update({
-        ultimo_contato_at: new Date().toISOString(),
-        proximo_passo: newNote.trim(),
-      })
-      .eq("id", id!);
+    // Build lead update payload
+    const leadUpdate: Record<string, unknown> = {
+      ultimo_contato_at: new Date().toISOString(),
+      proximo_passo: newNote.trim(),
+    };
+
+    // If próximo passo fields filled, persist them
+    if (newProximoPasso.trim()) {
+      leadUpdate.proximo_passo_descricao = newProximoPasso.trim();
+    }
+    if (newProximoPassoAt) {
+      leadUpdate.proximo_passo_at = new Date(newProximoPassoAt).toISOString();
+    }
+
+    await supabase.from("leads").update(leadUpdate).eq("id", id!);
+
+    // Update local lead state if próximo passo was set
+    if (newProximoPasso.trim() || newProximoPassoAt) {
+      setLead((prev) => prev ? {
+        ...prev,
+        proximo_passo_descricao: newProximoPasso.trim() || prev.proximo_passo_descricao,
+        proximo_passo_at: newProximoPassoAt ? new Date(newProximoPassoAt).toISOString() : prev.proximo_passo_at,
+      } as Lead : prev);
+    }
 
     setNewNote("");
+    setNewProximoPasso("");
+    setNewProximoPassoAt("");
     await fetchActivities();
     setSavingNote(false);
   }
@@ -537,6 +573,25 @@ export default function LeadDetailPage() {
                 rows={3}
                 className="rounded-xl bg-input border-border text-sm resize-none"
               />
+
+              {/* Próximo passo opcional */}
+              <div className="border-t border-border/40 pt-3 flex flex-col gap-2">
+                <p className="text-[10px] text-muted-foreground/50 uppercase tracking-widest font-medium">Próximo Passo (opcional)</p>
+                <input
+                  value={newProximoPasso}
+                  onChange={(e) => setNewProximoPasso(e.target.value.slice(0, 120))}
+                  placeholder="O que fazer depois? (máx. 120 caracteres)"
+                  maxLength={120}
+                  className="h-9 w-full rounded-xl bg-input/80 border border-border/60 text-sm text-foreground px-3 focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground/40"
+                />
+                <input
+                  type="datetime-local"
+                  value={newProximoPassoAt}
+                  onChange={(e) => setNewProximoPassoAt(e.target.value)}
+                  className="h-9 w-full rounded-xl bg-input/80 border border-border/60 text-sm text-foreground px-3 focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+              </div>
+
               <Button
                 type="submit"
                 disabled={savingNote || !newNote.trim()}

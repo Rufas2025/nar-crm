@@ -67,6 +67,20 @@ function truncate(str: string | null, n: number) {
   return str.length > n ? str.slice(0, n) + "…" : str;
 }
 
+type ProximoPassoStatus = { label: string; sub: string; variant: "atrasado" | "emdia" };
+
+function getProximoPassoStatus(at: string | null): ProximoPassoStatus | null {
+  if (!at) return null;
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const target = new Date(at);
+  const diffDays = Math.ceil((target.getTime() - todayStart.getTime()) / 86400000);
+  if (diffDays < 0) return { label: "Atrasado", sub: `há ${Math.abs(diffDays)}d`, variant: "atrasado" };
+  if (diffDays === 0) return { label: "Em dia", sub: "Hoje", variant: "emdia" };
+  if (diffDays === 1) return { label: "Em dia", sub: "Amanhã", variant: "emdia" };
+  return { label: "Em dia", sub: `Em ${diffDays} dias`, variant: "emdia" };
+}
+
 // ─── Quick views ─────────────────────────────────────────────────────────────
 
 const QUICK_VIEWS = [
@@ -86,7 +100,7 @@ const QUICK_VIEWS = [
     id: "sem_passo",
     label: "🟡 Sem Próximo Passo",
     dot: "bg-yellow-400",
-    filter: (l: Lead) => !l.proximo_passo || l.proximo_passo.trim() === "",
+    filter: (l: Lead) => !l.proximo_passo_at,
   },
   {
     id: "sem_contato",
@@ -606,10 +620,8 @@ export default function LeadsPage() {
           ) : (
             filtered.map((lead) => {
               const overdue = isOverdue(lead.data_decisao_prevista);
-              // Use latest activity description if available, else fall back to proximo_passo
-              const latestActivity = latestActivityMap[lead.id];
-              const proximoPasso = latestActivity ?? lead.proximo_passo;
-              const semPasso = !proximoPasso || proximoPasso.trim() === "";
+              const ppStatus = getProximoPassoStatus(lead.proximo_passo_at ?? null);
+              const ppDescricao = lead.proximo_passo_descricao;
               const contactDays = daysSince(lead.ultimo_contato_at);
               const semContato = contactDays === null || contactDays >= 7;
 
@@ -677,14 +689,21 @@ export default function LeadsPage() {
                   </div>
 
                   {/* Próximo passo */}
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    {semPasso ? (
-                      <span className="flex items-center gap-1 text-[10px] text-yellow-400 bg-yellow-400/10 border border-yellow-400/20 px-2 py-0.5 rounded-full font-medium">
+                  <div className="flex flex-col gap-0.5 min-w-0">
+                    {!ppStatus ? (
+                      <span className="flex items-center gap-1 text-[10px] text-yellow-400 bg-yellow-400/10 border border-yellow-400/20 px-2 py-0.5 rounded-full font-medium w-fit">
                         <AlertTriangle className="w-3 h-3 shrink-0" />
                         Sem próximo passo
                       </span>
                     ) : (
-                      <p className="text-xs text-muted-foreground truncate">{truncate(proximoPasso, 60)}</p>
+                      <div className="flex flex-col gap-0.5 min-w-0">
+                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border w-fit ${ppStatus.variant === "atrasado" ? "text-destructive bg-destructive/10 border-destructive/25" : "text-green-400 bg-green-400/10 border-green-400/25"}`}>
+                          {ppStatus.label} · {ppStatus.sub}
+                        </span>
+                        {ppDescricao && (
+                          <p className="text-[11px] text-muted-foreground truncate">{truncate(ppDescricao, 55)}</p>
+                        )}
+                      </div>
                     )}
                   </div>
 

@@ -21,6 +21,8 @@ export type Lead = {
   maturidade_decisao: string | null;
   score_estrategico: number | null;
   proximo_passo: string | null;
+  proximo_passo_descricao: string | null;
+  proximo_passo_at: string | null;
   data_decisao_prevista: string | null;
   ultimo_contato_at: string | null;
   stakeholders_mapeados: boolean | null;
