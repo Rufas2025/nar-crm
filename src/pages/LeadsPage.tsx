@@ -26,6 +26,8 @@ const MATURIDADE_OPTIONS = [
   { value: "decisao", label: "Decisão" },
 ];
 
+const UF_LIST = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
+
 // ─── Colors ──────────────────────────────────────────────────────────────────
 
 const statusColor: Record<string, string> = {
@@ -111,7 +113,7 @@ type Filters = {
   scoreMin: string;
   dataInicio: string;
   dataFim: string;
-  stakeholders: string; // "all" | "true" | "false"
+  stakeholders: string;
 };
 
 const DEFAULT_FILTERS: Filters = {
@@ -132,10 +134,180 @@ const PRODUCTS_MAP: Record<string, { label: string; color: string }> = {
   vibeflow: { label: "VibeFlow", color: "text-orange-400 bg-orange-400/10 border-orange-400/25" },
 };
 
+// ─── Shared form fields ───────────────────────────────────────────────────────
+
+type LeadForm = {
+  nome: string;
+  email: string;
+  telefone: string;
+  empresa: string;
+  lead_status: string;
+  inep: string;
+  cidade: string;
+  uf: string;
+};
+
+const EMPTY_FORM: LeadForm = {
+  nome: "", email: "", telefone: "", empresa: "",
+  lead_status: "novo", inep: "", cidade: "", uf: "",
+};
+
+// ─── Modal shared component ───────────────────────────────────────────────────
+
+const INPUT_CLASS = "h-10 rounded-xl bg-input/80 border border-border/60 text-sm text-foreground px-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 placeholder:text-muted-foreground/50";
+const SELECT_CLASS = "h-10 rounded-xl bg-input/80 border border-border/60 text-sm text-foreground px-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200";
+
+function LeadFormModal({
+  title,
+  form,
+  setForm,
+  onSubmit,
+  onClose,
+  saving,
+  error,
+}: {
+  title: string;
+  form: LeadForm;
+  setForm: (f: LeadForm) => void;
+  onSubmit: (e: React.FormEvent) => void;
+  onClose: () => void;
+  saving: boolean;
+  error: string | null;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+      <div className="w-full max-w-md rounded-2xl border border-blue-500/20 shadow-[0_8px_60px_rgba(0,0,0,0.6),0_0_0_1px_rgba(59,130,246,0.08),0_0_40px_rgba(59,130,246,0.06)] p-6"
+        style={{ background: "rgba(17,24,39,0.85)", backdropFilter: "blur(16px)" }}
+      >
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-base font-semibold text-foreground tracking-wide">{title}</h2>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
+            <X className="w-4 h-4" strokeWidth={1.5} />
+          </button>
+        </div>
+
+        <form onSubmit={onSubmit} className="flex flex-col gap-4">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-1.5 col-span-2">
+              <label className="text-xs text-muted-foreground">Nome *</label>
+              <input
+                value={form.nome}
+                onChange={(e) => setForm({ ...form, nome: e.target.value })}
+                required
+                className={INPUT_CLASS}
+                placeholder="Nome completo"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs text-muted-foreground">E-mail</label>
+              <input
+                type="email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                className={INPUT_CLASS}
+                placeholder="nome@empresa.com"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs text-muted-foreground">Telefone</label>
+              <input
+                value={form.telefone}
+                onChange={(e) => setForm({ ...form, telefone: e.target.value })}
+                className={INPUT_CLASS}
+                placeholder="(11) 99999-9999"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs text-muted-foreground">Instituição de Ensino</label>
+              <input
+                value={form.empresa}
+                onChange={(e) => setForm({ ...form, empresa: e.target.value })}
+                className={INPUT_CLASS}
+                placeholder="Nome da instituição"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs text-muted-foreground">INEP</label>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={form.inep}
+                onChange={(e) => {
+                  const v = e.target.value.replace(/\D/g, "");
+                  setForm({ ...form, inep: v });
+                }}
+                className={INPUT_CLASS}
+                placeholder="Código INEP"
+                minLength={7}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5 col-span-2">
+              <label className="text-xs text-muted-foreground">Status</label>
+              <select
+                value={form.lead_status}
+                onChange={(e) => setForm({ ...form, lead_status: e.target.value })}
+                className={SELECT_CLASS}
+              >
+                {STATUS_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+              </select>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs text-muted-foreground">Cidade</label>
+              <input
+                value={form.cidade}
+                onChange={(e) => setForm({ ...form, cidade: e.target.value })}
+                className={INPUT_CLASS}
+                placeholder="Ex: Campinas"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs text-muted-foreground">UF</label>
+              <select
+                value={form.uf}
+                onChange={(e) => setForm({ ...form, uf: e.target.value })}
+                className={SELECT_CLASS}
+              >
+                <option value="">Selecionar</option>
+                {UF_LIST.map((uf) => (
+                  <option key={uf} value={uf}>{uf}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {error && <p className="text-xs text-destructive bg-destructive/10 rounded-xl px-3 py-2">{error}</p>}
+
+          <div className="flex gap-2 pt-2">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={onClose}
+              className="flex-1 h-10 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground"
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              disabled={saving}
+              className="flex-1 h-10 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium shadow-[0_0_20px_hsl(var(--primary)/0.3)] transition-all duration-200"
+            >
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Salvar"}
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
+
 export default function LeadsPage() {
   const navigate = useNavigate();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [leadProductsMap, setLeadProductsMap] = useState<Record<string, string[]>>({});
+  // Map: lead_id -> latest activity description (or null)
+  const [latestActivityMap, setLatestActivityMap] = useState<Record<string, string | null>>({});
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -143,10 +315,7 @@ export default function LeadsPage() {
   const [activeView, setActiveView] = useState("all");
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [showFilters, setShowFilters] = useState(false);
-  const [form, setForm] = useState({
-    nome: "", email: "", telefone: "", empresa: "",
-    lead_status: "novo", inep: "", cidade: "", uf: "",
-  });
+  const [form, setForm] = useState<LeadForm>(EMPTY_FORM);
   const [error, setError] = useState<string | null>(null);
 
   async function fetchLeads() {
@@ -162,7 +331,14 @@ export default function LeadsPage() {
         .order("data_decisao_prevista", { ascending: true, nullsFirst: false }),
       supabase.from("lead_products").select("lead_id, produto"),
     ]);
-    if (leadsRes.data) setLeads(leadsRes.data);
+    if (leadsRes.data) {
+      setLeads(leadsRes.data);
+      // Fetch latest activity for each lead in one query
+      const leadIds = leadsRes.data.map((l) => l.id);
+      if (leadIds.length > 0) {
+        await fetchLatestActivities(leadIds);
+      }
+    }
     if (prodsRes.data) {
       const map: Record<string, string[]> = {};
       (prodsRes.data as Pick<LeadProduct, "lead_id" | "produto">[]).forEach(({ lead_id, produto }) => {
@@ -172,6 +348,26 @@ export default function LeadsPage() {
       setLeadProductsMap(map);
     }
     setLoading(false);
+  }
+
+  async function fetchLatestActivities(leadIds: string[]) {
+    // Fetch the latest activity per lead using a single query
+    const { data } = await supabase
+      .from("activities")
+      .select("lead_id, descricao, created_at")
+      .in("lead_id", leadIds)
+      .order("created_at", { ascending: false });
+
+    if (data) {
+      // Keep only the first (latest) entry per lead_id
+      const map: Record<string, string | null> = {};
+      for (const row of data) {
+        if (!(row.lead_id in map)) {
+          map[row.lead_id] = row.descricao;
+        }
+      }
+      setLatestActivityMap(map);
+    }
   }
 
   useEffect(() => { fetchLeads(); }, []);
@@ -232,7 +428,7 @@ export default function LeadsPage() {
     });
     if (error) { setError(error.message); setSaving(false); return; }
     setShowModal(false);
-    setForm({ nome: "", email: "", telefone: "", empresa: "", lead_status: "novo", inep: "", cidade: "", uf: "" });
+    setForm(EMPTY_FORM);
     fetchLeads();
     setSaving(false);
   }
@@ -319,7 +515,6 @@ export default function LeadsPage() {
       {/* Filter Panel */}
       {showFilters && (
         <div className="bg-card border border-border rounded-2xl p-4 mb-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          {/* Status */}
           <div className="flex flex-col gap-1">
             <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Status</label>
             <select
@@ -332,7 +527,6 @@ export default function LeadsPage() {
             </select>
           </div>
 
-          {/* Maturidade */}
           <div className="flex flex-col gap-1">
             <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Maturidade</label>
             <select
@@ -345,7 +539,6 @@ export default function LeadsPage() {
             </select>
           </div>
 
-          {/* Score mínimo */}
           <div className="flex flex-col gap-1">
             <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Score ≥</label>
             <input
@@ -358,7 +551,6 @@ export default function LeadsPage() {
             />
           </div>
 
-          {/* Data início */}
           <div className="flex flex-col gap-1">
             <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Decisão de</label>
             <input
@@ -369,7 +561,6 @@ export default function LeadsPage() {
             />
           </div>
 
-          {/* Data fim */}
           <div className="flex flex-col gap-1">
             <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Decisão até</label>
             <input
@@ -380,7 +571,6 @@ export default function LeadsPage() {
             />
           </div>
 
-          {/* Stakeholders */}
           <div className="flex flex-col gap-1">
             <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Stakeholders</label>
             <select
@@ -416,7 +606,10 @@ export default function LeadsPage() {
           ) : (
             filtered.map((lead) => {
               const overdue = isOverdue(lead.data_decisao_prevista);
-              const semPasso = !lead.proximo_passo || lead.proximo_passo.trim() === "";
+              // Use latest activity description if available, else fall back to proximo_passo
+              const latestActivity = latestActivityMap[lead.id];
+              const proximoPasso = latestActivity ?? lead.proximo_passo;
+              const semPasso = !proximoPasso || proximoPasso.trim() === "";
               const contactDays = daysSince(lead.ultimo_contato_at);
               const semContato = contactDays === null || contactDays >= 7;
 
@@ -491,7 +684,7 @@ export default function LeadsPage() {
                         Sem próximo passo
                       </span>
                     ) : (
-                      <p className="text-xs text-muted-foreground truncate">{truncate(lead.proximo_passo, 60)}</p>
+                      <p className="text-xs text-muted-foreground truncate">{truncate(proximoPasso, 60)}</p>
                     )}
                   </div>
 
@@ -529,90 +722,15 @@ export default function LeadsPage() {
 
       {/* Modal Novo Lead */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-          <div className="w-full max-w-md bg-card border border-border rounded-2xl shadow-[0_8px_60px_rgba(0,0,0,0.6)] p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-base font-semibold text-foreground">Novo Lead</h2>
-              <button onClick={() => setShowModal(false)} className="text-muted-foreground hover:text-foreground transition-colors">
-                <X className="w-4 h-4" strokeWidth={1.5} />
-              </button>
-            </div>
-
-            <form onSubmit={handleCreate} className="flex flex-col gap-4">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex flex-col gap-1.5 col-span-2">
-                  <label className="text-xs text-muted-foreground">Nome *</label>
-                  <Input value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} required className="h-10 rounded-xl bg-input border-border text-sm" placeholder="Nome completo" />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-muted-foreground">E-mail</label>
-                  <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="h-10 rounded-xl bg-input border-border text-sm" placeholder="nome@empresa.com" />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-muted-foreground">Telefone</label>
-                  <Input value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} className="h-10 rounded-xl bg-input border-border text-sm" placeholder="(11) 99999-9999" />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-muted-foreground">Instituição de Ensino</label>
-                  <Input value={form.empresa} onChange={(e) => setForm({ ...form, empresa: e.target.value })} className="h-10 rounded-xl bg-input border-border text-sm" placeholder="Nome da instituição" />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-muted-foreground">INEP</label>
-                  <Input
-                    type="text"
-                    inputMode="numeric"
-                    value={form.inep}
-                    onChange={(e) => {
-                      const v = e.target.value.replace(/\D/g, "");
-                      setForm({ ...form, inep: v });
-                    }}
-                    className="h-10 rounded-xl bg-input border-border text-sm"
-                    placeholder="Digite o código INEP da escola"
-                    minLength={7}
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5 col-span-2">
-                  <label className="text-xs text-muted-foreground">Status</label>
-                  <select
-                    value={form.lead_status}
-                    onChange={(e) => setForm({ ...form, lead_status: e.target.value })}
-                    className="h-10 rounded-xl bg-input border border-border text-sm text-foreground px-3 focus:outline-none focus:ring-2 focus:ring-primary"
-                  >
-                    {STATUS_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
-                  </select>
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-muted-foreground">Cidade</label>
-                  <Input value={form.cidade} onChange={(e) => setForm({ ...form, cidade: e.target.value })} className="h-10 rounded-xl bg-input border-border text-sm" placeholder="Ex: Campinas" />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-muted-foreground">UF</label>
-                  <select
-                    value={form.uf}
-                    onChange={(e) => setForm({ ...form, uf: e.target.value })}
-                    className="h-10 rounded-xl bg-input border border-border text-sm text-foreground px-3 focus:outline-none focus:ring-2 focus:ring-primary"
-                  >
-                    <option value="">Selecionar</option>
-                    {["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"].map((uf) => (
-                      <option key={uf} value={uf}>{uf}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {error && <p className="text-xs text-destructive bg-destructive/10 rounded-xl px-3 py-2">{error}</p>}
-
-              <div className="flex gap-2 pt-2">
-                <Button type="button" variant="ghost" onClick={() => setShowModal(false)} className="flex-1 h-10 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground">
-                  Cancelar
-                </Button>
-                <Button type="submit" disabled={saving} className="flex-1 h-10 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium">
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Salvar"}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <LeadFormModal
+          title="Novo Lead"
+          form={form}
+          setForm={setForm}
+          onSubmit={handleCreate}
+          onClose={() => { setShowModal(false); setError(null); setForm(EMPTY_FORM); }}
+          saving={saving}
+          error={error}
+        />
       )}
     </div>
   );

@@ -50,6 +50,8 @@ const PRODUCTS = [
   { value: "vibeflow", label: "VibeFlow" },
 ];
 
+const UF_LIST = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
+
 const PRODUCT_COLORS: Record<string, string> = {
   eduinfo:  "text-blue-400/90 bg-blue-400/8 border-blue-400/20",
   gennera:  "text-violet-400/90 bg-violet-400/8 border-violet-400/20",
@@ -65,6 +67,9 @@ const statusColor: Record<string, string> = {
   perdido: "text-destructive bg-destructive/10",
 };
 
+const INPUT_CLASS = "h-10 rounded-xl bg-input/80 border border-border/60 text-sm text-foreground px-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 placeholder:text-muted-foreground/50 w-full";
+const SELECT_CLASS = "h-10 rounded-xl bg-input/80 border border-border/60 text-sm text-foreground px-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 w-full";
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type Activity = {
@@ -74,6 +79,17 @@ type Activity = {
   tipo: string;
   descricao: string;
   created_at: string;
+};
+
+type EditLeadForm = {
+  nome: string;
+  email: string;
+  telefone: string;
+  empresa: string;
+  inep: string;
+  cidade: string;
+  uf: string;
+  lead_status: string;
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -111,11 +127,20 @@ export default function LeadDetailPage() {
   const [newType, setNewType] = useState("ligacao");
   const [savingNote, setSavingNote] = useState(false);
 
-  // Edit modal state
+  // Edit activity modal state
   const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
   const [editTipo, setEditTipo] = useState("");
   const [editDescricao, setEditDescricao] = useState("");
   const [savingEdit, setSavingEdit] = useState(false);
+
+  // Edit lead modal state
+  const [showEditLead, setShowEditLead] = useState(false);
+  const [editForm, setEditForm] = useState<EditLeadForm>({
+    nome: "", email: "", telefone: "", empresa: "",
+    inep: "", cidade: "", uf: "", lead_status: "novo",
+  });
+  const [savingLead, setSavingLead] = useState(false);
+  const [editLeadError, setEditLeadError] = useState<string | null>(null);
 
   async function fetchActivities() {
     const { data } = await supabase
@@ -139,6 +164,54 @@ export default function LeadDetailPage() {
   }
 
   useEffect(() => { fetchData(); }, [id]);
+
+  function openEditLead(l: Lead) {
+    setEditForm({
+      nome: l.nome ?? "",
+      email: l.email ?? "",
+      telefone: l.telefone ?? "",
+      empresa: l.empresa ?? "",
+      inep: l.inep ?? "",
+      cidade: l.cidade ?? "",
+      uf: l.uf ?? "",
+      lead_status: l.lead_status,
+    });
+    setEditLeadError(null);
+    setShowEditLead(true);
+  }
+
+  async function handleSaveLead(e: React.FormEvent) {
+    e.preventDefault();
+    if (!lead) return;
+    setSavingLead(true);
+    setEditLeadError(null);
+
+    const { error } = await supabase
+      .from("leads")
+      .update({
+        nome: editForm.nome,
+        email: editForm.email || null,
+        telefone: editForm.telefone || null,
+        empresa: editForm.empresa || null,
+        inep: editForm.inep || null,
+        cidade: editForm.cidade || null,
+        uf: editForm.uf || null,
+        lead_status: editForm.lead_status,
+      })
+      .eq("id", lead.id);
+
+    if (error) {
+      setEditLeadError(error.message);
+      setSavingLead(false);
+      return;
+    }
+
+    // Update local state
+    setLead((prev) => prev ? { ...prev, ...editForm } : prev);
+    setStatus(editForm.lead_status);
+    setShowEditLead(false);
+    setSavingLead(false);
+  }
 
   async function handleStatusUpdate(newStatus: string) {
     setUpdatingStatus(true);
@@ -250,14 +323,24 @@ export default function LeadDetailPage() {
 
   return (
     <div className="flex-1 p-8 max-w-4xl">
-      {/* Back */}
-      <button
-        onClick={() => navigate("/leads")}
-        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
-      >
-        <ArrowLeft className="w-4 h-4" strokeWidth={1.5} />
-        Voltar para Leads
-      </button>
+      {/* Back + Edit */}
+      <div className="flex items-center justify-between mb-6">
+        <button
+          onClick={() => navigate("/leads")}
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" strokeWidth={1.5} />
+          Voltar para Leads
+        </button>
+        <Button
+          onClick={() => openEditLead(lead)}
+          variant="ghost"
+          className="h-8 px-3 rounded-xl text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 border border-border/60 flex items-center gap-1.5 transition-all duration-150"
+        >
+          <Pencil className="w-3.5 h-3.5" strokeWidth={1.5} />
+          Editar Lead
+        </Button>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
         {/* ── Left column ── */}
@@ -514,6 +597,136 @@ export default function LeadDetailPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* ── Edit Lead Modal ── */}
+      {showEditLead && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+          <div
+            className="w-full max-w-md rounded-2xl border border-blue-500/20 shadow-[0_8px_60px_rgba(0,0,0,0.6),0_0_0_1px_rgba(59,130,246,0.08),0_0_40px_rgba(59,130,246,0.06)] p-6"
+            style={{ background: "rgba(17,24,39,0.85)", backdropFilter: "blur(16px)" }}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-base font-semibold text-foreground tracking-wide">Editar Lead</h2>
+              <button onClick={() => setShowEditLead(false)} className="text-muted-foreground hover:text-foreground transition-colors">
+                <FileText className="w-4 h-4 hidden" />
+                <span className="text-lg leading-none">&times;</span>
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveLead} className="flex flex-col gap-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-1.5 col-span-2">
+                  <label className="text-xs text-muted-foreground">Nome *</label>
+                  <input
+                    value={editForm.nome}
+                    onChange={(e) => setEditForm({ ...editForm, nome: e.target.value })}
+                    required
+                    className={INPUT_CLASS}
+                    placeholder="Nome completo"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs text-muted-foreground">E-mail</label>
+                  <input
+                    type="email"
+                    value={editForm.email}
+                    onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                    className={INPUT_CLASS}
+                    placeholder="nome@empresa.com"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs text-muted-foreground">Telefone</label>
+                  <input
+                    value={editForm.telefone}
+                    onChange={(e) => setEditForm({ ...editForm, telefone: e.target.value })}
+                    className={INPUT_CLASS}
+                    placeholder="(11) 99999-9999"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs text-muted-foreground">Instituição de Ensino</label>
+                  <input
+                    value={editForm.empresa}
+                    onChange={(e) => setEditForm({ ...editForm, empresa: e.target.value })}
+                    className={INPUT_CLASS}
+                    placeholder="Nome da instituição"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs text-muted-foreground">INEP</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={editForm.inep}
+                    onChange={(e) => {
+                      const v = e.target.value.replace(/\D/g, "");
+                      setEditForm({ ...editForm, inep: v });
+                    }}
+                    className={INPUT_CLASS}
+                    placeholder="Código INEP"
+                    minLength={7}
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5 col-span-2">
+                  <label className="text-xs text-muted-foreground">Status</label>
+                  <select
+                    value={editForm.lead_status}
+                    onChange={(e) => setEditForm({ ...editForm, lead_status: e.target.value })}
+                    className={SELECT_CLASS}
+                  >
+                    {STATUS_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+                  </select>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs text-muted-foreground">Cidade</label>
+                  <input
+                    value={editForm.cidade}
+                    onChange={(e) => setEditForm({ ...editForm, cidade: e.target.value })}
+                    className={INPUT_CLASS}
+                    placeholder="Ex: Campinas"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs text-muted-foreground">UF</label>
+                  <select
+                    value={editForm.uf}
+                    onChange={(e) => setEditForm({ ...editForm, uf: e.target.value })}
+                    className={SELECT_CLASS}
+                  >
+                    <option value="">Selecionar</option>
+                    {UF_LIST.map((uf) => (
+                      <option key={uf} value={uf}>{uf}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {editLeadError && (
+                <p className="text-xs text-destructive bg-destructive/10 rounded-xl px-3 py-2">{editLeadError}</p>
+              )}
+
+              <div className="flex gap-2 pt-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setShowEditLead(false)}
+                  className="flex-1 h-10 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={savingLead}
+                  className="flex-1 h-10 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium shadow-[0_0_20px_hsl(var(--primary)/0.3)] transition-all duration-200"
+                >
+                  {savingLead ? <Loader2 className="w-4 h-4 animate-spin" /> : "Salvar"}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
