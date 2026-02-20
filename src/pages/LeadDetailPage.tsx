@@ -294,40 +294,61 @@ export default function LeadDetailPage() {
     if (!newNote.trim()) return;
     setSavingNote(true);
 
-    await supabase.from("activities").insert({
+    // 1. Inserir atividade
+    const { error: actErr } = await supabase.from("activities").insert({
       lead_id: id,
       user_id: user?.id,
       tipo: newType,
       descricao: newNote.trim(),
     });
 
-    // Build lead update payload
+    if (actErr) {
+      console.error("[handleAddInteraction] Erro ao inserir atividade:", actErr);
+      setSavingNote(false);
+      return;
+    }
+
+    // 2. Montar payload de atualização do lead
     const leadUpdate: Record<string, unknown> = {
       ultimo_contato_at: new Date().toISOString(),
       proximo_passo: newNote.trim(),
     };
 
-    // If próximo passo fields filled, persist them
     if (newProximoPasso.trim()) {
       leadUpdate.proximo_passo_descricao = newProximoPasso.trim();
     }
+
+    // Sempre incluir proximo_passo_at — se vazio, mantém null explicitamente
     if (newProximoPassoAt) {
-      // newProximoPassoAt is in "YYYY-MM-DDTHH:mm" — safe to pass to Date constructor
       leadUpdate.proximo_passo_at = new Date(newProximoPassoAt).toISOString();
     }
 
-    await supabase.from("leads").update(leadUpdate).eq("id", id!);
+    // 3. Persistir no banco com verificação de rowCount
+    const updateRes = await supabase
+      .from("leads")
+      .update(leadUpdate)
+      .eq("id", id!)
+      .select("id");
 
-    // Update local lead state if próximo passo was set
-    if (newProximoPasso.trim() || newProximoPassoAt) {
-      setLead((prev) => prev ? {
-        ...prev,
-        proximo_passo_descricao: newProximoPasso.trim() || prev.proximo_passo_descricao,
-        proximo_passo_at: newProximoPassoAt ? new Date(newProximoPassoAt).toISOString() : prev.proximo_passo_at,
-      } as Lead : prev);
+    if (updateRes.error) {
+      console.error("[handleAddInteraction] Erro ao atualizar lead:", updateRes.error);
+    } else if (!updateRes.data || updateRes.data.length === 0) {
+      console.error("[handleAddInteraction] Nenhuma linha atualizada — verifique RLS ou ID do lead.");
     }
 
-    // Notify LeadsPage to refetch so pipeline updates proximo_passo_at
+    // 4. Refetch do lead para garantir que o estado local reflete o banco
+    const { data: refreshed } = await supabase
+      .from("leads")
+      .select("*")
+      .eq("id", id!)
+      .single();
+
+    if (refreshed) {
+      setLead(refreshed);
+      setStatus(refreshed.lead_status);
+    }
+
+    // 5. Notificar pipeline para atualizar
     window.dispatchEvent(new CustomEvent("leads:refresh"));
 
     setNewNote("");
