@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { supabase, Lead, Interaction } from "@/lib/supabase";
+import { supabase, Lead, Interaction, LeadProduct } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,6 +12,7 @@ import {
   Plus,
   Loader2,
   Building2,
+  Package2,
 } from "lucide-react";
 
 const STATUS_OPTIONS = [
@@ -30,6 +31,20 @@ const INTERACTION_TYPES = [
   { value: "outro", label: "Outro" },
 ];
 
+const PRODUCTS = [
+  { value: "eduinfo", label: "EduInfo" },
+  { value: "gennera", label: "Gennera" },
+  { value: "ecoclear", label: "EcoClear" },
+  { value: "vibeflow", label: "VibeFlow" },
+];
+
+const PRODUCT_COLORS: Record<string, string> = {
+  eduinfo:  "text-blue-400 bg-blue-400/10 border-blue-400/25",
+  gennera:  "text-violet-400 bg-violet-400/10 border-violet-400/25",
+  ecoclear: "text-green-400 bg-green-400/10 border-green-400/25",
+  vibeflow: "text-orange-400 bg-orange-400/10 border-orange-400/25",
+};
+
 const statusColor: Record<string, string> = {
   novo: "text-primary bg-primary/10",
   em_contato: "text-yellow-400 bg-yellow-400/10",
@@ -44,6 +59,8 @@ export default function LeadDetailPage() {
   const { user } = useAuth();
   const [lead, setLead] = useState<Lead | null>(null);
   const [interactions, setInteractions] = useState<Interaction[]>([]);
+  const [products, setProducts] = useState<LeadProduct[]>([]);
+  const [togglingProduct, setTogglingProduct] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("");
   const [updatingStatus, setUpdatingStatus] = useState(false);
@@ -52,12 +69,14 @@ export default function LeadDetailPage() {
   const [savingNote, setSavingNote] = useState(false);
 
   async function fetchData() {
-    const [leadRes, intRes] = await Promise.all([
+    const [leadRes, intRes, prodRes] = await Promise.all([
       supabase.from("leads").select("*").eq("id", id!).single(),
       supabase.from("interactions").select("*").eq("lead_id", id!).order("created_at", { ascending: false }),
+      supabase.from("lead_products").select("*").eq("lead_id", id!),
     ]);
     if (leadRes.data) { setLead(leadRes.data); setStatus(leadRes.data.lead_status); }
     if (intRes.data) setInteractions(intRes.data);
+    if (prodRes.data) setProducts(prodRes.data);
     setLoading(false);
   }
 
@@ -68,6 +87,23 @@ export default function LeadDetailPage() {
     await supabase.from("leads").update({ lead_status: newStatus }).eq("id", id!);
     setStatus(newStatus);
     setUpdatingStatus(false);
+  }
+
+  async function handleToggleProduct(produto: string) {
+    setTogglingProduct(produto);
+    const already = products.find((p) => p.produto === produto);
+    if (already) {
+      await supabase.from("lead_products").delete().eq("id", already.id);
+      setProducts((prev) => prev.filter((p) => p.id !== already.id));
+    } else {
+      const { data } = await supabase
+        .from("lead_products")
+        .insert({ lead_id: id, produto })
+        .select()
+        .single();
+      if (data) setProducts((prev) => [...prev, data]);
+    }
+    setTogglingProduct(null);
   }
 
   async function handleAddInteraction(e: React.FormEvent) {
@@ -101,6 +137,8 @@ export default function LeadDetailPage() {
     );
   }
 
+  const linkedProducts = products.map((p) => p.produto);
+
   return (
     <div className="flex-1 p-8 max-w-4xl">
       {/* Back */}
@@ -124,6 +162,22 @@ export default function LeadDetailPage() {
                   <p className="text-sm text-muted-foreground flex items-center gap-1.5 mt-1">
                     <Building2 className="w-3.5 h-3.5" strokeWidth={1.5} />{lead.empresa}
                   </p>
+                )}
+                {/* Product tags */}
+                {linkedProducts.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-2.5">
+                    {linkedProducts.map((p) => {
+                      const prod = PRODUCTS.find((x) => x.value === p);
+                      return (
+                        <span
+                          key={p}
+                          className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${PRODUCT_COLORS[p] || "text-muted-foreground bg-muted border-border"}`}
+                        >
+                          {prod?.label || p}
+                        </span>
+                      );
+                    })}
+                  </div>
                 )}
               </div>
               <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusColor[status] || "text-muted-foreground bg-muted"}`}>
@@ -208,6 +262,41 @@ export default function LeadDetailPage() {
                   {s.label}
                 </button>
               ))}
+            </div>
+          </div>
+
+          {/* Products multi-select */}
+          <div className="bg-card border border-border rounded-2xl p-5 shadow-[0_2px_16px_rgba(0,0,0,0.3)]">
+            <div className="flex items-center gap-2 mb-3">
+              <Package2 className="w-3.5 h-3.5 text-muted-foreground" strokeWidth={1.5} />
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Produtos</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              {PRODUCTS.map((prod) => {
+                const active = linkedProducts.includes(prod.value);
+                const isToggling = togglingProduct === prod.value;
+                return (
+                  <button
+                    key={prod.value}
+                    onClick={() => handleToggleProduct(prod.value)}
+                    disabled={isToggling}
+                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium border transition-all duration-200
+                      ${active
+                        ? `${PRODUCT_COLORS[prod.value]} shadow-sm`
+                        : "bg-secondary/50 text-muted-foreground border-border hover:bg-secondary hover:text-foreground"
+                      }`}
+                  >
+                    <span>{prod.label}</span>
+                    {isToggling ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin opacity-60" />
+                    ) : active ? (
+                      <span className="w-4 h-4 rounded-full bg-current opacity-20 flex items-center justify-center">
+                        <span className="w-2 h-2 rounded-full bg-current opacity-100" />
+                      </span>
+                    ) : null}
+                  </button>
+                );
+              })}
             </div>
           </div>
 

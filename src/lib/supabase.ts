@@ -26,6 +26,13 @@ export type Lead = {
   updated_at: string | null;
 };
 
+export type LeadProduct = {
+  id: string;
+  lead_id: string;
+  produto: string;
+  created_at: string;
+};
+
 export type Interaction = {
   id: string;
   lead_id: string;

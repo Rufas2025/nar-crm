@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase, Lead } from "@/lib/supabase";
+import { supabase, Lead, LeadProduct } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -125,9 +125,17 @@ const DEFAULT_FILTERS: Filters = {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
+const PRODUCTS_MAP: Record<string, { label: string; color: string }> = {
+  eduinfo:  { label: "EduInfo",  color: "text-blue-400 bg-blue-400/10 border-blue-400/25" },
+  gennera:  { label: "Gennera",  color: "text-violet-400 bg-violet-400/10 border-violet-400/25" },
+  ecoclear: { label: "EcoClear", color: "text-green-400 bg-green-400/10 border-green-400/25" },
+  vibeflow: { label: "VibeFlow", color: "text-orange-400 bg-orange-400/10 border-orange-400/25" },
+};
+
 export default function LeadsPage() {
   const navigate = useNavigate();
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [leadProductsMap, setLeadProductsMap] = useState<Record<string, string[]>>({});
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -145,13 +153,24 @@ export default function LeadsPage() {
     setLoading(true);
     const { data: { user: authUser } } = await supabase.auth.getUser();
     if (!authUser) { setLoading(false); return; }
-    const { data } = await supabase
-      .from("leads")
-      .select("*")
-      .eq("user_id", authUser.id)
-      .order("score_estrategico", { ascending: false, nullsFirst: false })
-      .order("data_decisao_prevista", { ascending: true, nullsFirst: false });
-    if (data) setLeads(data);
+    const [leadsRes, prodsRes] = await Promise.all([
+      supabase
+        .from("leads")
+        .select("*")
+        .eq("user_id", authUser.id)
+        .order("score_estrategico", { ascending: false, nullsFirst: false })
+        .order("data_decisao_prevista", { ascending: true, nullsFirst: false }),
+      supabase.from("lead_products").select("lead_id, produto"),
+    ]);
+    if (leadsRes.data) setLeads(leadsRes.data);
+    if (prodsRes.data) {
+      const map: Record<string, string[]> = {};
+      (prodsRes.data as Pick<LeadProduct, "lead_id" | "produto">[]).forEach(({ lead_id, produto }) => {
+        if (!map[lead_id]) map[lead_id] = [];
+        map[lead_id].push(produto);
+      });
+      setLeadProductsMap(map);
+    }
     setLoading(false);
   }
 
@@ -406,10 +425,27 @@ export default function LeadsPage() {
                   onClick={() => navigate(`/leads/${lead.id}`)}
                   className="grid grid-cols-[minmax(180px,1.8fr)_minmax(140px,1.2fr)_100px_90px_60px_minmax(120px,1.5fr)_90px_90px_36px] px-4 py-5 items-center hover:bg-accent/30 transition-colors duration-150 cursor-pointer group"
                 >
-                  {/* Coluna 1 — Instituição de Ensino */}
-                  <p className="text-[15px] font-semibold text-foreground truncate pr-2">
-                    {lead.empresa || "—"}
-                  </p>
+                  {/* Coluna 1 — Instituição de Ensino + produtos */}
+                  <div className="flex flex-col gap-1 min-w-0 pr-2">
+                    <p className="text-[15px] font-semibold text-foreground truncate leading-snug">
+                      {lead.empresa || "—"}
+                    </p>
+                    {leadProductsMap[lead.id]?.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {leadProductsMap[lead.id].map((p) => {
+                          const meta = PRODUCTS_MAP[p];
+                          return (
+                            <span
+                              key={p}
+                              className={`text-[9px] font-semibold px-1.5 py-px rounded-full border ${meta?.color || "text-muted-foreground bg-muted border-border"}`}
+                            >
+                              {meta?.label || p}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
 
                   {/* Coluna 2 — Decisor / Contato */}
                   <p className="text-xs text-muted-foreground truncate pr-2">{lead.nome || "—"}</p>
