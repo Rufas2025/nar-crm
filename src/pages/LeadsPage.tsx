@@ -603,8 +603,8 @@ export default function LeadsPage() {
       {/* Table */}
       <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-[0_2px_16px_rgba(0,0,0,0.3)]">
         {/* Header row */}
-        <div className="grid grid-cols-[minmax(180px,1.8fr)_minmax(140px,1.2fr)_100px_90px_60px_minmax(120px,1.5fr)_90px_90px_36px] px-4 py-3 border-b border-border">
-          {["Instituição de Ensino", "Decisor / Contato", "Status", "Maturidade", "Score", "Próximo Passo", "Decisão", "Contato", ""].map((h) => (
+        <div className="grid grid-cols-[minmax(180px,1.8fr)_minmax(140px,1.2fr)_100px_90px_60px_minmax(120px,1.5fr)_110px_36px] px-4 py-3 border-b border-border">
+          {["Instituição de Ensino", "Decisor / Contato", "Status", "Maturidade", "Score", "Próximo Passo", "Decisão", ""].map((h) => (
             <span key={h} className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest truncate">{h}</span>
           ))}
         </div>
@@ -622,14 +622,12 @@ export default function LeadsPage() {
               const overdue = isOverdue(lead.data_decisao_prevista);
               const ppStatus = getProximoPassoStatus(lead.proximo_passo_at ?? null);
               const ppDescricao = lead.proximo_passo_descricao;
-              const contactDays = daysSince(lead.ultimo_contato_at);
-              const semContato = contactDays === null || contactDays >= 7;
 
               return (
                 <div
                   key={lead.id}
                   onClick={() => navigate(`/leads/${lead.id}`)}
-                  className="grid grid-cols-[minmax(180px,1.8fr)_minmax(140px,1.2fr)_100px_90px_60px_minmax(120px,1.5fr)_90px_90px_36px] px-4 py-5 items-center hover:bg-accent/30 transition-colors duration-150 cursor-pointer group"
+                  className="grid grid-cols-[minmax(180px,1.8fr)_minmax(140px,1.2fr)_100px_90px_60px_minmax(120px,1.5fr)_110px_36px] px-4 py-5 items-center hover:bg-accent/30 transition-colors duration-150 cursor-pointer group"
                 >
                   {/* Coluna 1 — Instituição de Ensino + produtos */}
                   <div className="flex flex-col gap-1 min-w-0 pr-2">
@@ -707,8 +705,8 @@ export default function LeadsPage() {
                     )}
                   </div>
 
-                  {/* Data decisão */}
-                  <div>
+                  {/* Decisão — data + decisor */}
+                  <div className="flex flex-col gap-0.5 min-w-0">
                     {lead.data_decisao_prevista ? (
                       <span className={`text-xs font-medium ${overdue ? "text-destructive" : "text-muted-foreground"}`}>
                         {overdue && <AlertCircle className="w-3 h-3 inline mr-0.5 -mt-0.5" />}
@@ -717,16 +715,8 @@ export default function LeadsPage() {
                     ) : (
                       <span className="text-xs text-muted-foreground/50">—</span>
                     )}
-                  </div>
-
-                  {/* Último contato */}
-                  <div className="flex items-center gap-1">
-                    <span className={`text-xs ${semContato ? "text-destructive" : "text-muted-foreground"}`}>
-                      {lead.ultimo_contato_at ? (
-                        contactDays === 0 ? "Hoje" :
-                        contactDays === 1 ? "1d" :
-                        `${contactDays}d`
-                      ) : "—"}
+                    <span className="text-[11px] text-muted-foreground/60 truncate">
+                      {lead.nome || "—"}
                     </span>
                   </div>
 
