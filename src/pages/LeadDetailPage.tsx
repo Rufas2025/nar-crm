@@ -283,7 +283,6 @@ export default function LeadDetailPage() {
     const already = products.find((p) => p.produto === produto);
 
     if (already) {
-      // DELETE: remover vínculo existente
       console.log("[handleToggleProduct] Removendo produto:", { id: already.id, lead_id: id, produto });
       const { error, count } = await supabase
         .from("lead_products")
@@ -295,18 +294,8 @@ export default function LeadDetailPage() {
 
       if (error) {
         console.error("[handleToggleProduct] Erro ao remover produto:", error);
-      } else {
-        setProducts((prev) => prev.filter((p) => p.id !== already.id));
       }
     } else {
-      // INSERT: criar vínculo — apenas se não existe (evitar duplicidade)
-      const duplicate = products.find((p) => p.produto === produto);
-      if (duplicate) {
-        console.warn("[handleToggleProduct] Produto já vinculado, ignorando insert.");
-        setTogglingProduct(null);
-        return;
-      }
-
       console.log("[handleToggleProduct] Adicionando produto:", { lead_id: id, produto });
       const { data, error } = await supabase
         .from("lead_products")
@@ -318,10 +307,15 @@ export default function LeadDetailPage() {
 
       if (error) {
         console.error("[handleToggleProduct] Erro ao adicionar produto:", error);
-      } else if (data) {
-        setProducts((prev) => [...prev, data]);
       }
     }
+
+    // Refetch do banco para garantir fonte de verdade
+    const { data: refreshedProducts } = await supabase
+      .from("lead_products")
+      .select("*")
+      .eq("lead_id", id!);
+    if (refreshedProducts) setProducts(refreshedProducts);
 
     setTogglingProduct(null);
   }
