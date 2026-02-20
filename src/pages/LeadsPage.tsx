@@ -83,6 +83,13 @@ function getProximoPassoStatus(at: string | null): ProximoPassoStatus | null {
 
 // ─── Quick views ─────────────────────────────────────────────────────────────
 
+function isProximoPassoAtrasadoOuHoje(at: string | null): boolean {
+  if (!at) return false;
+  const todayEnd = new Date();
+  todayEnd.setHours(23, 59, 59, 999);
+  return new Date(at) <= todayEnd;
+}
+
 const QUICK_VIEWS = [
   {
     id: "all",
@@ -94,7 +101,7 @@ const QUICK_VIEWS = [
     id: "atencao",
     label: "🔴 Atenção Hoje",
     dot: "bg-destructive",
-    filter: (l: Lead) => !!l.data_decisao_prevista && isOverdue(l.data_decisao_prevista),
+    filter: (l: Lead) => isProximoPassoAtrasadoOuHoje(l.proximo_passo_at ?? null),
   },
   {
     id: "sem_passo",
@@ -385,6 +392,13 @@ export default function LeadsPage() {
   }
 
   useEffect(() => { fetchLeads(); }, []);
+
+  // Refetch when a lead detail page dispatches "leads:refresh" (e.g. after saving próximo passo)
+  useEffect(() => {
+    const handler = () => fetchLeads();
+    window.addEventListener("leads:refresh", handler);
+    return () => window.removeEventListener("leads:refresh", handler);
+  }, []);
 
   // Apply all filters + quick view + search
   const filtered = useMemo(() => {

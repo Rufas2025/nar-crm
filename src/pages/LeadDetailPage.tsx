@@ -293,6 +293,9 @@ export default function LeadDetailPage() {
       } as Lead : prev);
     }
 
+    // Notify LeadsPage to refetch so pipeline updates proximo_passo_at
+    window.dispatchEvent(new CustomEvent("leads:refresh"));
+
     setNewNote("");
     setNewProximoPasso("");
     setNewProximoPassoAt("");
