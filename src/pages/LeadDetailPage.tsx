@@ -207,13 +207,22 @@ export default function LeadDetailPage() {
     if (!editingActivity || !editDescricao.trim()) return;
     setSavingEdit(true);
 
-    await supabase
+    const { error } = await supabase
       .from("activities")
       .update({ tipo: editTipo, descricao: editDescricao.trim() })
       .eq("id", editingActivity.id);
 
+    if (!error) {
+      setActivities((prev) =>
+        prev.map((a) =>
+          a.id === editingActivity.id
+            ? { ...a, tipo: editTipo, descricao: editDescricao.trim() }
+            : a
+        )
+      );
+    }
+
     closeEditModal();
-    await fetchActivities();
     setSavingEdit(false);
   }
 
