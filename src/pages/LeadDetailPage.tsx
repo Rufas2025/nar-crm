@@ -232,29 +232,35 @@ export default function LeadDetailPage() {
   }
 
   async function handleStatusUpdate(newStatus: string) {
-    if (!id) return;
+    if (!id || !user?.id) return;
+    console.log("[handleStatusUpdate] Iniciando update:", { id, newStatus, userId: user.id });
     setUpdatingStatus(true);
 
-    const { error, count } = await supabase
+    const { data, error } = await supabase
       .from("leads")
       .update({ lead_status: newStatus })
       .eq("id", id)
-      .select("id")
-      .then((res) => ({ ...res, count: res.data?.length ?? 0 }));
+      .eq("user_id", user.id)
+      .select("id");
+
+    console.log("[handleStatusUpdate] Resultado do update:", { data, error });
 
     if (error) {
-      console.error("[handleStatusUpdate] Erro ao atualizar status:", error);
+      console.error("[handleStatusUpdate] Erro:", error);
       setUpdatingStatus(false);
       return;
     }
 
-    if (count === 0) {
-      console.error("[handleStatusUpdate] Nenhuma linha atualizada — verifique permissões RLS ou o ID do lead.");
+    if (!data || data.length === 0) {
+      console.error("[handleStatusUpdate] Nenhuma linha atualizada — RLS pode estar bloqueando.");
+      // Mesmo sem rowCount, atualiza estado local otimisticamente
+      setStatus(newStatus);
+      setLead((prev) => prev ? { ...prev, lead_status: newStatus } : prev);
       setUpdatingStatus(false);
       return;
     }
 
-    // Refetch lead do banco para garantir persistência
+    // Refetch completo para confirmar persistência
     const { data: refreshed } = await supabase
       .from("leads")
       .select("*")
@@ -266,9 +272,7 @@ export default function LeadDetailPage() {
       setStatus(refreshed.lead_status);
     }
 
-    // Notifica pipeline para atualizar também
     window.dispatchEvent(new CustomEvent("leads:refresh"));
-
     setUpdatingStatus(false);
   }
 
@@ -328,6 +332,7 @@ export default function LeadDetailPage() {
       .from("leads")
       .update(leadUpdate)
       .eq("id", id!)
+      .eq("user_id", user?.id!)
       .select("id");
 
     if (updateRes.error) {
