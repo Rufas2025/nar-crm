@@ -261,10 +261,10 @@ export default function LeadDetailPage() {
                   <Phone className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />{lead.telefone}
                 </p>
               )}
-              {(lead.cidade || lead.uf) && (
+              {lead.cidade && lead.uf && (
                 <p className="text-sm text-muted-foreground flex items-center gap-2">
                   <MapPin className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />
-                  {[lead.cidade, lead.uf].filter(Boolean).join(" · ")}
+                  {lead.cidade} / {lead.uf}
                 </p>
               )}
             </div>
