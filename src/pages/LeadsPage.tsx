@@ -379,8 +379,8 @@ export default function LeadsPage() {
       {/* Table */}
       <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-[0_2px_16px_rgba(0,0,0,0.3)]">
         {/* Header row */}
-        <div className="grid grid-cols-[minmax(160px,1.5fr)_minmax(120px,1fr)_100px_90px_60px_minmax(120px,1.5fr)_90px_90px_36px] px-4 py-3 border-b border-border">
-          {["Instituição / Contato", "Empresa", "Status", "Maturidade", "Score", "Próximo Passo", "Decisão", "Contato", ""].map((h) => (
+        <div className="grid grid-cols-[minmax(180px,1.8fr)_minmax(140px,1.2fr)_100px_90px_60px_minmax(120px,1.5fr)_90px_90px_36px] px-4 py-3 border-b border-border">
+          {["Instituição de Ensino", "Decisor / Contato", "Status", "Maturidade", "Score", "Próximo Passo", "Decisão", "Contato", ""].map((h) => (
             <span key={h} className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest truncate">{h}</span>
           ))}
         </div>
@@ -404,20 +404,15 @@ export default function LeadsPage() {
                 <div
                   key={lead.id}
                   onClick={() => navigate(`/leads/${lead.id}`)}
-                  className="grid grid-cols-[minmax(160px,1.5fr)_minmax(120px,1fr)_100px_90px_60px_minmax(120px,1.5fr)_90px_90px_36px] px-4 py-5 items-center hover:bg-accent/30 transition-colors duration-150 cursor-pointer group"
+                  className="grid grid-cols-[minmax(180px,1.8fr)_minmax(140px,1.2fr)_100px_90px_60px_minmax(120px,1.5fr)_90px_90px_36px] px-4 py-5 items-center hover:bg-accent/30 transition-colors duration-150 cursor-pointer group"
                 >
-                  {/* Instituição + Nome */}
-                  <div className="flex flex-col gap-0.5 min-w-0">
-                    <p className="text-[15px] font-semibold text-foreground truncate leading-snug">
-                      {lead.empresa || "—"}
-                    </p>
-                    <p className="text-xs text-muted-foreground truncate leading-snug">
-                      {lead.nome}
-                    </p>
-                  </div>
+                  {/* Coluna 1 — Instituição de Ensino */}
+                  <p className="text-[15px] font-semibold text-foreground truncate pr-2">
+                    {lead.empresa || "—"}
+                  </p>
 
-                  {/* Empresa (INEP ou vazio) */}
-                  <p className="text-xs text-muted-foreground truncate">{lead.inep || "—"}</p>
+                  {/* Coluna 2 — Decisor / Contato */}
+                  <p className="text-xs text-muted-foreground truncate pr-2">{lead.nome || "—"}</p>
 
                   {/* Status badge */}
                   <div>
