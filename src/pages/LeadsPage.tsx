@@ -1,12 +1,13 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase, Lead, LeadProduct } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import * as XLSX from "xlsx";
 
 import {
   Plus, Search, ChevronRight, X, Loader2,
-  CheckCircle2, AlertTriangle, AlertCircle,
+  CheckCircle2, AlertTriangle, AlertCircle, Upload,
 } from "lucide-react";
 
 // ─── Enums ───────────────────────────────────────────────────────────────────
@@ -321,6 +322,208 @@ function LeadFormModal({
   );
 }
 
+// ─── Import Modal ─────────────────────────────────────────────────────────────
+
+type ImportReport = { created: number; ignored: number; errors: number };
+
+const VALID_PRODUCTS = ["eduinfo", "gennera", "ecoclear", "vibeflow"];
+
+function ImportLeadsModal({ onClose, onDone }: { onClose: () => void; onDone: () => void }) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
+  const [rows, setRows] = useState<Record<string, string>[] | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [report, setReport] = useState<ImportReport | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
+
+  function handleFile(file: File) {
+    setImportError(null);
+    setReport(null);
+    setRows(null);
+    setFileName(file.name);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target!.result as ArrayBuffer);
+        const wb = XLSX.read(data, { type: "array" });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const parsed = XLSX.utils.sheet_to_json<Record<string, string>>(ws, { defval: "" });
+        if (!parsed.length) { setImportError("Arquivo vazio ou sem dados."); return; }
+        setRows(parsed);
+      } catch {
+        setImportError("Erro ao ler arquivo. Use .xlsx ou .csv.");
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  async function handleImport() {
+    if (!rows) return;
+    setImporting(true);
+    setImportError(null);
+
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    if (!authUser) { setImportError("Usuário não autenticado."); setImporting(false); return; }
+
+    // Fetch existing emails to deduplicate
+    const { data: existingLeads } = await supabase
+      .from("leads")
+      .select("email")
+      .eq("user_id", authUser.id);
+    const existingEmails = new Set(
+      (existingLeads ?? []).map((l: { email: string | null }) => (l.email ?? "").toLowerCase().trim()).filter(Boolean)
+    );
+
+    let created = 0, ignored = 0, errors = 0;
+
+    for (const row of rows) {
+      const email = String(row["email"] ?? "").toLowerCase().trim() || null;
+      const nome = String(row["nome_contato"] ?? "").trim();
+      const empresa = String(row["instituicao"] ?? "").trim() || null;
+      const telefone = String(row["telefone"] ?? "").trim() || null;
+      const inep = String(row["inep"] ?? "").replace(/\D/g, "") || null;
+      const cidade = String(row["cidade"] ?? "").trim() || null;
+      const uf = String(row["uf"] ?? "").trim().toUpperCase() || null;
+      const rawStatus = String(row["status"] ?? "").trim().toLowerCase();
+      const lead_status = ["novo","em_contato","qualificado","fechado","perdido"].includes(rawStatus) ? rawStatus : "novo";
+      const produtosRaw = String(row["produtos"] ?? "").trim();
+
+      if (!nome) { errors++; continue; }
+      if (email && existingEmails.has(email)) { ignored++; continue; }
+
+      const { data: inserted, error: insertErr } = await supabase
+        .from("leads")
+        .insert({ nome, email, telefone, empresa, inep, cidade, uf, lead_status, user_id: authUser.id })
+        .select("id")
+        .single();
+
+      if (insertErr || !inserted) { errors++; continue; }
+
+      if (email) existingEmails.add(email);
+
+      // Insert products
+      if (produtosRaw) {
+        const produtos = produtosRaw.split(",").map((p) => p.trim().toLowerCase()).filter((p) => VALID_PRODUCTS.includes(p));
+        if (produtos.length > 0) {
+          await supabase.from("lead_products").insert(
+            produtos.map((produto) => ({ lead_id: inserted.id, produto }))
+          );
+        }
+      }
+
+      created++;
+    }
+
+    setReport({ created, ignored, errors });
+    setImporting(false);
+    if (created > 0) onDone();
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+      <div
+        className="w-full max-w-md rounded-2xl border border-blue-500/20 shadow-[0_8px_60px_rgba(0,0,0,0.6)] p-6 flex flex-col gap-5"
+        style={{ background: "rgba(17,24,39,0.92)", backdropFilter: "blur(16px)" }}
+      >
+        <div className="flex items-center justify-between">
+          <h2 className="text-base font-semibold text-foreground tracking-wide flex items-center gap-2">
+            <Upload className="w-4 h-4 text-primary" />
+            Importar Leads
+          </h2>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
+            <X className="w-4 h-4" strokeWidth={1.5} />
+          </button>
+        </div>
+
+        {/* Column reference */}
+        <div className="bg-muted/40 rounded-xl px-4 py-3 border border-border/60">
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-2">Colunas esperadas</p>
+          <div className="flex flex-wrap gap-1">
+            {["instituicao","nome_contato","email","telefone","inep","cidade","uf","status","produtos"].map((c) => (
+              <span key={c} className="text-[10px] font-mono bg-primary/10 text-primary border border-primary/20 px-1.5 py-0.5 rounded">{c}</span>
+            ))}
+          </div>
+          <p className="text-[10px] text-muted-foreground mt-2">Coluna <span className="font-mono">produtos</span>: valores separados por vírgula (eduinfo, gennera, ecoclear, vibeflow).</p>
+        </div>
+
+        {/* Drop / pick file */}
+        {!report && (
+          <div
+            className="border-2 border-dashed border-border/60 rounded-xl py-8 flex flex-col items-center gap-3 cursor-pointer hover:border-primary/50 transition-colors"
+            onClick={() => fileRef.current?.click()}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f); }}
+          >
+            <Upload className="w-7 h-7 text-muted-foreground" strokeWidth={1.3} />
+            {fileName ? (
+              <p className="text-sm text-foreground font-medium">{fileName}</p>
+            ) : (
+              <p className="text-sm text-muted-foreground">Clique ou arraste o arquivo aqui</p>
+            )}
+            <p className="text-xs text-muted-foreground/70">.xlsx ou .csv</p>
+            <input
+              ref={fileRef}
+              type="file"
+              accept=".xlsx,.csv"
+              className="hidden"
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
+            />
+          </div>
+        )}
+
+        {rows && !report && (
+          <p className="text-xs text-muted-foreground text-center">{rows.length} linha{rows.length !== 1 ? "s" : ""} detectada{rows.length !== 1 ? "s" : ""}.</p>
+        )}
+
+        {importError && (
+          <p className="text-xs text-destructive bg-destructive/10 rounded-xl px-3 py-2">{importError}</p>
+        )}
+
+        {/* Report */}
+        {report && (
+          <div className="rounded-xl border border-border/60 bg-muted/20 p-4 flex flex-col gap-3">
+            <p className="text-sm font-semibold text-foreground">Importação concluída</p>
+            <div className="flex gap-4">
+              <div className="flex flex-col items-center gap-0.5">
+                <span className="text-xl font-bold text-green-400">{report.created}</span>
+                <span className="text-[10px] text-muted-foreground">criados</span>
+              </div>
+              <div className="flex flex-col items-center gap-0.5">
+                <span className="text-xl font-bold text-yellow-400">{report.ignored}</span>
+                <span className="text-[10px] text-muted-foreground">ignorados</span>
+              </div>
+              <div className="flex flex-col items-center gap-0.5">
+                <span className="text-xl font-bold text-destructive">{report.errors}</span>
+                <span className="text-[10px] text-muted-foreground">erros</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="flex gap-2 pt-1">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onClose}
+            className="flex-1 h-10 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground"
+          >
+            {report ? "Fechar" : "Cancelar"}
+          </Button>
+          {!report && (
+            <Button
+              onClick={handleImport}
+              disabled={!rows || importing}
+              className="flex-1 h-10 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium shadow-[0_0_20px_hsl(var(--primary)/0.3)] transition-all duration-200"
+            >
+              {importing ? <Loader2 className="w-4 h-4 animate-spin" /> : "Importar"}
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function LeadsPage() {
@@ -338,6 +541,7 @@ export default function LeadsPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [form, setForm] = useState<LeadForm>(EMPTY_FORM);
   const [error, setError] = useState<string | null>(null);
+  const [showImport, setShowImport] = useState(false);
 
   async function fetchLeads() {
     setLoading(true);
@@ -471,13 +675,23 @@ export default function LeadsPage() {
           <h1 className="text-2xl font-semibold text-foreground tracking-tight">Pipeline de Leads</h1>
           <p className="text-sm text-muted-foreground mt-0.5">{filtered.length} de {leads.length} lead{leads.length !== 1 ? "s" : ""}</p>
         </div>
-        <Button
-          onClick={() => setShowModal(true)}
-          className="h-9 px-4 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-sm shadow-[0_4px_16px_hsl(var(--primary)/0.3)] flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" strokeWidth={1.5} />
-          Novo Lead
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => setShowImport(true)}
+            variant="outline"
+            className="h-9 px-4 rounded-xl border-border text-muted-foreground hover:text-foreground font-medium text-sm flex items-center gap-2"
+          >
+            <Upload className="w-4 h-4" strokeWidth={1.5} />
+            Importar Leads
+          </Button>
+          <Button
+            onClick={() => setShowModal(true)}
+            className="h-9 px-4 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-sm shadow-[0_4px_16px_hsl(var(--primary)/0.3)] flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" strokeWidth={1.5} />
+            Novo Lead
+          </Button>
+        </div>
       </div>
 
       {/* Quick Views */}
@@ -753,6 +967,14 @@ export default function LeadsPage() {
           onClose={() => { setShowModal(false); setError(null); setForm(EMPTY_FORM); }}
           saving={saving}
           error={error}
+        />
+      )}
+
+      {/* Modal Importar Leads */}
+      {showImport && (
+        <ImportLeadsModal
+          onClose={() => setShowImport(false)}
+          onDone={() => { fetchLeads(); }}
         />
       )}
     </div>
