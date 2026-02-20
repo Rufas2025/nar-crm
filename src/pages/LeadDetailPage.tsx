@@ -63,8 +63,8 @@ type Activity = {
   id: string;
   lead_id: string;
   user_id: string;
-  type: string;
-  note: string;
+  tipo: string;
+  descricao: string;
   created_at: string;
 };
 
@@ -80,8 +80,8 @@ function formatActivityDate(iso: string) {
   return `${day} ${month2} · ${hours}:${minutes}`;
 }
 
-function getInteractionIcon(type: string) {
-  const found = INTERACTION_TYPES.find((t) => t.value === type);
+function getInteractionIcon(tipo: string) {
+  const found = INTERACTION_TYPES.find((t) => t.value === tipo);
   return found ? found.icon : FileText;
 }
 
@@ -157,8 +157,8 @@ export default function LeadDetailPage() {
     await supabase.from("activities").insert({
       lead_id: id,
       user_id: user?.id,
-      type: newType,
-      note: newNote.trim(),
+      tipo: newType,
+      descricao: newNote.trim(),
     });
     setNewNote("");
     await fetchActivities();
@@ -290,8 +290,8 @@ export default function LeadDetailPage() {
             ) : (
               <div className="px-6 py-4 flex flex-col gap-5">
                 {activities.map((act, idx) => {
-                  const Icon = getInteractionIcon(act.type);
-                  const typeLabel = INTERACTION_TYPES.find((t) => t.value === act.type)?.label || act.type;
+                  const Icon = getInteractionIcon(act.tipo);
+                  const typeLabel = INTERACTION_TYPES.find((t) => t.value === act.tipo)?.label || act.tipo;
                   return (
                     <div key={act.id}>
                       <div className="flex items-start gap-3">
@@ -304,7 +304,7 @@ export default function LeadDetailPage() {
                             <span className="text-xs font-medium text-foreground/80">{typeLabel}</span>
                             <span className="text-[11px] text-muted-foreground/60">{formatActivityDate(act.created_at)}</span>
                           </div>
-                          <p className="text-sm text-muted-foreground leading-relaxed">{act.note}</p>
+                          <p className="text-sm text-muted-foreground leading-relaxed">{act.descricao}</p>
                         </div>
                       </div>
                       {idx < activities.length - 1 && (
