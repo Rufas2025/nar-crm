@@ -240,44 +240,42 @@ export default function LeadDetailPage() {
   }
 
   async function updateLeadStatus(leadId: string, newStatus: string) {
-    if (!user?.id) return;
-    setUpdatingStatus(true);
+    const { data: { user: authUser } } = await supabase.auth.getUser();
 
-    try {
-      const { data, error } = await supabase
-        .from("leads")
-        .update({ lead_status: newStatus })
-        .eq("id", leadId)
-        .eq("user_id", user.id)
-        .select();
-
-      if (error) {
-        console.error("Erro ao atualizar status:", error);
-        return;
-      }
-
-      if (!data || data.length === 0) {
-        console.error("Nenhuma linha retornada após update — RLS bloqueou.");
-        return;
-      }
-
-      console.log("Status atualizado com sucesso:", data);
-
-      // Refetch lead do banco (fonte de verdade)
-      const { data: refreshed } = await supabase
-        .from("leads")
-        .select("*")
-        .eq("id", leadId)
-        .eq("user_id", user.id)
-        .single();
-
-      if (refreshed) setLead(refreshed);
-
-      // Notificar Pipeline para refetch completo
-      window.dispatchEvent(new CustomEvent("leads:refresh"));
-    } finally {
-      setUpdatingStatus(false);
+    if (!authUser) {
+      console.error("Usuário não autenticado. Não é possível atualizar status.");
+      return;
     }
+
+    const { data, error } = await supabase
+      .from("leads")
+      .update({ lead_status: newStatus })
+      .eq("id", leadId)
+      .eq("user_id", authUser.id)
+      .select();
+
+    if (error) {
+      console.error("Erro ao atualizar status:", error);
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      console.error("Nenhuma linha retornada após update — verifique RLS.");
+      return;
+    }
+
+    console.log("Status atualizado com sucesso:", data);
+
+    // Refetch lead do banco (fonte de verdade)
+    const { data: refreshed } = await supabase
+      .from("leads")
+      .select("*")
+      .eq("id", leadId)
+      .single();
+
+    if (refreshed) setLead(refreshed);
+
+    window.dispatchEvent(new CustomEvent("leads:refresh"));
   }
 
   async function handleToggleProduct(produto: string) {
