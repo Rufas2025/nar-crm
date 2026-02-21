@@ -245,9 +245,9 @@ function LeadFormModal({
                 <option value="telefone">Telefone</option>
               </select>
             </div>
-            {/* 3) Telefone (left) | Instituição (right) */}
+            {/* 3) Número (left) | Instituição (right) */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs text-muted-foreground">Telefone</label>
+              <label className="text-xs text-muted-foreground">Número</label>
               <input
                 value={form.telefone}
                 onChange={(e) => setForm({ ...form, telefone: e.target.value })}
