@@ -41,10 +41,26 @@ export default function DashboardPage() {
       });
   }, []);
 
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
+
   const total = leads.length;
   const novo = leads.filter((l) => l.lead_status === "novo").length;
   const emContato = leads.filter((l) => l.lead_status === "em_contato").length;
   const qualificado = leads.filter((l) => l.lead_status === "qualificado").length;
+
+  const atencaoHoje = leads.filter((l) => {
+    if (!l.proximo_passo_at) return false;
+    return new Date(l.proximo_passo_at) <= today;
+  }).length;
+
+  const semProximoPasso = leads.filter((l) => !l.proximo_passo_at).length;
+
+  const semContato7dias = leads.filter((l) => {
+    if (!l.ultimo_contato_at) return true;
+    const diff = Math.floor((Date.now() - new Date(l.ultimo_contato_at).getTime()) / 86400000);
+    return diff >= 7;
+  }).length;
 
   const navigate = useNavigate();
 
@@ -53,6 +69,12 @@ export default function DashboardPage() {
     { label: "Novos", value: novo, icon: TrendingUp, color: "text-blue-400", filter: "novo" },
     { label: "Em Contato", value: emContato, icon: Clock, color: "text-yellow-400", filter: "em_contato" },
     { label: "Qualificados", value: qualificado, icon: CheckCircle2, color: "text-green-400", filter: "qualificado" },
+  ];
+
+  const chips = [
+    { label: "🔴 Atenção Hoje", value: atencaoHoje, view: "atencao" },
+    { label: "🟡 Sem Próximo Passo", value: semProximoPasso, view: "sem_passo" },
+    { label: "🔵 Sem Contato 7+ dias", value: semContato7dias, view: "sem_contato" },
   ];
 
   return (
@@ -78,6 +100,24 @@ export default function DashboardPage() {
               {loading ? "–" : value}
             </p>
           </div>
+        ))}
+      </div>
+
+      {/* Quick-view chips */}
+      <div className="flex flex-wrap gap-2 mb-8">
+        {chips.map(({ label, value, view }) => (
+          <button
+            key={view}
+            onClick={() => navigate(`/leads?view=${view}`)}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-card border border-border text-xs font-medium text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors cursor-pointer"
+          >
+            {label}
+            {!loading && value > 0 && (
+              <span className="text-[10px] font-bold bg-muted px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                {value}
+              </span>
+            )}
+          </button>
         ))}
       </div>
 
