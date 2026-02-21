@@ -9,7 +9,10 @@ import * as XLSX from "xlsx";
 import {
   Plus, Search, ChevronRight, X, Loader2,
   CheckCircle2, AlertTriangle, AlertCircle, Upload,
+  Copy, Phone, Mail,
 } from "lucide-react";
+import { toast } from "sonner";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // ─── Enums ───────────────────────────────────────────────────────────────────
 
@@ -568,6 +571,8 @@ export default function LeadsPage() {
   const [error, setError] = useState<string | null>(null);
   const [showImport, setShowImport] = useState(false);
 
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
   async function fetchLeads() {
     setLoading(true);
     const { data: { user: authUser } } = await supabase.auth.getUser();
@@ -718,6 +723,51 @@ export default function LeadsPage() {
   }
 
   const activeFiltersCount = Object.values(filters).filter(Boolean).length;
+
+  const JUNK = new Set(["", "—", "-", "null", "undefined"]);
+  function isUsefulValue(v: string | null | undefined) {
+    if (!v) return false;
+    return !JUNK.has(v.trim().toLowerCase()) && v.trim().length > 0;
+  }
+
+  function toggleSelect(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    if (selectedIds.size === filtered.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filtered.map((l) => l.id)));
+    }
+  }
+
+  function clearSelection() { setSelectedIds(new Set()); }
+
+  function copyEmails() {
+    const selected = filtered.filter((l) => selectedIds.has(l.id));
+    const emails = selected.map((l) => l.email?.trim()).filter((e) => e && isUsefulValue(e) && e.includes("@")) as string[];
+    if (!emails.length) { toast.error("Nenhum e-mail válido nos leads selecionados."); return; }
+    navigator.clipboard.writeText(emails.join(", "));
+    toast.success(`${emails.length} e-mail${emails.length !== 1 ? "s" : ""} copiado${emails.length !== 1 ? "s" : ""}`);
+  }
+
+  function copyCelulares() {
+    const selected = filtered.filter((l) => selectedIds.has(l.id));
+    const nums = selected
+      .filter((l) => l.telefone_tipo === "celular" && isUsefulValue(l.telefone))
+      .map((l) => l.telefone!.replace(/[\s()\-]/g, ""))
+      .filter(Boolean);
+    if (!nums.length) { toast.error("Nenhum celular válido nos leads selecionados."); return; }
+    navigator.clipboard.writeText(nums.join("\n"));
+    toast.success(`${nums.length} celular${nums.length !== 1 ? "es" : ""} copiado${nums.length !== 1 ? "s" : ""}`);
+  }
+
+  const hasSelection = selectedIds.size > 0;
 
   return (
     <div className="flex-1 p-6 min-w-0">
@@ -880,10 +930,35 @@ export default function LeadsPage() {
         </div>
       )}
 
+      {/* Bulk action bar */}
+      {hasSelection && (
+        <div className="bg-primary/10 border border-primary/25 rounded-2xl px-4 py-3 mb-4 flex items-center gap-3 flex-wrap">
+          <span className="text-sm font-medium text-foreground">{selectedIds.size} lead{selectedIds.size !== 1 ? "s" : ""} selecionado{selectedIds.size !== 1 ? "s" : ""}</span>
+          <div className="flex items-center gap-2 ml-auto">
+            <Button variant="outline" size="sm" className="h-8 rounded-lg text-xs gap-1.5" onClick={copyEmails}>
+              <Mail className="w-3.5 h-3.5" /> Copiar e-mails
+            </Button>
+            <Button variant="outline" size="sm" className="h-8 rounded-lg text-xs gap-1.5" onClick={copyCelulares}>
+              <Phone className="w-3.5 h-3.5" /> Copiar celulares
+            </Button>
+            <Button variant="ghost" size="sm" className="h-8 rounded-lg text-xs text-muted-foreground" onClick={clearSelection}>
+              Limpar seleção
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Table */}
       <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-[0_2px_16px_rgba(0,0,0,0.3)]">
         {/* Header row */}
-        <div className="grid grid-cols-[minmax(180px,1.8fr)_minmax(140px,1.2fr)_100px_90px_60px_minmax(120px,1.5fr)_110px_36px] px-4 py-3 border-b border-border">
+        <div className="grid grid-cols-[36px_minmax(180px,1.8fr)_minmax(140px,1.2fr)_100px_90px_60px_minmax(120px,1.5fr)_110px_36px] px-4 py-3 border-b border-border items-center">
+          <div className="flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+            <Checkbox
+              checked={filtered.length > 0 && selectedIds.size === filtered.length}
+              onCheckedChange={toggleSelectAll}
+              className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+            />
+          </div>
           {["Instituição de Ensino", "Decisor / Contato", "Status", "Maturidade", "Score", "Próximo Passo", "Decisão", ""].map((h) => (
             <span key={h} className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest truncate">{h}</span>
           ))}
@@ -902,13 +977,22 @@ export default function LeadsPage() {
               const overdue = isOverdue(lead.data_decisao_prevista);
               const ppStatus = getProximoPassoStatus(lead.proximo_passo_at ?? null);
               const ppDescricao = lead.proximo_passo_descricao;
+              const isSelected = selectedIds.has(lead.id);
 
               return (
                 <div
                   key={lead.id}
                   onClick={() => navigate(`/leads/${lead.id}`)}
-                  className="grid grid-cols-[minmax(180px,1.8fr)_minmax(140px,1.2fr)_100px_90px_60px_minmax(120px,1.5fr)_110px_36px] px-4 py-5 items-center hover:bg-accent/30 transition-colors duration-150 cursor-pointer group"
+                  className={`grid grid-cols-[36px_minmax(180px,1.8fr)_minmax(140px,1.2fr)_100px_90px_60px_minmax(120px,1.5fr)_110px_36px] px-4 py-5 items-center hover:bg-accent/30 transition-colors duration-150 cursor-pointer group ${isSelected ? "bg-primary/5" : ""}`}
                 >
+                  {/* Checkbox */}
+                  <div className="flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+                    <Checkbox
+                      checked={isSelected}
+                      onCheckedChange={() => toggleSelect(lead.id)}
+                      className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                    />
+                  </div>
                   {/* Coluna 1 — Instituição de Ensino + produtos */}
                   <div className="flex flex-col gap-1 min-w-0 pr-2">
                     <p className="text-[15px] font-semibold text-foreground truncate leading-snug">
