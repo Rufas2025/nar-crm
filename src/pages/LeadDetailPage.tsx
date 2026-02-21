@@ -244,14 +244,15 @@ export default function LeadDetailPage() {
 
   async function handleStatusUpdate(newStatus: string) {
     if (!id || !user?.id) return;
+    if (lead?.lead_status === newStatus) return; // já é o status atual
     console.log("[handleStatusUpdate] Iniciando update:", { id, newStatus, userId: user.id });
     setUpdatingStatus(true);
 
-    // Usar returning=* para confirmar que a linha foi realmente alterada
     const { data, error } = await supabase
       .from("leads")
       .update({ lead_status: newStatus })
       .eq("id", id)
+      .eq("user_id", user.id)
       .select("*")
       .single();
 
@@ -596,7 +597,7 @@ export default function LeadDetailPage() {
                 <button
                   key={s.value}
                   onClick={() => handleStatusUpdate(s.value)}
-                  disabled={updatingStatus}
+                  disabled={updatingStatus || lead.lead_status === s.value}
                   className={`w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
                     ${status === s.value
                       ? "bg-primary text-primary-foreground shadow-[0_4px_12px_hsl(var(--primary)/0.25)]"
