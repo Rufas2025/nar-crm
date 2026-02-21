@@ -203,67 +203,92 @@ export default function LeadDetailPage() {
     setSavingLead(true);
     setEditLeadError(null);
 
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    const payload = {
+      nome: editForm.nome,
+      email: editForm.email || null,
+      telefone: editForm.telefone || null,
+      empresa: editForm.empresa || null,
+      inep: editForm.inep || null,
+      cidade: editForm.cidade || null,
+      uf: editForm.uf || null,
+      lead_status: editForm.lead_status,
+    };
+    console.log("[LEAD_UPDATE_DEBUG] === handleSaveLead ===");
+    console.log("[LEAD_UPDATE_DEBUG] authUser:", authUser?.id);
+    console.log("[LEAD_UPDATE_DEBUG] lead.id:", lead.id, "lead.user_id:", lead.user_id);
+    console.log("[LEAD_UPDATE_DEBUG] payload:", payload);
+
     const { data: updated, error } = await supabase
       .from("leads")
-      .update({
-        nome: editForm.nome,
-        email: editForm.email || null,
-        telefone: editForm.telefone || null,
-        empresa: editForm.empresa || null,
-        inep: editForm.inep || null,
-        cidade: editForm.cidade || null,
-        uf: editForm.uf || null,
-        lead_status: editForm.lead_status,
-      })
+      .update(payload)
       .eq("id", lead.id)
       .select("*")
       .single();
 
+    console.log("[LEAD_UPDATE_DEBUG] handleSaveLead result - error:", error);
+    console.log("[LEAD_UPDATE_DEBUG] handleSaveLead result - data:", updated);
+
     if (error) {
+      console.warn("[LEAD_UPDATE_DEBUG] ⚠️ handleSaveLead falhou. authUser.id:", authUser?.id, "lead.user_id:", lead.user_id, "match:", authUser?.id === lead.user_id);
       setEditLeadError(error.message);
       setSavingLead(false);
       return;
     }
 
     if (!updated) {
+      console.warn("[LEAD_UPDATE_DEBUG] ⚠️ handleSaveLead 0 linhas. Possível RLS block.");
       setEditLeadError("Nenhuma linha atualizada. Verifique permissões.");
       setSavingLead(false);
       return;
     }
 
-    setLead(updated);
+    // Refetch explícito
+    const { data: refreshed } = await supabase.from("leads").select("*").eq("id", lead.id).single();
+    console.log("[LEAD_UPDATE_DEBUG] handleSaveLead refetch:", refreshed?.lead_status);
+
+    setLead(refreshed || updated);
     setShowEditLead(false);
     setSavingLead(false);
 
-    // Sincronizar Pipeline
     window.dispatchEvent(new CustomEvent("leads:refresh"));
   }
 
   async function updateLeadStatus(leadId: string, newStatus: string) {
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    console.log("[LEAD_UPDATE_DEBUG] === updateLeadStatus ===");
+    console.log("[LEAD_UPDATE_DEBUG] authUser:", authUser?.id);
+    console.log("[LEAD_UPDATE_DEBUG] lead state id:", lead?.id, "lead state user_id:", lead?.user_id);
+    console.log("[LEAD_UPDATE_DEBUG] payload:", { lead_status: newStatus });
+    console.log("[LEAD_UPDATE_DEBUG] filter: .eq('id',", leadId, ")");
+
     const { data, error } = await supabase
       .from("leads")
       .update({ lead_status: newStatus })
       .eq("id", leadId)
       .select();
 
+    console.log("[LEAD_UPDATE_DEBUG] update result - error:", error);
+    console.log("[LEAD_UPDATE_DEBUG] update result - data:", data);
+    console.log("[LEAD_UPDATE_DEBUG] update result - rows returned:", data?.length ?? 0);
+
+    if (data?.length === 0) {
+      console.warn("[LEAD_UPDATE_DEBUG] ⚠️ 0 linhas atualizadas! Possível RLS/policy bloqueando. authUser.id:", authUser?.id, "lead.user_id:", lead?.user_id, "match:", authUser?.id === lead?.user_id);
+    }
+
     if (error) {
-      console.error("Erro ao atualizar status:", error);
+      console.error("[LEAD_UPDATE_DEBUG] Erro completo:", JSON.stringify(error));
       return;
     }
 
-    if (!data || data.length === 0) {
-      console.error("Nenhuma linha retornada após update — verifique RLS.");
-      return;
-    }
-
-    console.log("Status atualizado com sucesso:", data);
-
-    // Refetch lead do banco (fonte de verdade)
-    const { data: refreshed } = await supabase
+    // Refetch explícito
+    const { data: refreshed, error: refetchErr } = await supabase
       .from("leads")
       .select("*")
       .eq("id", leadId)
       .single();
+
+    console.log("[LEAD_UPDATE_DEBUG] refetch result:", refreshed?.lead_status, "error:", refetchErr);
 
     if (refreshed) setLead(refreshed);
 
@@ -346,6 +371,12 @@ export default function LeadDetailPage() {
       leadUpdate.proximo_passo_at = new Date(newProximoPassoAt).toISOString();
     }
 
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    console.log("[LEAD_UPDATE_DEBUG] === handleAddInteraction (lead update) ===");
+    console.log("[LEAD_UPDATE_DEBUG] authUser:", authUser?.id);
+    console.log("[LEAD_UPDATE_DEBUG] lead.id:", id, "lead.user_id:", lead?.user_id);
+    console.log("[LEAD_UPDATE_DEBUG] payload:", leadUpdate);
+
     // 3. Persistir no banco com verificação de rowCount
     const updateRes = await supabase
       .from("leads")
@@ -353,10 +384,14 @@ export default function LeadDetailPage() {
       .eq("id", id!)
       .select("id");
 
+    console.log("[LEAD_UPDATE_DEBUG] handleAddInteraction result - error:", updateRes.error);
+    console.log("[LEAD_UPDATE_DEBUG] handleAddInteraction result - data:", updateRes.data);
+    console.log("[LEAD_UPDATE_DEBUG] handleAddInteraction result - rows:", updateRes.data?.length ?? 0);
+
     if (updateRes.error) {
-      console.error("[handleAddInteraction] Erro ao atualizar lead:", updateRes.error);
+      console.error("[LEAD_UPDATE_DEBUG] Erro ao atualizar lead:", updateRes.error);
     } else if (!updateRes.data || updateRes.data.length === 0) {
-      console.error("[handleAddInteraction] Nenhuma linha atualizada — verifique RLS ou ID do lead.");
+      console.warn("[LEAD_UPDATE_DEBUG] ⚠️ handleAddInteraction 0 linhas. authUser.id:", authUser?.id, "lead.user_id:", lead?.user_id, "match:", authUser?.id === lead?.user_id);
     }
 
     // 4. Refetch do lead para garantir que o estado local reflete o banco
