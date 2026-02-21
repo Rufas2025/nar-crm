@@ -177,11 +177,12 @@ type LeadForm = {
   inep: string;
   cidade: string;
   uf: string;
+  alunado: string;
 };
 
 const EMPTY_FORM: LeadForm = {
   nome: "", email: "", telefone: "", telefone_tipo: "celular", empresa: "",
-  lead_status: "novo", inep: "", cidade: "", uf: "",
+  lead_status: "novo", inep: "", cidade: "", uf: "", alunado: "",
 };
 
 // ─── Modal shared component ───────────────────────────────────────────────────
@@ -273,7 +274,7 @@ function LeadFormModal({
                 placeholder="(11) 99999-9999"
               />
             </div>
-            {/* 4) INEP (left only) */}
+            {/* 4) INEP (left) | Alunado (right) */}
             <div className="flex flex-col gap-1.5">
               <label className="text-xs text-muted-foreground">INEP</label>
               <input
@@ -287,6 +288,20 @@ function LeadFormModal({
                 className={INPUT_CLASS}
                 placeholder="Código INEP"
                 minLength={7}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs text-muted-foreground">Alunado</label>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={form.alunado}
+                onChange={(e) => {
+                  const v = e.target.value.replace(/\D/g, "");
+                  setForm({ ...form, alunado: v });
+                }}
+                className={INPUT_CLASS}
+                placeholder="Qtd. de alunos"
               />
             </div>
             <div className="flex flex-col gap-1.5 col-span-2">
@@ -715,6 +730,7 @@ export default function LeadsPage() {
       lead_status: form.lead_status || "novo",
       cidade: form.cidade.trim() || null,
       uf: form.uf || null,
+      alunado: form.alunado ? parseInt(form.alunado, 10) : null,
       user_id: authUser.id,
     };
     console.log("[LEAD_CREATE_DEBUG] payload:", payload);
@@ -1012,7 +1028,7 @@ export default function LeadsPage() {
       {/* Table */}
       <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-[0_2px_16px_rgba(0,0,0,0.3)]">
         {/* Header row */}
-        <div className="grid grid-cols-[36px_minmax(180px,1.8fr)_minmax(140px,1.2fr)_100px_90px_60px_minmax(120px,1.5fr)_110px_36px] px-4 py-3 border-b border-border items-center">
+        <div className="grid grid-cols-[36px_minmax(180px,1.8fr)_minmax(140px,1.2fr)_100px_80px_60px_minmax(120px,1.5fr)_110px_36px] px-4 py-3 border-b border-border items-center">
           <div className="flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
             <Checkbox
               checked={filtered.length > 0 && selectedIds.size === filtered.length}
@@ -1020,7 +1036,7 @@ export default function LeadsPage() {
               className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
             />
           </div>
-          {["Instituição de Ensino", "Decisor / Contato", "Status", "Maturidade", "Score", "Próximo Passo", "Decisão", ""].map((h) => (
+          {["Instituição de Ensino", "Decisor / Contato", "Status", "Alunado", "Score", "Próximo Passo", "Decisão", ""].map((h) => (
             <span key={h} className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest truncate">{h}</span>
           ))}
         </div>
@@ -1044,7 +1060,7 @@ export default function LeadsPage() {
                 <div
                   key={lead.id}
                   onClick={() => navigate(`/leads/${lead.id}`)}
-                  className={`grid grid-cols-[36px_minmax(180px,1.8fr)_minmax(140px,1.2fr)_100px_90px_60px_minmax(120px,1.5fr)_110px_36px] px-4 py-5 items-center hover:bg-accent/30 transition-colors duration-150 cursor-pointer group ${isSelected ? "bg-primary/5" : ""}`}
+                  className={`grid grid-cols-[36px_minmax(180px,1.8fr)_minmax(140px,1.2fr)_100px_80px_60px_minmax(120px,1.5fr)_110px_36px] px-4 py-5 items-center hover:bg-accent/30 transition-colors duration-150 cursor-pointer group ${isSelected ? "bg-primary/5" : ""}`}
                 >
                   {/* Checkbox */}
                   <div className="flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
@@ -1086,14 +1102,14 @@ export default function LeadsPage() {
                     </span>
                   </div>
 
-                  {/* Maturidade badge */}
-                  <div>
-                    {lead.maturidade_decisao ? (
-                      <span className={`inline-flex text-[10px] font-medium px-1.5 py-0.5 rounded border ${maturidadeColor[lead.maturidade_decisao] || "text-muted-foreground bg-muted border-border"}`}>
-                        {MATURIDADE_OPTIONS.find((m) => m.value === lead.maturidade_decisao)?.label || lead.maturidade_decisao}
+                  {/* Alunado */}
+                  <div className="flex items-center justify-center">
+                    {lead.alunado != null ? (
+                      <span className="text-xs font-medium text-foreground tabular-nums">
+                        {lead.alunado.toLocaleString("pt-BR")}
                       </span>
                     ) : (
-                      <span className="text-[10px] text-muted-foreground/50">—</span>
+                      <span className="text-xs text-muted-foreground/50">—</span>
                     )}
                   </div>
 

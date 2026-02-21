@@ -27,6 +27,7 @@ export type Lead = {
   data_decisao_prevista: string | null;
   ultimo_contato_at: string | null;
   stakeholders_mapeados: boolean | null;
+  alunado: number | null;
   created_at: string;
   updated_at: string | null;
 };
