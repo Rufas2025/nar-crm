@@ -240,18 +240,10 @@ export default function LeadDetailPage() {
   }
 
   async function updateLeadStatus(leadId: string, newStatus: string) {
-    const { data: { user: authUser } } = await supabase.auth.getUser();
-
-    if (!authUser) {
-      console.error("Usuário não autenticado. Não é possível atualizar status.");
-      return;
-    }
-
     const { data, error } = await supabase
       .from("leads")
       .update({ lead_status: newStatus })
       .eq("id", leadId)
-      .eq("user_id", authUser.id)
       .select();
 
     if (error) {
@@ -359,7 +351,6 @@ export default function LeadDetailPage() {
       .from("leads")
       .update(leadUpdate)
       .eq("id", id!)
-      .eq("user_id", user?.id!)
       .select("id");
 
     if (updateRes.error) {
