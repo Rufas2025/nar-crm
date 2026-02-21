@@ -622,7 +622,7 @@ export default function LeadsPage() {
       return hasIdentifier;
     });
 
-    console.log("[PIPELINE_LEADS_RENDER_COUNT] total recebido:", leads.length, "| total após filtro de válidos:", validLeads.length);
+    console.log("[PIPELINE_LEADS_RENDER_COUNT]", { raw: leads?.length ?? 0, valid: validLeads.length });
 
     return validLeads.filter((l) => {
       if (!qv.filter(l)) return false;
