@@ -623,7 +623,7 @@ export default function LeadsPage() {
     console.log("[PIPELINE_LEADS_RENDER_COUNT]", {
       raw: leads.length,
       valid: validLeads.length,
-      first5ids: validLeads.slice(0, 5).map(l => l.id),
+      ignored: leads.length - validLeads.length,
     });
 
     return validLeads.filter((l) => {
