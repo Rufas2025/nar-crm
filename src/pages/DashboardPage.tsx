@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase, Lead } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -45,11 +46,13 @@ export default function DashboardPage() {
   const emContato = leads.filter((l) => l.lead_status === "em_contato").length;
   const qualificado = leads.filter((l) => l.lead_status === "qualificado").length;
 
+  const navigate = useNavigate();
+
   const cards = [
-    { label: "Total de Leads", value: total, icon: Users, color: "text-primary" },
-    { label: "Novos", value: novo, icon: TrendingUp, color: "text-blue-400" },
-    { label: "Em Contato", value: emContato, icon: Clock, color: "text-yellow-400" },
-    { label: "Qualificados", value: qualificado, icon: CheckCircle2, color: "text-green-400" },
+    { label: "Total de Leads", value: total, icon: Users, color: "text-primary", filter: "" },
+    { label: "Novos", value: novo, icon: TrendingUp, color: "text-blue-400", filter: "novo" },
+    { label: "Em Contato", value: emContato, icon: Clock, color: "text-yellow-400", filter: "em_contato" },
+    { label: "Qualificados", value: qualificado, icon: CheckCircle2, color: "text-green-400", filter: "qualificado" },
   ];
 
   return (
@@ -61,8 +64,12 @@ export default function DashboardPage() {
 
       {/* Metric cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {cards.map(({ label, value, icon: Icon, color }) => (
-          <div key={label} className="bg-card border border-border rounded-2xl p-5 shadow-[0_2px_16px_rgba(0,0,0,0.3)]">
+        {cards.map(({ label, value, icon: Icon, color, filter }) => (
+          <div
+            key={label}
+            onClick={() => navigate(filter ? `/leads?status=${filter}` : "/leads")}
+            className="bg-card border border-border rounded-2xl p-5 shadow-[0_2px_16px_rgba(0,0,0,0.3)] cursor-pointer hover:border-primary/40 transition-colors"
+          >
             <div className="flex items-center justify-between mb-4">
               <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest">{label}</p>
               <Icon className={`w-4 h-4 ${color}`} strokeWidth={1.5} />
