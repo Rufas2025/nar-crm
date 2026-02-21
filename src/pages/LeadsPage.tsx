@@ -622,7 +622,15 @@ export default function LeadsPage() {
       return hasIdentifier;
     });
 
-    console.log("[PIPELINE_LEADS_RENDER_COUNT]", { raw: leads?.length ?? 0, valid: validLeads.length });
+    console.log("[LEADS_DEBUG] componente: LeadsPage");
+    console.log("[LEADS_DEBUG] origem: supabase.from('leads').select('*').eq('user_id', authUser.id)");
+    console.log("[LEADS_DEBUG] array bruto (leads):", leads.length);
+    console.log("[LEADS_DEBUG] array após filtro válidos (validLeads):", validLeads.length);
+    console.log("[LEADS_DEBUG] placeholder rows: NÃO (sem lógica de fillers)");
+    console.log("[LEADS_DEBUG] key no map: lead.id (não index)");
+    console.log("[LEADS_DEBUG] primeiros 5 validLeads:", validLeads.slice(0, 5).map(l => ({
+      id: l.id, nome: l.nome, empresa: l.empresa, email: l.email, telefone: l.telefone, lead_status: l.lead_status
+    })));
 
     return validLeads.filter((l) => {
       if (!qv.filter(l)) return false;
