@@ -778,11 +778,20 @@ export default function LeadsPage() {
   async function deleteSelected() {
     setDeleting(true);
     const ids = Array.from(selectedIds);
-    const { error } = await supabase.from("leads").delete().in("id", ids);
+    console.log("[BULK_DELETE] Attempting to delete", ids.length, "leads:", ids);
+    const { error, count } = await supabase
+      .from("leads")
+      .delete({ count: "exact" })
+      .in("id", ids);
+    console.log("[BULK_DELETE] Result — error:", error, "count:", count);
     if (error) {
+      console.error("[BULK_DELETE] Error:", error);
       toast.error("Erro ao excluir leads: " + error.message);
+    } else if (count === 0) {
+      console.warn("[BULK_DELETE] Nenhuma linha excluída — provável falta de policy RLS DELETE");
+      toast.error("Nenhum lead foi excluído. Verifique as permissões (RLS) no banco de dados.");
     } else {
-      toast.success(`${ids.length} lead${ids.length !== 1 ? "s" : ""} excluído${ids.length !== 1 ? "s" : ""}`);
+      toast.success(`${count} lead${count !== 1 ? "s" : ""} excluído${count !== 1 ? "s" : ""}`);
       clearSelection();
       fetchLeads();
     }
