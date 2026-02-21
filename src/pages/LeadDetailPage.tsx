@@ -99,6 +99,7 @@ type EditLeadForm = {
   nome: string;
   email: string;
   telefone: string;
+  telefone_tipo: string;
   empresa: string;
   inep: string;
   cidade: string;
@@ -153,7 +154,7 @@ export default function LeadDetailPage() {
   // Edit lead modal state
   const [showEditLead, setShowEditLead] = useState(false);
   const [editForm, setEditForm] = useState<EditLeadForm>({
-    nome: "", email: "", telefone: "", empresa: "",
+    nome: "", email: "", telefone: "", telefone_tipo: "celular", empresa: "",
     inep: "", cidade: "", uf: "", lead_status: "novo",
   });
   const [savingLead, setSavingLead] = useState(false);
@@ -187,6 +188,7 @@ export default function LeadDetailPage() {
       nome: l.nome ?? "",
       email: l.email ?? "",
       telefone: l.telefone ?? "",
+      telefone_tipo: l.telefone_tipo ?? "celular",
       empresa: l.empresa ?? "",
       inep: l.inep ?? "",
       cidade: l.cidade ?? "",
@@ -208,6 +210,7 @@ export default function LeadDetailPage() {
       nome: editForm.nome,
       email: editForm.email || null,
       telefone: editForm.telefone || null,
+      telefone_tipo: editForm.telefone_tipo || "celular",
       empresa: editForm.empresa || null,
       inep: editForm.inep || null,
       cidade: editForm.cidade || null,
@@ -548,7 +551,11 @@ export default function LeadDetailPage() {
               )}
               {lead.telefone && (
                 <p className="text-sm text-muted-foreground flex items-center gap-2">
-                  <Phone className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />{lead.telefone}
+                  <Phone className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />
+                  {lead.telefone}
+                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-muted border border-border text-muted-foreground">
+                    {(lead.telefone_tipo ?? "celular") === "celular" ? "Celular" : "Telefone"}
+                  </span>
                 </p>
               )}
               {lead.cidade && lead.uf && (
@@ -806,6 +813,17 @@ export default function LeadDetailPage() {
                     className={INPUT_CLASS}
                     placeholder="nome@empresa.com"
                   />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs text-muted-foreground">Tipo de Contato</label>
+                  <select
+                    value={editForm.telefone_tipo}
+                    onChange={(e) => setEditForm({ ...editForm, telefone_tipo: e.target.value })}
+                    className={SELECT_CLASS}
+                  >
+                    <option value="celular">Celular</option>
+                    <option value="telefone">Telefone</option>
+                  </select>
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs text-muted-foreground">Telefone</label>

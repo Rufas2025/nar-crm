@@ -163,6 +163,7 @@ type LeadForm = {
   nome: string;
   email: string;
   telefone: string;
+  telefone_tipo: string;
   empresa: string;
   lead_status: string;
   inep: string;
@@ -171,7 +172,7 @@ type LeadForm = {
 };
 
 const EMPTY_FORM: LeadForm = {
-  nome: "", email: "", telefone: "", empresa: "",
+  nome: "", email: "", telefone: "", telefone_tipo: "celular", empresa: "",
   lead_status: "novo", inep: "", cidade: "", uf: "",
 };
 
@@ -230,6 +231,17 @@ function LeadFormModal({
                 className={INPUT_CLASS}
                 placeholder="nome@empresa.com"
               />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs text-muted-foreground">Tipo de Contato</label>
+              <select
+                value={form.telefone_tipo}
+                onChange={(e) => setForm({ ...form, telefone_tipo: e.target.value })}
+                className={SELECT_CLASS}
+              >
+                <option value="celular">Celular</option>
+                <option value="telefone">Telefone</option>
+              </select>
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-xs text-muted-foreground">Telefone</label>
@@ -683,6 +695,7 @@ export default function LeadsPage() {
       nome: trimmedNome,
       email: form.email.trim() || null,
       telefone: form.telefone.trim() || null,
+      telefone_tipo: form.telefone_tipo || "celular",
       empresa: trimmedEmpresa,
       inep: form.inep.trim() || null,
       lead_status: form.lead_status || "novo",
