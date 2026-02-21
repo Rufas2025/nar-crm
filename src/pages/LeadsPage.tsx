@@ -391,11 +391,14 @@ function ImportLeadsModal({ onClose, onDone }: { onClose: () => void; onDone: ()
       if (!nome) { errors++; continue; }
       if (email && existingEmails.has(email)) { ignored++; continue; }
 
+      const importPayload = { nome, email, telefone, empresa, inep, cidade, uf, lead_status, user_id: authUser.id };
+      console.log("[LEAD_CREATE_DEBUG] import payload:", importPayload);
       const { data: inserted, error: insertErr } = await supabase
         .from("leads")
-        .insert({ nome, email, telefone, empresa, inep, cidade, uf, lead_status, user_id: authUser.id })
+        .insert(importPayload)
         .select("id")
         .single();
+      console.log("[LEAD_CREATE_DEBUG] import result:", { data: inserted, error: insertErr });
 
       if (insertErr || !inserted) { errors++; continue; }
 
@@ -642,12 +645,14 @@ export default function LeadsPage() {
     setSaving(true);
     setError(null);
     const { data: { user: authUser } } = await supabase.auth.getUser();
+    console.log("[LEAD_CREATE_AUTH] authUser:", authUser?.id ?? "NÃO AUTENTICADO");
     if (!authUser) {
+      console.error("[LEAD_CREATE_AUTH] Bloqueando insert: usuário não autenticado");
       setError("Usuário não autenticado.");
       setSaving(false);
       return;
     }
-    const { error } = await supabase.from("leads").insert({
+    const payload = {
       nome: form.nome,
       email: form.email || null,
       telefone: form.telefone || null,
@@ -657,7 +662,10 @@ export default function LeadsPage() {
       cidade: form.cidade || null,
       uf: form.uf || null,
       user_id: authUser.id,
-    });
+    };
+    console.log("[LEAD_CREATE_DEBUG] payload:", payload);
+    const { data: insertedData, error } = await supabase.from("leads").insert(payload).select();
+    console.log("[LEAD_CREATE_DEBUG] result:", { data: insertedData, error, rows: insertedData?.length ?? 0 });
     if (error) { setError(error.message); setSaving(false); return; }
     setShowModal(false);
     setForm(EMPTY_FORM);
