@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase, Lead, LeadProduct } from "@/lib/supabase";
+import { isValidLead } from "@/lib/leadValidation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import * as XLSX from "xlsx";
@@ -617,15 +618,7 @@ export default function LeadsPage() {
     const qv = QUICK_VIEWS.find((v) => v.id === activeView)!;
     const q = search.toLowerCase();
 
-    // Remove leads sem nenhum identificador útil
-    const validLeads = leads.filter((l) => {
-      const hasIdentifier =
-        (l.empresa ?? "").trim().length > 0 ||
-        (l.nome ?? "").trim().length > 0 ||
-        (l.email ?? "").trim().length > 0 ||
-        (l.telefone ?? "").trim().length > 0;
-      return hasIdentifier;
-    });
+    const validLeads = leads.filter(isValidLead);
 
     console.log("[PIPELINE_LEADS_RENDER_COUNT]", {
       raw: leads.length,
