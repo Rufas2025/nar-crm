@@ -616,7 +616,7 @@ export default function LeadsPage() {
       if (!qv.filter(l)) return false;
 
       if (q && !(
-        l.nome.toLowerCase().includes(q) ||
+        (l.nome ?? "").toLowerCase().includes(q) ||
         (l.empresa ?? "").toLowerCase().includes(q) ||
         (l.email ?? "").toLowerCase().includes(q) ||
         (l.inep ?? "").toLowerCase().includes(q)
