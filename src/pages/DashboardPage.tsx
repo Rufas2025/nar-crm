@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase, Lead } from "@/lib/supabase";
+import { isValidLead } from "@/lib/leadValidation";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   Users,
@@ -41,22 +42,24 @@ export default function DashboardPage() {
       });
   }, []);
 
+  const validLeads = leads.filter(isValidLead);
+
   const today = new Date();
   today.setHours(23, 59, 59, 999);
 
-  const total = leads.length;
-  const novo = leads.filter((l) => l.lead_status === "novo").length;
-  const emContato = leads.filter((l) => l.lead_status === "em_contato").length;
-  const qualificado = leads.filter((l) => l.lead_status === "qualificado").length;
+  const total = validLeads.length;
+  const novo = validLeads.filter((l) => l.lead_status === "novo").length;
+  const emContato = validLeads.filter((l) => l.lead_status === "em_contato").length;
+  const qualificado = validLeads.filter((l) => l.lead_status === "qualificado").length;
 
-  const atencaoHoje = leads.filter((l) => {
+  const atencaoHoje = validLeads.filter((l) => {
     if (!l.proximo_passo_at) return false;
     return new Date(l.proximo_passo_at) <= today;
   }).length;
 
-  const semProximoPasso = leads.filter((l) => !l.proximo_passo_at).length;
+  const semProximoPasso = validLeads.filter((l) => !l.proximo_passo_at).length;
 
-  const semContato7dias = leads.filter((l) => {
+  const semContato7dias = validLeads.filter((l) => {
     if (!l.ultimo_contato_at) return true;
     const diff = Math.floor((Date.now() - new Date(l.ultimo_contato_at).getTime()) / 86400000);
     return diff >= 7;
@@ -129,10 +132,10 @@ export default function DashboardPage() {
         <div className="divide-y divide-border">
           {loading ? (
             <p className="text-sm text-muted-foreground px-6 py-8 text-center">Carregando…</p>
-          ) : leads.length === 0 ? (
+          ) : validLeads.length === 0 ? (
             <p className="text-sm text-muted-foreground px-6 py-8 text-center">Nenhum lead cadastrado ainda.</p>
           ) : (
-            leads.slice(0, 5).map((lead) => (
+            validLeads.slice(0, 5).map((lead) => (
               <div key={lead.id} className="flex items-center px-6 py-4 hover:bg-accent/40 transition-colors duration-150">
                 <div className="flex-1">
                   <p className="text-sm font-medium text-foreground">{lead.nome}</p>
