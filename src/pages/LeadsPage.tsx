@@ -541,7 +541,7 @@ export default function LeadsPage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [activeView, setActiveView] = useState("all");
+  const [activeView, setActiveView] = useState(() => searchParams.get("view") || "all");
   const [filters, setFilters] = useState<Filters>(() => {
     const statusFromUrl = searchParams.get("status") || "";
     return { ...DEFAULT_FILTERS, status: statusFromUrl };
