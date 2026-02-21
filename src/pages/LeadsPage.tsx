@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase, Lead, LeadProduct } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -532,6 +532,7 @@ function ImportLeadsModal({ onClose, onDone }: { onClose: () => void; onDone: ()
 
 export default function LeadsPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [leadProductsMap, setLeadProductsMap] = useState<Record<string, string[]>>({});
   // Map: lead_id -> latest activity description (or null)
@@ -541,8 +542,11 @@ export default function LeadsPage() {
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [activeView, setActiveView] = useState("all");
-  const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
-  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState<Filters>(() => {
+    const statusFromUrl = searchParams.get("status") || "";
+    return { ...DEFAULT_FILTERS, status: statusFromUrl };
+  });
+  const [showFilters, setShowFilters] = useState(() => !!searchParams.get("status"));
   const [form, setForm] = useState<LeadForm>(EMPTY_FORM);
   const [error, setError] = useState<string | null>(null);
   const [showImport, setShowImport] = useState(false);
