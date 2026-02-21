@@ -135,7 +135,6 @@ export default function LeadDetailPage() {
   const [products, setProducts] = useState<LeadProduct[]>([]);
   const [togglingProduct, setTogglingProduct] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState("");
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [newNote, setNewNote] = useState("");
   const [newType, setNewType] = useState("ligacao");
@@ -175,7 +174,7 @@ export default function LeadDetailPage() {
       supabase.from("leads").select("*").eq("id", id!).single(),
       supabase.from("lead_products").select("*").eq("lead_id", id!),
     ]);
-    if (leadRes.data) { setLead(leadRes.data); setStatus(leadRes.data.lead_status); }
+    if (leadRes.data) { setLead(leadRes.data); }
     if (prodRes.data) setProducts(prodRes.data);
     await fetchActivities();
     setLoading(false);
@@ -232,9 +231,7 @@ export default function LeadDetailPage() {
       return;
     }
 
-    // Atualizar estado local com dado confirmado pelo banco
     setLead(updated);
-    setStatus(updated.lead_status);
     setShowEditLead(false);
     setSavingLead(false);
 
@@ -242,37 +239,37 @@ export default function LeadDetailPage() {
     window.dispatchEvent(new CustomEvent("leads:refresh"));
   }
 
-  async function handleStatusUpdate(newStatus: string) {
-    if (!id || !user?.id) return;
-    if (lead?.lead_status === newStatus) return; // já é o status atual
-    console.log("[handleStatusUpdate] Iniciando update:", { id, newStatus, userId: user.id });
+  async function updateLeadStatus(leadId: string, newStatus: string) {
     setUpdatingStatus(true);
 
     const { data, error } = await supabase
       .from("leads")
       .update({ lead_status: newStatus })
-      .eq("id", id)
-      .eq("user_id", user.id)
-      .select("*")
-      .single();
-
-    console.log("[handleStatusUpdate] Resultado do update:", { data, error });
+      .eq("id", leadId)
+      .select();
 
     if (error) {
-      console.error("[handleStatusUpdate] Erro:", error);
+      console.error("Erro ao atualizar status:", error);
       setUpdatingStatus(false);
       return;
     }
 
-    if (!data) {
-      console.error("[handleStatusUpdate] Nenhuma linha retornada — RLS pode estar bloqueando.");
+    if (!data || data.length === 0) {
+      console.error("Nenhuma linha retornada após update — verifique RLS.");
       setUpdatingStatus(false);
       return;
     }
 
-    // Banco confirmou — atualizar estado local com dado real do banco
-    setLead(data);
-    setStatus(data.lead_status);
+    console.log("Status atualizado com sucesso:", data);
+
+    // Refetch lead do banco (fonte de verdade)
+    const { data: refreshed } = await supabase
+      .from("leads")
+      .select("*")
+      .eq("id", leadId)
+      .single();
+
+    if (refreshed) setLead(refreshed);
 
     // Notificar Pipeline para refetch completo
     window.dispatchEvent(new CustomEvent("leads:refresh"));
@@ -378,7 +375,6 @@ export default function LeadDetailPage() {
 
     if (refreshed) {
       setLead(refreshed);
-      setStatus(refreshed.lead_status);
     }
 
     // 5. Notificar pipeline para atualizar
@@ -510,8 +506,8 @@ export default function LeadDetailPage() {
                 )}
               </div>
 
-              <span className={`shrink-0 text-xs font-medium px-2.5 py-1 rounded-full ${statusColor[status] || "text-muted-foreground bg-muted"}`}>
-                {STATUS_OPTIONS.find((s) => s.value === status)?.label || status}
+              <span className={`shrink-0 text-xs font-medium px-2.5 py-1 rounded-full ${statusColor[lead.lead_status] || "text-muted-foreground bg-muted"}`}>
+                {STATUS_OPTIONS.find((s) => s.value === lead.lead_status)?.label || lead.lead_status}
               </span>
             </div>
 
@@ -596,10 +592,10 @@ export default function LeadDetailPage() {
               {STATUS_OPTIONS.map((s) => (
                 <button
                   key={s.value}
-                  onClick={() => handleStatusUpdate(s.value)}
-                  disabled={updatingStatus || lead.lead_status === s.value}
+                  onClick={() => updateLeadStatus(lead.id, s.value)}
+                  disabled={lead.lead_status === s.value}
                   className={`w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
-                    ${status === s.value
+                    ${lead.lead_status === s.value
                       ? "bg-primary text-primary-foreground shadow-[0_4px_12px_hsl(var(--primary)/0.25)]"
                       : "bg-secondary/40 text-foreground/70 hover:bg-secondary hover:text-foreground"
                     }`}
