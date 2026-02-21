@@ -612,7 +612,19 @@ export default function LeadsPage() {
     const qv = QUICK_VIEWS.find((v) => v.id === activeView)!;
     const q = search.toLowerCase();
 
-    return leads.filter((l) => {
+    // Remove leads sem nenhum identificador útil
+    const validLeads = leads.filter((l) => {
+      const hasIdentifier =
+        (l.empresa ?? "").trim().length > 0 ||
+        (l.nome ?? "").trim().length > 0 ||
+        (l.email ?? "").trim().length > 0 ||
+        (l.telefone ?? "").trim().length > 0;
+      return hasIdentifier;
+    });
+
+    console.log("[PIPELINE_LEADS_RENDER_COUNT] total recebido:", leads.length, "| total após filtro de válidos:", validLeads.length);
+
+    return validLeads.filter((l) => {
       if (!qv.filter(l)) return false;
 
       if (q && !(
