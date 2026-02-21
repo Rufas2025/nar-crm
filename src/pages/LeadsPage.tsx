@@ -239,11 +239,12 @@ function LeadFormModal({
                 placeholder="(11) 99999-9999"
               />
             </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs text-muted-foreground">Instituição de Ensino</label>
+    <div className="flex flex-col gap-1.5">
+              <label className="text-xs text-muted-foreground">Instituição de Ensino *</label>
               <input
                 value={form.empresa}
                 onChange={(e) => setForm({ ...form, empresa: e.target.value })}
+                required
                 className={INPUT_CLASS}
                 placeholder="Nome da instituição"
               />
@@ -622,15 +623,11 @@ export default function LeadsPage() {
       return hasIdentifier;
     });
 
-    console.log("[LEADS_DEBUG] componente: LeadsPage");
-    console.log("[LEADS_DEBUG] origem: supabase.from('leads').select('*').eq('user_id', authUser.id)");
-    console.log("[LEADS_DEBUG] array bruto (leads):", leads.length);
-    console.log("[LEADS_DEBUG] array após filtro válidos (validLeads):", validLeads.length);
-    console.log("[LEADS_DEBUG] placeholder rows: NÃO (sem lógica de fillers)");
-    console.log("[LEADS_DEBUG] key no map: lead.id (não index)");
-    console.log("[LEADS_DEBUG] primeiros 5 validLeads:", validLeads.slice(0, 5).map(l => ({
-      id: l.id, nome: l.nome, empresa: l.empresa, email: l.email, telefone: l.telefone, lead_status: l.lead_status
-    })));
+    console.log("[PIPELINE_LEADS_RENDER_COUNT]", {
+      raw: leads.length,
+      valid: validLeads.length,
+      first5ids: validLeads.slice(0, 5).map(l => l.id),
+    });
 
     return validLeads.filter((l) => {
       if (!qv.filter(l)) return false;
@@ -664,22 +661,35 @@ export default function LeadsPage() {
     e.preventDefault();
     setSaving(true);
     setError(null);
+
+    const trimmedNome = form.nome.trim();
+    const trimmedEmpresa = form.empresa.trim();
+
+    if (!trimmedNome) {
+      setError("O campo Nome é obrigatório.");
+      setSaving(false);
+      return;
+    }
+    if (!trimmedEmpresa) {
+      setError("O campo Instituição de Ensino é obrigatório.");
+      setSaving(false);
+      return;
+    }
+
     const { data: { user: authUser } } = await supabase.auth.getUser();
-    console.log("[LEAD_CREATE_AUTH] authUser:", authUser?.id ?? "NÃO AUTENTICADO");
     if (!authUser) {
-      console.error("[LEAD_CREATE_AUTH] Bloqueando insert: usuário não autenticado");
       setError("Usuário não autenticado.");
       setSaving(false);
       return;
     }
     const payload = {
-      nome: form.nome,
-      email: form.email || null,
-      telefone: form.telefone || null,
-      empresa: form.empresa || null,
-      inep: form.inep || null,
-      lead_status: form.lead_status,
-      cidade: form.cidade || null,
+      nome: trimmedNome,
+      email: form.email.trim() || null,
+      telefone: form.telefone.trim() || null,
+      empresa: trimmedEmpresa,
+      inep: form.inep.trim() || null,
+      lead_status: form.lead_status || "novo",
+      cidade: form.cidade.trim() || null,
       uf: form.uf || null,
       user_id: authUser.id,
     };
