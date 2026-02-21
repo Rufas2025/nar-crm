@@ -212,6 +212,7 @@ function LeadFormModal({
 
         <form onSubmit={onSubmit} className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-3">
+            {/* 1) Nome — full width */}
             <div className="flex flex-col gap-1.5 col-span-2">
               <label className="text-xs text-muted-foreground">Nome *</label>
               <input
@@ -222,6 +223,7 @@ function LeadFormModal({
                 placeholder="Nome completo"
               />
             </div>
+            {/* 2) E-mail (left) | Tipo de Contato (right) */}
             <div className="flex flex-col gap-1.5">
               <label className="text-xs text-muted-foreground">E-mail</label>
               <input
@@ -243,6 +245,7 @@ function LeadFormModal({
                 <option value="telefone">Telefone</option>
               </select>
             </div>
+            {/* 3) Telefone (left) | Instituição (right) */}
             <div className="flex flex-col gap-1.5">
               <label className="text-xs text-muted-foreground">Telefone</label>
               <input
@@ -252,7 +255,7 @@ function LeadFormModal({
                 placeholder="(11) 99999-9999"
               />
             </div>
-    <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5">
               <label className="text-xs text-muted-foreground">Instituição de Ensino *</label>
               <input
                 value={form.empresa}
@@ -262,6 +265,7 @@ function LeadFormModal({
                 placeholder="Nome da instituição"
               />
             </div>
+            {/* 4) INEP (left only) */}
             <div className="flex flex-col gap-1.5">
               <label className="text-xs text-muted-foreground">INEP</label>
               <input
