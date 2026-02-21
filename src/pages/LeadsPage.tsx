@@ -9,8 +9,13 @@ import * as XLSX from "xlsx";
 import {
   Plus, Search, ChevronRight, X, Loader2,
   CheckCircle2, AlertTriangle, AlertCircle, Upload,
-  Copy, Phone, Mail,
+  Copy, Phone, Mail, Trash2,
 } from "lucide-react";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel,
+  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+  AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -767,6 +772,24 @@ export default function LeadsPage() {
     toast.success(`${nums.length} celular${nums.length !== 1 ? "es" : ""} copiado${nums.length !== 1 ? "s" : ""}`);
   }
 
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  async function deleteSelected() {
+    setDeleting(true);
+    const ids = Array.from(selectedIds);
+    const { error } = await supabase.from("leads").delete().in("id", ids);
+    if (error) {
+      toast.error("Erro ao excluir leads: " + error.message);
+    } else {
+      toast.success(`${ids.length} lead${ids.length !== 1 ? "s" : ""} excluído${ids.length !== 1 ? "s" : ""}`);
+      clearSelection();
+      fetchLeads();
+    }
+    setDeleting(false);
+    setShowDeleteConfirm(false);
+  }
+
   const hasSelection = selectedIds.size > 0;
 
   return (
@@ -931,22 +954,51 @@ export default function LeadsPage() {
       )}
 
       {/* Bulk action bar */}
-      {hasSelection && (
+      {hasSelection && (<>
         <div className="bg-primary/10 border border-primary/25 rounded-2xl px-4 py-3 mb-4 flex items-center gap-3 flex-wrap">
           <span className="text-sm font-medium text-foreground">{selectedIds.size} lead{selectedIds.size !== 1 ? "s" : ""} selecionado{selectedIds.size !== 1 ? "s" : ""}</span>
-          <div className="flex items-center gap-2 ml-auto">
+          <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" className="h-8 rounded-lg text-xs gap-1.5" onClick={copyEmails}>
               <Mail className="w-3.5 h-3.5" /> Copiar e-mails
             </Button>
             <Button variant="outline" size="sm" className="h-8 rounded-lg text-xs gap-1.5" onClick={copyCelulares}>
               <Phone className="w-3.5 h-3.5" /> Copiar celulares
             </Button>
-            <Button variant="ghost" size="sm" className="h-8 rounded-lg text-xs text-muted-foreground" onClick={clearSelection}>
-              Limpar seleção
+            <Button
+              variant="destructive"
+              size="sm"
+              className="h-8 rounded-lg text-xs gap-1.5 shadow-[0_2px_8px_hsl(var(--destructive)/0.3)]"
+              onClick={() => setShowDeleteConfirm(true)}
+            >
+              <Trash2 className="w-3.5 h-3.5" /> Excluir selecionados
             </Button>
           </div>
+          <Button variant="ghost" size="sm" className="h-8 rounded-lg text-xs text-muted-foreground ml-auto" onClick={clearSelection}>
+            Limpar seleção
+          </Button>
         </div>
-      )}
+
+        <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+          <AlertDialogContent className="rounded-2xl bg-card border-border">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Excluir {selectedIds.size} lead{selectedIds.size !== 1 ? "s" : ""}?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Tem certeza que deseja excluir {selectedIds.size} lead{selectedIds.size !== 1 ? "s" : ""} selecionado{selectedIds.size !== 1 ? "s" : ""}? Esta ação não pode ser desfeita.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="rounded-xl">Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={deleteSelected}
+                disabled={deleting}
+                className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Excluir"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </>)}
 
       {/* Table */}
       <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-[0_2px_16px_rgba(0,0,0,0.3)]">
