@@ -245,16 +245,7 @@ function LeadFormModal({
                 <option value="telefone">Telefone</option>
               </select>
             </div>
-            {/* 3) Número (left) | Instituição (right) */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs text-muted-foreground">Número</label>
-              <input
-                value={form.telefone}
-                onChange={(e) => setForm({ ...form, telefone: e.target.value })}
-                className={INPUT_CLASS}
-                placeholder="(11) 99999-9999"
-              />
-            </div>
+            {/* 3) Instituição de Ensino (left) | Número (right) */}
             <div className="flex flex-col gap-1.5">
               <label className="text-xs text-muted-foreground">Instituição de Ensino *</label>
               <input
@@ -263,6 +254,15 @@ function LeadFormModal({
                 required
                 className={INPUT_CLASS}
                 placeholder="Nome da instituição"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs text-muted-foreground">Número</label>
+              <input
+                value={form.telefone}
+                onChange={(e) => setForm({ ...form, telefone: e.target.value })}
+                className={INPUT_CLASS}
+                placeholder="(11) 99999-9999"
               />
             </div>
             {/* 4) INEP (left only) */}
