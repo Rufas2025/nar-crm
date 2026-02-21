@@ -10,15 +10,17 @@ import {
 
 const statusLabel: Record<string, string> = {
   novo: "Novo",
-  em_andamento: "Em andamento",
-  convertido: "Convertido",
+  em_contato: "Em Contato",
+  qualificado: "Qualificado",
+  fechado: "Fechado",
   perdido: "Perdido",
 };
 
 const statusColor: Record<string, string> = {
   novo: "text-primary bg-primary/10",
-  em_andamento: "text-yellow-400 bg-yellow-400/10",
-  convertido: "text-green-400 bg-green-400/10",
+  em_contato: "text-yellow-400 bg-yellow-400/10",
+  qualificado: "text-blue-400 bg-blue-400/10",
+  fechado: "text-green-400 bg-green-400/10",
   perdido: "text-destructive bg-destructive/10",
 };
 
@@ -40,14 +42,14 @@ export default function DashboardPage() {
 
   const total = leads.length;
   const novo = leads.filter((l) => l.lead_status === "novo").length;
-  const emAndamento = leads.filter((l) => l.lead_status === "em_andamento").length;
-  const convertido = leads.filter((l) => l.lead_status === "convertido").length;
+  const emContato = leads.filter((l) => l.lead_status === "em_contato").length;
+  const qualificado = leads.filter((l) => l.lead_status === "qualificado").length;
 
   const cards = [
     { label: "Total de Leads", value: total, icon: Users, color: "text-primary" },
     { label: "Novos", value: novo, icon: TrendingUp, color: "text-blue-400" },
-    { label: "Em Andamento", value: emAndamento, icon: Clock, color: "text-yellow-400" },
-    { label: "Convertidos", value: convertido, icon: CheckCircle2, color: "text-green-400" },
+    { label: "Em Contato", value: emContato, icon: Clock, color: "text-yellow-400" },
+    { label: "Qualificados", value: qualificado, icon: CheckCircle2, color: "text-green-400" },
   ];
 
   return (
