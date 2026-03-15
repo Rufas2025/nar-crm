@@ -9,7 +9,7 @@ import * as XLSX from "xlsx";
 import {
   Plus, Search, ChevronRight, X, Loader2,
   CheckCircle2, AlertTriangle, AlertCircle, Upload,
-  Copy, Phone, Mail, Trash2,
+  Copy, Phone, Mail, Trash2, Building2, User,
 } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
@@ -788,6 +788,22 @@ export default function LeadsPage() {
     toast.success(`${nums.length} telefone${nums.length !== 1 ? "s" : ""} copiado${nums.length !== 1 ? "s" : ""}`);
   }
 
+  function copyEmpresas() {
+    const selected = filtered.filter((l) => selectedIds.has(l.id));
+    const empresas = selected.map((l) => l.empresa?.trim()).filter((e) => e && isUsefulValue(e)) as string[];
+    if (!empresas.length) { toast.error("Nenhuma instituição válida nos leads selecionados."); return; }
+    navigator.clipboard.writeText(empresas.join("\n"));
+    toast.success(`${empresas.length} instituição${empresas.length !== 1 ? "ões" : ""} copiada${empresas.length !== 1 ? "s" : ""}`);
+  }
+
+  function copyNomes() {
+    const selected = filtered.filter((l) => selectedIds.has(l.id));
+    const nomes = selected.map((l) => l.nome?.trim()).filter((n) => n && isUsefulValue(n)) as string[];
+    if (!nomes.length) { toast.error("Nenhum nome válido nos leads selecionados."); return; }
+    navigator.clipboard.writeText(nomes.join("\n"));
+    toast.success(`${nomes.length} nome${nomes.length !== 1 ? "s" : ""} copiado${nomes.length !== 1 ? "s" : ""}`);
+  }
+
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -988,6 +1004,12 @@ export default function LeadsPage() {
             </Button>
             <Button variant="outline" size="sm" className="h-8 rounded-lg text-xs gap-1.5" onClick={copyCelulares}>
               <Phone className="w-3.5 h-3.5" /> Copiar celulares
+            </Button>
+            <Button variant="outline" size="sm" className="h-8 rounded-lg text-xs gap-1.5" onClick={copyEmpresas}>
+              <Building2 className="w-3.5 h-3.5" /> Copiar instituições
+            </Button>
+            <Button variant="outline" size="sm" className="h-8 rounded-lg text-xs gap-1.5" onClick={copyNomes}>
+              <User className="w-3.5 h-3.5" /> Copiar nomes
             </Button>
             <Button
               variant="destructive"
