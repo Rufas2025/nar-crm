@@ -9,7 +9,7 @@ import * as XLSX from "xlsx";
 import {
   Plus, Search, ChevronRight, X, Loader2,
   CheckCircle2, AlertTriangle, AlertCircle, Upload,
-  Copy, Phone, Mail, Trash2, Building2, User,
+  Copy, Phone, Mail, Trash2, Building2, User, Table2,
 } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
@@ -769,8 +769,33 @@ export default function LeadsPage() {
 
   function clearSelection() { setSelectedIds(new Set()); }
 
+  function getSelectedLeads() {
+    return filtered.filter((l) => selectedIds.has(l.id));
+  }
+
+  function safeValue(val: string | null | undefined): string {
+    if (!val) return "";
+    const trimmed = val.trim();
+    return isUsefulValue(trimmed) ? trimmed : "";
+  }
+
+  function copyParaExcel() {
+    const selected = getSelectedLeads();
+    const header = "E-mail\tNome\tCelular\tColégio";
+    const rows = selected.map((l) => {
+      const email = safeValue(l.email);
+      const nome = safeValue(l.nome);
+      const celular = l.telefone ? l.telefone.replace(/[\s()\-]/g, "") : "";
+      const colegio = safeValue(l.empresa);
+      return `${email}\t${nome}\t${celular}\t${colegio}`;
+    });
+    if (!rows.length) { toast.error("Nenhum lead selecionado."); return; }
+    navigator.clipboard.writeText([header, ...rows].join("\n"));
+    toast.success(`${rows.length} lead${rows.length !== 1 ? "s" : ""} copiado${rows.length !== 1 ? "s" : ""} para Excel`);
+  }
+
   function copyEmails() {
-    const selected = filtered.filter((l) => selectedIds.has(l.id));
+    const selected = getSelectedLeads();
     const emails = selected.map((l) => l.email?.trim()).filter((e) => e && isUsefulValue(e) && e.includes("@")) as string[];
     if (!emails.length) { toast.error("Nenhum e-mail válido nos leads selecionados."); return; }
     navigator.clipboard.writeText(emails.join("\n"));
@@ -778,7 +803,7 @@ export default function LeadsPage() {
   }
 
   function copyCelulares() {
-    const selected = filtered.filter((l) => selectedIds.has(l.id));
+    const selected = getSelectedLeads();
     const nums = selected
       .filter((l) => isUsefulValue(l.telefone))
       .map((l) => l.telefone!.replace(/[\s()\-]/g, ""))
@@ -789,7 +814,7 @@ export default function LeadsPage() {
   }
 
   function copyEmpresas() {
-    const selected = filtered.filter((l) => selectedIds.has(l.id));
+    const selected = getSelectedLeads();
     const empresas = selected.map((l) => l.empresa?.trim()).filter((e) => e && isUsefulValue(e)) as string[];
     if (!empresas.length) { toast.error("Nenhuma instituição válida nos leads selecionados."); return; }
     navigator.clipboard.writeText(empresas.join("\n"));
@@ -797,7 +822,7 @@ export default function LeadsPage() {
   }
 
   function copyNomes() {
-    const selected = filtered.filter((l) => selectedIds.has(l.id));
+    const selected = getSelectedLeads();
     const nomes = selected.map((l) => l.nome?.trim()).filter((n) => n && isUsefulValue(n)) as string[];
     if (!nomes.length) { toast.error("Nenhum nome válido nos leads selecionados."); return; }
     navigator.clipboard.writeText(nomes.join("\n"));
@@ -999,6 +1024,9 @@ export default function LeadsPage() {
         <div className="bg-primary/10 border border-primary/25 rounded-2xl px-4 py-3 mb-4 flex items-center gap-3 flex-wrap">
           <span className="text-sm font-medium text-foreground">{selectedIds.size} lead{selectedIds.size !== 1 ? "s" : ""} selecionado{selectedIds.size !== 1 ? "s" : ""}</span>
           <div className="flex items-center gap-2">
+            <Button variant="default" size="sm" className="h-8 rounded-lg text-xs gap-1.5" onClick={copyParaExcel}>
+              <Table2 className="w-3.5 h-3.5" /> Copiar para Excel
+            </Button>
             <Button variant="outline" size="sm" className="h-8 rounded-lg text-xs gap-1.5" onClick={copyEmpresas}>
               <Building2 className="w-3.5 h-3.5" /> Copiar colégios
             </Button>
