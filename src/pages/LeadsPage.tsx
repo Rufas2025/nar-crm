@@ -773,7 +773,7 @@ export default function LeadsPage() {
     const selected = filtered.filter((l) => selectedIds.has(l.id));
     const emails = selected.map((l) => l.email?.trim()).filter((e) => e && isUsefulValue(e) && e.includes("@")) as string[];
     if (!emails.length) { toast.error("Nenhum e-mail válido nos leads selecionados."); return; }
-    navigator.clipboard.writeText(emails.join(", "));
+    navigator.clipboard.writeText(emails.join("\n"));
     toast.success(`${emails.length} e-mail${emails.length !== 1 ? "s" : ""} copiado${emails.length !== 1 ? "s" : ""}`);
   }
 
