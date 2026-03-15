@@ -1005,6 +1005,12 @@ export default function LeadsPage() {
             <Button variant="outline" size="sm" className="h-8 rounded-lg text-xs gap-1.5" onClick={copyCelulares}>
               <Phone className="w-3.5 h-3.5" /> Copiar celulares
             </Button>
+            <Button variant="outline" size="sm" className="h-8 rounded-lg text-xs gap-1.5" onClick={copyEmpresas}>
+              <Building2 className="w-3.5 h-3.5" /> Copiar instituições
+            </Button>
+            <Button variant="outline" size="sm" className="h-8 rounded-lg text-xs gap-1.5" onClick={copyNomes}>
+              <User className="w-3.5 h-3.5" /> Copiar nomes
+            </Button>
             <Button
               variant="destructive"
               size="sm"
