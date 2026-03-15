@@ -999,17 +999,17 @@ export default function LeadsPage() {
         <div className="bg-primary/10 border border-primary/25 rounded-2xl px-4 py-3 mb-4 flex items-center gap-3 flex-wrap">
           <span className="text-sm font-medium text-foreground">{selectedIds.size} lead{selectedIds.size !== 1 ? "s" : ""} selecionado{selectedIds.size !== 1 ? "s" : ""}</span>
           <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" className="h-8 rounded-lg text-xs gap-1.5" onClick={copyEmpresas}>
+              <Building2 className="w-3.5 h-3.5" /> Copiar colégios
+            </Button>
+            <Button variant="outline" size="sm" className="h-8 rounded-lg text-xs gap-1.5" onClick={copyNomes}>
+              <User className="w-3.5 h-3.5" /> Copiar nomes
+            </Button>
             <Button variant="outline" size="sm" className="h-8 rounded-lg text-xs gap-1.5" onClick={copyEmails}>
               <Mail className="w-3.5 h-3.5" /> Copiar e-mails
             </Button>
             <Button variant="outline" size="sm" className="h-8 rounded-lg text-xs gap-1.5" onClick={copyCelulares}>
               <Phone className="w-3.5 h-3.5" /> Copiar celulares
-            </Button>
-            <Button variant="outline" size="sm" className="h-8 rounded-lg text-xs gap-1.5" onClick={copyEmpresas}>
-              <Building2 className="w-3.5 h-3.5" /> Copiar instituições
-            </Button>
-            <Button variant="outline" size="sm" className="h-8 rounded-lg text-xs gap-1.5" onClick={copyNomes}>
-              <User className="w-3.5 h-3.5" /> Copiar nomes
             </Button>
             <Button
               variant="destructive"
