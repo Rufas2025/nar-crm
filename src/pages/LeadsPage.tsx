@@ -780,12 +780,12 @@ export default function LeadsPage() {
   function copyCelulares() {
     const selected = filtered.filter((l) => selectedIds.has(l.id));
     const nums = selected
-      .filter((l) => l.telefone_tipo === "celular" && isUsefulValue(l.telefone))
+      .filter((l) => isUsefulValue(l.telefone))
       .map((l) => l.telefone!.replace(/[\s()\-]/g, ""))
       .filter(Boolean);
-    if (!nums.length) { toast.error("Nenhum celular válido nos leads selecionados."); return; }
+    if (!nums.length) { toast.error("Nenhum telefone válido nos leads selecionados."); return; }
     navigator.clipboard.writeText(nums.join("\n"));
-    toast.success(`${nums.length} celular${nums.length !== 1 ? "es" : ""} copiado${nums.length !== 1 ? "s" : ""}`);
+    toast.success(`${nums.length} telefone${nums.length !== 1 ? "s" : ""} copiado${nums.length !== 1 ? "s" : ""}`);
   }
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
