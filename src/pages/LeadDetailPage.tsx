@@ -482,7 +482,7 @@ Produto de interesse: ${produtos}
 
 Se essa mensagem chegou corretamente, o primeiro teste do MVP funcionou.`;
 
-    const url = `https://wa.me/${phone}?text=${encodeURIComponent(mensagem)}`;
+    const url = `https://web.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(mensagem)}`;
     window.open(url, "_blank");
 
     // Registra interação
@@ -490,7 +490,7 @@ Se essa mensagem chegou corretamente, o primeiro teste do MVP funcionou.`;
       lead_id: id,
       user_id: user?.id,
       tipo: "whatsapp",
-      descricao: "Mensagem de WhatsApp gerada e aberta pelo botão do CRM.",
+      descricao: "Mensagem de WhatsApp gerada pelo CRM e aberta no WhatsApp Web.",
     });
 
     // Atualiza status para "em_contato"
@@ -503,6 +503,7 @@ Se essa mensagem chegou corretamente, o primeiro teste do MVP funcionou.`;
     if (refreshed) setLead(refreshed);
     await fetchActivities();
     window.dispatchEvent(new CustomEvent("leads:refresh"));
+    toast.success("Mensagem gerada e interação registrada com sucesso.");
     setSendingWhatsApp(false);
   }
 
