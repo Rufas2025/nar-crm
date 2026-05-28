@@ -476,14 +476,14 @@ export default function LeadDetailPage() {
 
 Aqui é o Rufino, da NAR ECO Soluções.
 
-Estou fazendo um teste rápido do nosso fluxo de atendimento para escolas. A ideia é validar se conseguimos transformar um lead cadastrado no CRM em uma conversa de WhatsApp com poucos cliques.
+Estou fazendo um teste rápido do nosso fluxo de atendimento para escolas.
 
 Escola: ${escola}
-Produto de interesse: ${produtos}
+Interesse: ${produtos}
 
-Se essa mensagem chegou corretamente, o primeiro teste do MVP funcionou.`;
+Se essa mensagem abriu corretamente no WhatsApp, o teste manual do CRM funcionou.`;
 
-    const url = `https://web.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(mensagem)}`;
+    const url = `https://api.whatsapp.com/send/?phone=${phone}&text=${encodeURIComponent(mensagem)}&type=phone_number&app_absent=0`;
     window.open(url, "_blank");
 
     // Registra interação
@@ -491,7 +491,7 @@ Se essa mensagem chegou corretamente, o primeiro teste do MVP funcionou.`;
       lead_id: id,
       user_id: user?.id,
       tipo: "whatsapp",
-      descricao: "Mensagem de WhatsApp gerada pelo CRM e aberta no WhatsApp Web.",
+      descricao: "Link de WhatsApp aberto pelo CRM.",
     });
 
     // Atualiza status para "em_contato"
