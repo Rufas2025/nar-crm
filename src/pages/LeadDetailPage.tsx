@@ -455,6 +455,59 @@ export default function LeadDetailPage() {
     setSavingEdit(false);
   }
 
+  const [sendingWhatsApp, setSendingWhatsApp] = useState(false);
+
+  async function handleSendWhatsApp() {
+    if (!lead?.telefone) return;
+    setSendingWhatsApp(true);
+
+    // Limpa telefone removendo tudo que não for dígito
+    let phone = lead.telefone.replace(/\D/g, "");
+    if (!phone.startsWith("55")) phone = "55" + phone;
+
+    const nome = lead.nome || "";
+    const escola = lead.empresa || "—";
+    const linkedProds = products
+      .map((p) => PRODUCTS.find((x) => x.value === p.produto)?.label || p.produto);
+    const produtos = linkedProds.length > 0 ? linkedProds.join(" / ") : "—";
+
+    const mensagem = `Olá, ${nome}! Tudo bem?
+
+Aqui é o Rufino, da NAR ECO Soluções.
+
+Estou fazendo um teste rápido do nosso fluxo de atendimento para escolas. A ideia é validar se conseguimos transformar um lead cadastrado no CRM em uma conversa de WhatsApp com poucos cliques.
+
+Escola: ${escola}
+Produto de interesse: ${produtos}
+
+Se essa mensagem chegou corretamente, o primeiro teste do MVP funcionou.`;
+
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(mensagem)}`;
+    window.open(url, "_blank");
+
+    // Registra interação
+    await supabase.from("activities").insert({
+      lead_id: id,
+      user_id: user?.id,
+      tipo: "whatsapp",
+      descricao: "Mensagem de WhatsApp gerada e aberta pelo botão do CRM.",
+    });
+
+    // Atualiza status para "em_contato"
+    await supabase
+      .from("leads")
+      .update({ lead_status: "em_contato", ultimo_contato_at: new Date().toISOString() })
+      .eq("id", lead.id);
+
+    const { data: refreshed } = await supabase.from("leads").select("*").eq("id", lead.id).single();
+    if (refreshed) setLead(refreshed);
+    await fetchActivities();
+    window.dispatchEvent(new CustomEvent("leads:refresh"));
+    setSendingWhatsApp(false);
+  }
+
+
+
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center">
