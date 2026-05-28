@@ -2,6 +2,7 @@ import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
+  MessageCircle,
   LogOut,
   ChevronRight,
 } from "lucide-react";
@@ -10,6 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 const navItems = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
   { to: "/leads", label: "Leads", icon: Users },
+  { to: "/teste-whatsapp", label: "Teste WhatsApp", icon: MessageCircle },
 ];
 
 export default function Sidebar() {
