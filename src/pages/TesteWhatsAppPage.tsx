@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { MessageCircle, Send } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,10 +23,14 @@ export default function TesteWhatsAppPage() {
   );
 
   const handleEnviarWhatsApp = () => {
+    let phone = telefone.replace(/\D/g, "");
+    if (!phone.startsWith("55")) phone = "55" + phone;
+
     const mensagem = `Olá, ${nome}! Tudo bem?\n\nAqui é o Rufino, da NAR Eco Soluções.\n\nEstou fazendo um teste rápido do nosso fluxo de atendimento para escolas. A ideia é validar se conseguimos transformar um lead em uma conversa de WhatsApp com poucos cliques.\n\nEscola: ${escola}\n\nInteresse: ${segmento}\n\nSe essa mensagem chegou corretamente, o primeiro teste do MVP funcionou.`;
 
-    const url = `https://wa.me/${telefone}?text=${encodeURIComponent(mensagem)}`;
+    const url = `https://web.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(mensagem)}`;
     window.open(url, "_blank");
+    toast.success("Mensagem gerada e interação registrada com sucesso.");
   };
 
   return (
