@@ -695,6 +695,35 @@ Se essa mensagem chegou corretamente, o primeiro teste do MVP funcionou.`;
             </div>
           </div>
 
+          {/* WhatsApp */}
+          <div className="bg-card border border-border rounded-2xl p-5 shadow-[0_2px_16px_rgba(0,0,0,0.25)]">
+            <div className="flex items-center gap-2 mb-3">
+              <MessageSquare className="w-3.5 h-3.5 text-emerald-400/80" strokeWidth={1.5} />
+              <p className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-widest">WhatsApp</p>
+            </div>
+            <button
+              onClick={handleSendWhatsApp}
+              disabled={sendingWhatsApp || !lead.telefone}
+              className="w-full h-10 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 shadow-[0_4px_14px_rgba(16,185,129,0.35)]"
+            >
+              {sendingWhatsApp ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <>
+                  <Send className="w-4 h-4" strokeWidth={2} />
+                  Enviar WhatsApp
+                </>
+              )}
+            </button>
+            {!lead.telefone && (
+              <p className="text-[11px] text-muted-foreground/60 mt-2 text-center">
+                Cadastre um telefone para habilitar.
+              </p>
+            )}
+          </div>
+
+
+
           {/* Products */}
           <div className="bg-card border border-border rounded-2xl p-5 shadow-[0_2px_16px_rgba(0,0,0,0.25)]">
             <div className="flex items-center gap-2 mb-3">
