@@ -23,6 +23,7 @@ import {
   MapPin,
   Package2,
   Pencil,
+  Send,
 } from "lucide-react";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -454,6 +455,59 @@ export default function LeadDetailPage() {
     setSavingEdit(false);
   }
 
+  const [sendingWhatsApp, setSendingWhatsApp] = useState(false);
+
+  async function handleSendWhatsApp() {
+    if (!lead?.telefone) return;
+    setSendingWhatsApp(true);
+
+    // Limpa telefone removendo tudo que não for dígito
+    let phone = lead.telefone.replace(/\D/g, "");
+    if (!phone.startsWith("55")) phone = "55" + phone;
+
+    const nome = lead.nome || "";
+    const escola = lead.empresa || "—";
+    const linkedProds = products
+      .map((p) => PRODUCTS.find((x) => x.value === p.produto)?.label || p.produto);
+    const produtos = linkedProds.length > 0 ? linkedProds.join(" / ") : "—";
+
+    const mensagem = `Olá, ${nome}! Tudo bem?
+
+Aqui é o Rufino, da NAR ECO Soluções.
+
+Estou fazendo um teste rápido do nosso fluxo de atendimento para escolas. A ideia é validar se conseguimos transformar um lead cadastrado no CRM em uma conversa de WhatsApp com poucos cliques.
+
+Escola: ${escola}
+Produto de interesse: ${produtos}
+
+Se essa mensagem chegou corretamente, o primeiro teste do MVP funcionou.`;
+
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(mensagem)}`;
+    window.open(url, "_blank");
+
+    // Registra interação
+    await supabase.from("activities").insert({
+      lead_id: id,
+      user_id: user?.id,
+      tipo: "whatsapp",
+      descricao: "Mensagem de WhatsApp gerada e aberta pelo botão do CRM.",
+    });
+
+    // Atualiza status para "em_contato"
+    await supabase
+      .from("leads")
+      .update({ lead_status: "em_contato", ultimo_contato_at: new Date().toISOString() })
+      .eq("id", lead.id);
+
+    const { data: refreshed } = await supabase.from("leads").select("*").eq("id", lead.id).single();
+    if (refreshed) setLead(refreshed);
+    await fetchActivities();
+    window.dispatchEvent(new CustomEvent("leads:refresh"));
+    setSendingWhatsApp(false);
+  }
+
+
+
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center">
@@ -640,6 +694,35 @@ export default function LeadDetailPage() {
               ))}
             </div>
           </div>
+
+          {/* WhatsApp */}
+          <div className="bg-card border border-border rounded-2xl p-5 shadow-[0_2px_16px_rgba(0,0,0,0.25)]">
+            <div className="flex items-center gap-2 mb-3">
+              <MessageSquare className="w-3.5 h-3.5 text-emerald-400/80" strokeWidth={1.5} />
+              <p className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-widest">WhatsApp</p>
+            </div>
+            <button
+              onClick={handleSendWhatsApp}
+              disabled={sendingWhatsApp || !lead.telefone}
+              className="w-full h-10 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 shadow-[0_4px_14px_rgba(16,185,129,0.35)]"
+            >
+              {sendingWhatsApp ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <>
+                  <Send className="w-4 h-4" strokeWidth={2} />
+                  Enviar WhatsApp
+                </>
+              )}
+            </button>
+            {!lead.telefone && (
+              <p className="text-[11px] text-muted-foreground/60 mt-2 text-center">
+                Cadastre um telefone para habilitar.
+              </p>
+            )}
+          </div>
+
+
 
           {/* Products */}
           <div className="bg-card border border-border rounded-2xl p-5 shadow-[0_2px_16px_rgba(0,0,0,0.25)]">
