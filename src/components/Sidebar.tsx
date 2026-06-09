@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   Users,
   MessageCircle,
+  Settings,
   LogOut,
   ChevronRight,
 } from "lucide-react";
@@ -12,6 +13,7 @@ const navItems = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
   { to: "/leads", label: "Leads", icon: Users },
   { to: "/teste-whatsapp", label: "Teste WhatsApp", icon: MessageCircle },
+  { to: "/configuracoes", label: "Configurações", icon: Settings },
 ];
 
 export default function Sidebar() {

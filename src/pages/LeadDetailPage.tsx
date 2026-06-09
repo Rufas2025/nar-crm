@@ -483,28 +483,31 @@ Interesse: ${produtos}
 
 Se essa mensagem abriu corretamente no WhatsApp, o teste manual do CRM funcionou.`;
 
-    const url = `https://api.whatsapp.com/send/?phone=${phone}&text=${encodeURIComponent(mensagem)}&type=phone_number&app_absent=0`;
-    window.open(url, "_blank");
-
-    // Registra interação
-    await supabase.from("activities").insert({
-      lead_id: id,
-      user_id: user?.id,
-      tipo: "whatsapp",
-      descricao: "Link de WhatsApp aberto pelo CRM.",
+    const { data, error } = await supabase.functions.invoke("evolution-send-message", {
+      body: { leadId: id, phone, message: mensagem },
     });
 
-    // Atualiza status para "em_contato"
-    await supabase
-      .from("leads")
-      .update({ lead_status: "em_contato", ultimo_contato_at: new Date().toISOString() })
-      .eq("id", lead.id);
+    if (error || !data?.ok) {
+      let errMsg = data?.error as string | undefined;
+      if (!errMsg && error && "context" in error) {
+        const body = await (error as { context?: Response }).context?.json?.().catch(() => null);
+        errMsg = body?.error;
+      }
+      errMsg = errMsg || error?.message || "Erro ao enviar mensagem.";
+      toast.error(
+        errMsg.includes("não configurada")
+          ? `${errMsg} Acesse Configurações para conectar a Evolution API.`
+          : `Erro ao enviar WhatsApp: ${errMsg}`
+      );
+      setSendingWhatsApp(false);
+      return;
+    }
 
     const { data: refreshed } = await supabase.from("leads").select("*").eq("id", lead.id).single();
     if (refreshed) setLead(refreshed);
     await fetchActivities();
     window.dispatchEvent(new CustomEvent("leads:refresh"));
-    toast.success("Mensagem gerada e interação registrada com sucesso.");
+    toast.success("Mensagem enviada via WhatsApp e interação registrada com sucesso.");
     setSendingWhatsApp(false);
   }
 
