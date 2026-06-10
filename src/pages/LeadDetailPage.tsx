@@ -689,7 +689,7 @@ export default function LeadDetailPage() {
             {/* WhatsApp action */}
             <div className="mt-5 pt-5 border-t border-border/40">
               <button
-                onClick={handleSendWhatsApp}
+                onClick={openWhatsAppModal}
                 disabled={sendingWhatsApp || !lead.telefone}
                 className="w-full sm:w-auto h-10 px-5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 shadow-[0_4px_14px_rgba(16,185,129,0.35)]"
               >
