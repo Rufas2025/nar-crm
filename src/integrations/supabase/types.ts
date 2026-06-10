@@ -14,7 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      evolution_config: {
+        Row: {
+          api_key: string
+          api_url: string
+          connection_status: string | null
+          created_at: string
+          id: string
+          instance_name: string
+          last_test_error: string | null
+          last_tested_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          api_key: string
+          api_url: string
+          connection_status?: string | null
+          created_at?: string
+          id?: string
+          instance_name: string
+          last_test_error?: string | null
+          last_tested_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          api_key?: string
+          api_url?: string
+          connection_status?: string | null
+          created_at?: string
+          id?: string
+          instance_name?: string
+          last_test_error?: string | null
+          last_tested_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
