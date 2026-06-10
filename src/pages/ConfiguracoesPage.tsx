@@ -42,8 +42,13 @@ export default function ConfiguracoesPage() {
 
     try {
       const result = await testEvolutionConnection(url, key, instance);
-      const status = result.ok && result.state === "open" ? "open" : result.state ?? "error";
-      const errorMessage = result.ok ? null : result.error ?? "Erro desconhecido no teste de conexão.";
+      const status = result.ok && result.state === "open" ? "open" : "error";
+      const errorMessage = result.ok
+        ? null
+        : result.error ??
+          (result.state
+            ? `Instância não conectada. Estado retornado: "${result.state}".`
+            : "Erro desconhecido no teste de conexão.");
 
       if (status === "open") {
         toast.success('Conexão testada: estado "open" (Conectado).');
@@ -71,7 +76,7 @@ export default function ConfiguracoesPage() {
   async function handleSave(e?: FormEvent) {
     e?.preventDefault();
 
-    const cleanUrl = baseUrl.trim().replace(/\/$/, "");
+    const cleanUrl = baseUrl.trim().replace(/\/+$/, "");
     const cleanKey = apiKey.trim();
     const cleanInstance = instanceName.trim();
 
@@ -105,7 +110,7 @@ export default function ConfiguracoesPage() {
   }
 
   async function handleTestConnection() {
-    const cleanUrl = baseUrl.trim().replace(/\/$/, "");
+    const cleanUrl = baseUrl.trim().replace(/\/+$/, "");
     const cleanKey = apiKey.trim();
     const cleanInstance = instanceName.trim();
 
@@ -114,6 +119,7 @@ export default function ConfiguracoesPage() {
       return;
     }
 
+    setBaseUrl(cleanUrl);
     await runConnectionTest(cleanUrl, cleanKey, cleanInstance);
   }
 
