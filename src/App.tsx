@@ -10,6 +10,7 @@ import DashboardPage from "./pages/DashboardPage";
 import LeadsPage from "./pages/LeadsPage";
 import LeadDetailPage from "./pages/LeadDetailPage";
 import TesteWhatsAppPage from "./pages/TesteWhatsAppPage";
+import CampanhasWhatsAppPage from "./pages/CampanhasWhatsAppPage";
 import ConfiguracoesPage from "./pages/ConfiguracoesPage";
 import Sidebar from "./components/Sidebar";
 import { Loader2 } from "lucide-react";
@@ -61,6 +62,7 @@ const App = () => (
               <Route path="/leads" element={<LeadsPage />} />
               <Route path="/leads/:id" element={<LeadDetailPage />} />
               <Route path="/teste-whatsapp" element={<TesteWhatsAppPage />} />
+              <Route path="/campanhas-whatsapp" element={<CampanhasWhatsAppPage />} />
               <Route path="/configuracoes" element={<ConfiguracoesPage />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />

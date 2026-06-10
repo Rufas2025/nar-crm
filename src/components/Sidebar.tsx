@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   Users,
   MessageCircle,
+  Megaphone,
   Settings,
   LogOut,
   ChevronRight,
@@ -13,6 +14,7 @@ const navItems = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
   { to: "/leads", label: "Leads", icon: Users },
   { to: "/teste-whatsapp", label: "Teste WhatsApp", icon: MessageCircle },
+  { to: "/campanhas-whatsapp", label: "Campanhas WhatsApp", icon: Megaphone },
   { to: "/configuracoes", label: "Configurações", icon: Settings },
 ];
 
