@@ -44,11 +44,11 @@ export default function ConfiguracoesPage() {
     })();
   }, []);
 
-  async function runConnectionTest() {
+  async function runConnectionTest(creds: { apiUrl: string; apiKey: string; instanceName: string }) {
     setTesting(true);
 
     try {
-      const result = await testEvolutionConnection();
+      const result = await testEvolutionConnection(creds);
       const status = result.state ?? (result.ok ? "open" : "error");
 
       if (result.ok) {
@@ -60,6 +60,14 @@ export default function ConfiguracoesPage() {
       setConnectionStatus(status);
       setLastTestedAt(result.testedAt);
       setLastTestError(result.error ?? null);
+
+      // Persiste o resultado do teste junto com as credenciais
+      await saveEvolutionSettings({
+        ...creds,
+        connectionStatus: status,
+        lastTestedAt: result.testedAt,
+        lastTestError: result.error ?? null,
+      });
     } finally {
       setTesting(false);
     }
