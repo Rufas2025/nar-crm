@@ -133,6 +133,9 @@ export default function ConfiguracoesPage() {
     if (lastTestStatus === "error") {
       return <Badge variant="destructive">Erro</Badge>;
     }
+    if (["close", "closed", "connecting"].includes(lastTestStatus)) {
+      return <Badge variant="secondary">Não conectado ({lastTestStatus})</Badge>;
+    }
     return <Badge variant="secondary">Desconectado ({lastTestStatus})</Badge>;
   }
 
