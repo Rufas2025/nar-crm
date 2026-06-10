@@ -1,32 +1,22 @@
 import { useEffect, useState } from "react";
 import { Eye, EyeOff, Loader2, Plug, Save } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
-import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-
-type EvolutionConfig = {
-  id: string;
-  user_id: string;
-  base_url: string;
-  api_key: string;
-  instance_name: string;
-  last_test_status: string | null;
-  last_test_at: string | null;
-};
+import {
+  loadEvolutionSettings,
+  saveEvolutionSettings,
+  testEvolutionConnection,
+} from "@/lib/evolution";
 
 export default function ConfiguracoesPage() {
-  const { user } = useAuth();
-
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
 
-  const [configId, setConfigId] = useState<string | null>(null);
   const [baseUrl, setBaseUrl] = useState("");
   const [apiKey, setApiKey] = useState("");
   const [instanceName, setInstanceName] = useState("");
@@ -34,100 +24,96 @@ export default function ConfiguracoesPage() {
   const [lastTestAt, setLastTestAt] = useState<string | null>(null);
 
   useEffect(() => {
-    async function loadConfig() {
-      const { data, error } = await supabase
-        .from("evolution_config")
-        .select("*")
-        .maybeSingle<EvolutionConfig>();
-
-      if (error) {
-        toast.error("Erro ao carregar configuração: " + error.message);
-      } else if (data) {
-        setConfigId(data.id);
-        setBaseUrl(data.base_url);
-        setApiKey(data.api_key);
-        setInstanceName(data.instance_name);
-        setLastTestStatus(data.last_test_status);
-        setLastTestAt(data.last_test_at);
-      }
-      setLoading(false);
+    const saved = loadEvolutionSettings();
+    if (saved) {
+      setBaseUrl(saved.baseUrl);
+      setApiKey(saved.apiKey);
+      setInstanceName(saved.instanceName);
+      setLastTestStatus(saved.lastTestStatus);
+      setLastTestAt(saved.lastTestAt);
     }
-
-    loadConfig();
+    setLoading(false);
   }, []);
 
-  async function handleSave() {
-    if (!user) return;
-    if (!baseUrl.trim() || !apiKey.trim() || !instanceName.trim()) {
+  async function runConnectionTest(url: string, key: string, instance: string) {
+    setTesting(true);
+
+    const result = await testEvolutionConnection(url, key, instance);
+
+    const testedAt = new Date().toISOString();
+    let status: string;
+
+    if (result.ok && result.state === "open") {
+      status = "open";
+      toast.success('Conexão testada: estado "open" (Conectado).');
+    } else if (result.ok) {
+      status = result.state ?? "unknown";
+      toast.error(`Instância não conectada. Estado retornado: "${status}".`);
+    } else {
+      status = "error";
+      toast.error("Falha ao testar conexão: " + (result.error ?? "erro desconhecido"));
+    }
+
+    setLastTestStatus(status);
+    setLastTestAt(testedAt);
+
+    saveEvolutionSettings({
+      baseUrl: url,
+      apiKey: key,
+      instanceName: instance,
+      lastTestStatus: status,
+      lastTestAt: testedAt,
+    });
+
+    setTesting(false);
+  }
+
+  async function handleSave(e?: React.FormEvent) {
+    e?.preventDefault();
+
+    const cleanUrl = baseUrl.trim().replace(/\/$/, "");
+    const cleanKey = apiKey.trim();
+    const cleanInstance = instanceName.trim();
+
+    if (!cleanUrl || !cleanKey || !cleanInstance) {
       toast.error("Preencha URL, API Key e nome da instância.");
       return;
     }
 
     setSaving(true);
 
-    const { data, error } = await supabase
-      .from("evolution_config")
-      .upsert(
-        {
-          user_id: user.id,
-          base_url: baseUrl.trim(),
-          api_key: apiKey.trim(),
-          instance_name: instanceName.trim(),
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id" }
-      )
-      .select("*")
-      .single<EvolutionConfig>();
+    try {
+      saveEvolutionSettings({
+        baseUrl: cleanUrl,
+        apiKey: cleanKey,
+        instanceName: cleanInstance,
+        lastTestStatus,
+        lastTestAt,
+      });
+      setBaseUrl(cleanUrl);
 
-    setSaving(false);
+      toast.success("Configuração da Evolution API salva com sucesso.");
 
-    if (error) {
-      toast.error("Erro ao salvar: " + error.message);
-      return;
+      // Após salvar com sucesso, roda automaticamente o teste de conexão
+      await runConnectionTest(cleanUrl, cleanKey, cleanInstance);
+    } catch (err: any) {
+      toast.error("Erro ao salvar: " + String(err?.message ?? err));
+    } finally {
+      setSaving(false);
     }
-
-    setConfigId(data.id);
-    toast.success("Configuração da Evolution API salva com sucesso.");
   }
 
   async function handleTestConnection() {
-    if (!baseUrl.trim() || !apiKey.trim() || !instanceName.trim()) {
+    const cleanUrl = baseUrl.trim().replace(/\/$/, "");
+    const cleanKey = apiKey.trim();
+    const cleanInstance = instanceName.trim();
+
+    if (!cleanUrl || !cleanKey || !cleanInstance) {
       toast.error("Preencha URL, API Key e nome da instância antes de testar.");
       return;
     }
 
-    setTesting(true);
-
-    const { data, error } = await supabase.functions.invoke("evolution-test-connection", {
-      body: {
-        baseUrl: baseUrl.trim(),
-        apiKey: apiKey.trim(),
-        instanceName: instanceName.trim(),
-      },
-    });
-
-    setTesting(false);
-
-    const ok = !error && data?.ok;
-    const status = ok ? data.state : "error";
-    const testedAt = new Date().toISOString();
-
-    setLastTestStatus(status);
-    setLastTestAt(testedAt);
-
-    if (configId) {
-      await supabase
-        .from("evolution_config")
-        .update({ last_test_status: status, last_test_at: testedAt })
-        .eq("id", configId);
-    }
-
-    if (ok) {
-      toast.success(`Conexão testada: estado "${status}".`);
-    } else {
-      toast.error("Falha ao testar conexão: " + (error?.message || data?.error || "erro desconhecido"));
-    }
+    await runConnectionTest(cleanUrl, cleanKey, cleanInstance);
   }
 
   function statusBadge() {
@@ -162,7 +148,7 @@ export default function ConfiguracoesPage() {
         </p>
       </div>
 
-      <div className="space-y-5">
+      <form className="space-y-5" onSubmit={handleSave}>
         <div className="space-y-2">
           <Label htmlFor="baseUrl">URL da Evolution API</Label>
           <Input
@@ -215,13 +201,14 @@ export default function ConfiguracoesPage() {
         </div>
 
         <div className="pt-4 flex flex-col sm:flex-row gap-3">
-          <Button onClick={handleSave} disabled={saving} className="h-11 gap-2">
+          <Button type="submit" disabled={saving || testing} className="h-11 gap-2">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             Salvar
           </Button>
           <Button
+            type="button"
             onClick={handleTestConnection}
-            disabled={testing}
+            disabled={testing || saving}
             variant="outline"
             className="h-11 gap-2"
           >
@@ -229,7 +216,7 @@ export default function ConfiguracoesPage() {
             Testar conexão
           </Button>
         </div>
-      </div>
+      </form>
     </div>
   );
 }
