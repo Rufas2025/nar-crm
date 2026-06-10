@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, type ClipboardEvent } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
+import { supabase, Lead } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -13,13 +13,21 @@ import {
 } from "@/components/ui/dialog";
 import { AlertTriangle, Loader2, Megaphone, Paperclip, Send, X } from "lucide-react";
 import {
+  buildLeadTemplateVariables,
+  renderTemplate,
+  composeWhatsappMessage,
   DEFAULT_WHATSAPP_TEMPLATES,
   WHATSAPP_TEMPLATE_VARIABLES,
+  WHATSAPP_GREETING_PRESETS,
+  NO_GREETING_ID,
   validateAttachment,
   getEdgeFunctionError,
 } from "@/lib/whatsapp";
 
+const ATTACHMENT_ACCEPT = "image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip,.m4a,.opus,.mov,.webm";
+
 type StoredTemplate = { id: string; name: string; content: string };
+type PreviewLead = Pick<Lead, "id" | "nome" | "empresa" | "cidade" | "uf" | "email" | "telefone" | "lead_status">;
 
 const STATUS_OPTIONS = [
   { value: "novo", label: "Novo" },
@@ -69,6 +77,54 @@ async function countMatchingLeads(filters: FilterState): Promise<number> {
   return leadIds.filter((id) => idsWithProduct.has(id)).length;
 }
 
+/** Busca até 3 leads correspondentes aos filtros, com seus produtos, para a prévia de campanha. */
+async function fetchPreviewLeads(filters: FilterState): Promise<{ leads: PreviewLead[]; productsByLead: Record<string, string[]> }> {
+  const empty = { leads: [] as PreviewLead[], productsByLead: {} as Record<string, string[]> };
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return empty;
+
+  let query = supabase
+    .from("leads")
+    .select("id, nome, empresa, cidade, uf, email, telefone, lead_status")
+    .eq("user_id", user.id);
+  if (filters.cidade.trim()) query = query.ilike("cidade", filters.cidade.trim());
+  if (filters.uf) query = query.eq("uf", filters.uf);
+  if (filters.lead_status) query = query.eq("lead_status", filters.lead_status);
+
+  const { data: leads, error } = await query.limit(filters.produto ? 50 : 3);
+  if (error || !leads) return empty;
+
+  let candidates = leads as PreviewLead[];
+  if (filters.produto) {
+    const candidateIds = candidates.map((l) => l.id);
+    if (candidateIds.length === 0) return empty;
+    const { data: prods } = await supabase
+      .from("lead_products")
+      .select("lead_id")
+      .eq("produto", filters.produto)
+      .in("lead_id", candidateIds);
+    const idsWithProduct = new Set((prods ?? []).map((p: { lead_id: string }) => p.lead_id));
+    candidates = candidates.filter((l) => idsWithProduct.has(l.id));
+  }
+
+  const previewLeads = candidates.slice(0, 3);
+  if (previewLeads.length === 0) return empty;
+
+  const leadIds = previewLeads.map((l) => l.id);
+  const { data: allProds } = await supabase
+    .from("lead_products")
+    .select("lead_id, produto")
+    .in("lead_id", leadIds);
+
+  const productsByLead: Record<string, string[]> = {};
+  for (const p of (allProds ?? []) as { lead_id: string; produto: string }[]) {
+    (productsByLead[p.lead_id] ??= []).push(p.produto);
+  }
+
+  return { leads: previewLeads, productsByLead };
+}
+
 export function CreateWhatsappCampaignModal({
   open,
   onClose,
@@ -85,6 +141,9 @@ export function CreateWhatsappCampaignModal({
   const [templates, setTemplates] = useState<StoredTemplate[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState("__custom__");
   const [message, setMessage] = useState("");
+  const [greetingOption, setGreetingOption] = useState<string>(WHATSAPP_GREETING_PRESETS[0].id);
+  const [greetingTemplate, setGreetingTemplate] = useState<string>(WHATSAPP_GREETING_PRESETS[0].template);
+  const [vendedor, setVendedor] = useState("Equipe NAR");
   const [link, setLink] = useState("");
   const [linkError, setLinkError] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
@@ -93,6 +152,13 @@ export function CreateWhatsappCampaignModal({
   const [delayMessages, setDelayMessages] = useState("5");
   const [delayBatches, setDelayBatches] = useState("60");
   const [creating, setCreating] = useState(false);
+  const [previewLeads, setPreviewLeads] = useState<PreviewLead[]>([]);
+  const [previewProducts, setPreviewProducts] = useState<Record<string, string[]>>({});
+
+  const composedTemplate = useMemo(
+    () => composeWhatsappMessage(greetingTemplate, message),
+    [greetingTemplate, message]
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -101,6 +167,8 @@ export function CreateWhatsappCampaignModal({
     setMatchCount(null);
     setSelectedTemplate("__custom__");
     setMessage("");
+    setGreetingOption(WHATSAPP_GREETING_PRESETS[0].id);
+    setGreetingTemplate(WHATSAPP_GREETING_PRESETS[0].template);
     setLink("");
     setLinkError(null);
     setFile(null);
@@ -108,8 +176,15 @@ export function CreateWhatsappCampaignModal({
     setBatchSize("10");
     setDelayMessages("5");
     setDelayBatches("60");
+    setPreviewLeads([]);
+    setPreviewProducts({});
 
     (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      const meta = user?.user_metadata as Record<string, unknown> | undefined;
+      const fullName = (meta?.full_name ?? meta?.name) as string | undefined;
+      setVendedor(fullName?.trim() || user?.email?.split("@")[0] || "Equipe NAR");
+
       const { data } = await supabase
         .from("whatsapp_message_templates")
         .select("id, name, content")
@@ -126,6 +201,12 @@ export function CreateWhatsappCampaignModal({
       if (!cancelled) {
         setMatchCount(count);
         setCountLoading(false);
+      }
+    });
+    fetchPreviewLeads(filters).then(({ leads, productsByLead }) => {
+      if (!cancelled) {
+        setPreviewLeads(leads);
+        setPreviewProducts(productsByLead);
       }
     });
     return () => { cancelled = true; };
@@ -170,10 +251,39 @@ export function CreateWhatsappCampaignModal({
     setFile(f);
   }
 
+  function handleGreetingOptionChange(id: string) {
+    setGreetingOption(id);
+    if (id === NO_GREETING_ID) {
+      setGreetingTemplate("");
+      return;
+    }
+    const preset = WHATSAPP_GREETING_PRESETS.find((p) => p.id === id);
+    if (preset) setGreetingTemplate(preset.template);
+  }
+
+  function handleMessagePaste(e: ClipboardEvent<HTMLTextAreaElement>) {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.type.startsWith("image/")) {
+        const blob = item.getAsFile();
+        if (blob) {
+          e.preventDefault();
+          const ext = item.type.split("/")[1] || "png";
+          const pasted = new File([blob], `colado-${Date.now()}.${ext}`, { type: item.type });
+          handleFileChange(pasted);
+          toast.success("Imagem colada anexada.");
+        }
+        return;
+      }
+    }
+  }
+
   const canCreate =
     !creating &&
     name.trim().length > 0 &&
-    (message.trim().length > 0 || link.trim().length > 0 || !!file) &&
+    (composedTemplate.trim().length > 0 || link.trim().length > 0 || !!file) &&
     !linkError &&
     !fileError &&
     (matchCount ?? 0) > 0;
@@ -195,7 +305,7 @@ export function CreateWhatsappCampaignModal({
         .insert({
           user_id: user.id,
           name: name.trim(),
-          message_template: message.trim(),
+          message_template: composedTemplate.trim(),
           link: link.trim() || null,
           filters: filtersPayload,
           batch_size: Math.max(1, parseInt(batchSize, 10) || 10),
@@ -342,10 +452,33 @@ export function CreateWhatsappCampaignModal({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-muted-foreground">Mensagem</label>
+            <label className="text-xs text-muted-foreground">Saudação automática</label>
+            <select
+              value={greetingOption}
+              onChange={(e) => handleGreetingOptionChange(e.target.value)}
+              className={FIELD_CLASS}
+            >
+              {WHATSAPP_GREETING_PRESETS.map((p) => (
+                <option key={p.id} value={p.id}>{p.label}</option>
+              ))}
+              <option value={NO_GREETING_ID}>Sem saudação automática</option>
+            </select>
+            {greetingOption !== NO_GREETING_ID && (
+              <Input
+                value={greetingTemplate}
+                onChange={(e) => setGreetingTemplate(e.target.value)}
+                placeholder="Olá, {{nome}}, tudo bem?"
+                className="h-10 rounded-xl bg-input border-border text-sm"
+              />
+            )}
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-muted-foreground">Mensagem (corpo)</label>
             <Textarea
               value={message}
               onChange={(e) => { setMessage(e.target.value); setSelectedTemplate("__custom__"); }}
+              onPaste={handleMessagePaste}
               rows={6}
               className="rounded-xl bg-input border-border text-sm resize-none"
               placeholder="Digite a mensagem… use {{variavel}} para personalizar por lead"
@@ -362,6 +495,31 @@ export function CreateWhatsappCampaignModal({
                 {`{{${v.key}}}`}
               </span>
             ))}
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-muted-foreground">Prévia para alguns leads</label>
+            {previewLeads.length === 0 ? (
+              <p className="text-xs text-muted-foreground">
+                Nenhum lead correspondente para pré-visualizar ainda.
+              </p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {previewLeads.map((previewLead) => (
+                  <div key={previewLead.id} className="rounded-xl bg-muted/50 border border-border text-sm px-3 py-2">
+                    <p className="text-xs font-medium text-foreground mb-1">
+                      {previewLead.nome || previewLead.empresa || "Lead sem nome"}
+                    </p>
+                    <p className="whitespace-pre-wrap text-foreground">
+                      {renderTemplate(
+                        composedTemplate,
+                        buildLeadTemplateVariables(previewLead, previewProducts[previewLead.id] ?? [], vendedor)
+                      ) || <span className="text-muted-foreground">A prévia aparecerá aqui…</span>}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -390,7 +548,7 @@ export function CreateWhatsappCampaignModal({
             ) : (
               <input
                 type="file"
-                accept="image/jpeg,image/png,image/webp,video/mp4,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
+                accept={ATTACHMENT_ACCEPT}
                 onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
                 className="text-sm text-muted-foreground file:mr-3 file:h-9 file:px-3 file:rounded-xl file:border-0 file:bg-secondary file:text-foreground file:text-xs file:font-medium"
               />

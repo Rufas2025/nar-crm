@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ClipboardEvent } from "react";
 import { toast } from "sonner";
 import { supabase, Lead } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
@@ -15,11 +15,16 @@ import { Loader2, Paperclip, Send, X } from "lucide-react";
 import {
   buildLeadTemplateVariables,
   renderTemplate,
+  composeWhatsappMessage,
   DEFAULT_WHATSAPP_TEMPLATES,
   WHATSAPP_TEMPLATE_VARIABLES,
+  WHATSAPP_GREETING_PRESETS,
+  NO_GREETING_ID,
   validateAttachment,
   normalizePhoneForWhatsapp,
 } from "@/lib/whatsapp";
+
+const ATTACHMENT_ACCEPT = "image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip,.m4a,.opus,.mov,.webm";
 
 type StoredTemplate = { id: string; name: string; content: string };
 
@@ -42,6 +47,8 @@ export function WhatsappSendModal({
   const [selectedTemplate, setSelectedTemplate] = useState<string>(`__default__:${DEFAULT_TEMPLATE_NAME}`);
   const [vendedor, setVendedor] = useState("Equipe NAR");
   const [message, setMessage] = useState("");
+  const [greetingOption, setGreetingOption] = useState<string>(WHATSAPP_GREETING_PRESETS[0].id);
+  const [greetingTemplate, setGreetingTemplate] = useState<string>(WHATSAPP_GREETING_PRESETS[0].template);
   const [link, setLink] = useState("");
   const [linkError, setLinkError] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
@@ -50,6 +57,11 @@ export function WhatsappSendModal({
 
   const variables = useMemo(() => buildLeadTemplateVariables(lead, produtos, vendedor), [lead, produtos, vendedor]);
 
+  const finalMessage = useMemo(
+    () => renderTemplate(composeWhatsappMessage(greetingTemplate, message), variables),
+    [greetingTemplate, message, variables]
+  );
+
   useEffect(() => {
     if (!open) return;
 
@@ -57,6 +69,8 @@ export function WhatsappSendModal({
     setLinkError(null);
     setFile(null);
     setFileError(null);
+    setGreetingOption(WHATSAPP_GREETING_PRESETS[0].id);
+    setGreetingTemplate(WHATSAPP_GREETING_PRESETS[0].template);
     setSelectedTemplate(`__default__:${DEFAULT_TEMPLATE_NAME}`);
 
     (async () => {
@@ -118,8 +132,37 @@ export function WhatsappSendModal({
     setFile(f);
   }
 
+  function handleGreetingOptionChange(id: string) {
+    setGreetingOption(id);
+    if (id === NO_GREETING_ID) {
+      setGreetingTemplate("");
+      return;
+    }
+    const preset = WHATSAPP_GREETING_PRESETS.find((p) => p.id === id);
+    if (preset) setGreetingTemplate(preset.template);
+  }
+
+  function handleMessagePaste(e: ClipboardEvent<HTMLTextAreaElement>) {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.type.startsWith("image/")) {
+        const blob = item.getAsFile();
+        if (blob) {
+          e.preventDefault();
+          const ext = item.type.split("/")[1] || "png";
+          const pasted = new File([blob], `colado-${Date.now()}.${ext}`, { type: item.type });
+          handleFileChange(pasted);
+          toast.success("Imagem colada anexada.");
+        }
+        return;
+      }
+    }
+  }
+
   const phone = normalizePhoneForWhatsapp(lead.telefone);
-  const canSend = !sending && !!phone && (!!message.trim() || !!link.trim() || !!file) && !linkError && !fileError;
+  const canSend = !sending && !!phone && (!!finalMessage.trim() || !!link.trim() || !!file) && !linkError && !fileError;
 
   async function handleSend() {
     if (!phone) {
@@ -172,7 +215,7 @@ export function WhatsappSendModal({
         body: {
           leadId: lead.id,
           phone,
-          message: message.trim() || null,
+          message: finalMessage.trim() || null,
           link: link.trim() || null,
           attachmentId,
           templateId,
@@ -245,10 +288,33 @@ export function WhatsappSendModal({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-muted-foreground">Mensagem</label>
+            <label className="text-xs text-muted-foreground">Saudação automática</label>
+            <select
+              value={greetingOption}
+              onChange={(e) => handleGreetingOptionChange(e.target.value)}
+              className="h-10 rounded-xl bg-input border border-border text-sm text-foreground px-3 focus:outline-none focus:ring-1 focus:ring-primary"
+            >
+              {WHATSAPP_GREETING_PRESETS.map((p) => (
+                <option key={p.id} value={p.id}>{p.label}</option>
+              ))}
+              <option value={NO_GREETING_ID}>Sem saudação automática</option>
+            </select>
+            {greetingOption !== NO_GREETING_ID && (
+              <Input
+                value={greetingTemplate}
+                onChange={(e) => setGreetingTemplate(e.target.value)}
+                placeholder="Olá, {{nome}}, tudo bem?"
+                className="h-10 rounded-xl bg-input border-border text-sm"
+              />
+            )}
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-muted-foreground">Mensagem (corpo)</label>
             <Textarea
               value={message}
               onChange={(e) => { setMessage(e.target.value); setSelectedTemplate("__custom__"); }}
+              onPaste={handleMessagePaste}
               rows={6}
               className="rounded-xl bg-input border-border text-sm resize-none"
               placeholder="Digite a mensagem…"
@@ -265,6 +331,13 @@ export function WhatsappSendModal({
                 {`{{${v.key}}}`}
               </span>
             ))}
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-muted-foreground">Prévia da mensagem final</label>
+            <div className="rounded-xl bg-muted/50 border border-border text-sm text-foreground px-3 py-2 whitespace-pre-wrap">
+              {finalMessage || <span className="text-muted-foreground">A prévia aparecerá aqui…</span>}
+            </div>
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -293,7 +366,7 @@ export function WhatsappSendModal({
             ) : (
               <input
                 type="file"
-                accept="image/jpeg,image/png,image/webp,video/mp4,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
+                accept={ATTACHMENT_ACCEPT}
                 onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
                 className="text-sm text-muted-foreground file:mr-3 file:h-9 file:px-3 file:rounded-xl file:border-0 file:bg-secondary file:text-foreground file:text-xs file:font-medium"
               />

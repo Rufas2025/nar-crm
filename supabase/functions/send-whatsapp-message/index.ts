@@ -107,7 +107,7 @@ Deno.serve(async (req) => {
       const parts: string[] = [];
       if (message) parts.push(`"${String(message).slice(0, 200)}"`);
       if (link) parts.push(`link: ${link}`);
-      if (attachment) parts.push(`anexo: ${attachment.file_name}`);
+      if (attachment) parts.push(`anexo: ${attachment.file_name} (${attachment.file_type})`);
 
       await supabase.from("activities").insert({
         lead_id: leadId,
