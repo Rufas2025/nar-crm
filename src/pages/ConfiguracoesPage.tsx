@@ -97,6 +97,8 @@ export default function ConfiguracoesPage() {
         lastTestError,
       });
       setBaseUrl(cleanUrl);
+      setApiKey(cleanKey);
+      setInstanceName(cleanInstance);
 
       toast.success("Configuração da Evolution API salva com sucesso.");
 
@@ -120,6 +122,8 @@ export default function ConfiguracoesPage() {
     }
 
     setBaseUrl(cleanUrl);
+    setApiKey(cleanKey);
+    setInstanceName(cleanInstance);
     await runConnectionTest(cleanUrl, cleanKey, cleanInstance);
   }
 
