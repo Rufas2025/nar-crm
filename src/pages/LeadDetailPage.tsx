@@ -459,12 +459,11 @@ export default function LeadDetailPage() {
   const [sendingWhatsApp, setSendingWhatsApp] = useState(false);
 
   async function handleSendWhatsApp() {
-    if (!lead?.telefone) return;
+    if (!lead?.telefone) {
+      toast.error("Telefone inválido");
+      return;
+    }
     setSendingWhatsApp(true);
-
-    // Limpa telefone removendo tudo que não for dígito
-    let phone = lead.telefone.replace(/\D/g, "");
-    if (!phone.startsWith("55")) phone = "55" + phone;
 
     const nome = lead.nome || "";
     const escola = lead.empresa || "—";
@@ -483,20 +482,19 @@ Interesse: ${produtos}
 
 Se essa mensagem abriu corretamente no WhatsApp, o teste manual do CRM funcionou.`;
 
-    const { data, error } = await supabase.functions.invoke("evolution-send-message", {
-      body: { leadId: id, phone, message: mensagem },
+    // O backend normaliza o telefone (adiciona 55 quando necessário) e
+    // busca a configuração da Evolution na tabela evolution_config.
+    const result = await sendWhatsAppMessage({
+      leadId: id,
+      phone: lead.telefone,
+      message: mensagem,
     });
 
-    if (error || !data?.ok) {
-      let errMsg = data?.error as string | undefined;
-      if (!errMsg && error && "context" in error) {
-        const body = await (error as { context?: Response }).context?.json?.().catch(() => null);
-        errMsg = body?.error;
-      }
-      errMsg = errMsg || error?.message || "Erro ao enviar mensagem.";
+    if (!result.ok) {
+      const errMsg = result.error || "Erro ao enviar mensagem.";
       toast.error(
-        errMsg.includes("não configurada")
-          ? `${errMsg} Acesse Configurações para conectar a Evolution API.`
+        errMsg.includes("não encontrada") || errMsg.includes("Configuração")
+          ? `${errMsg}`
           : `Erro ao enviar WhatsApp: ${errMsg}`
       );
       setSendingWhatsApp(false);
@@ -507,7 +505,11 @@ Se essa mensagem abriu corretamente no WhatsApp, o teste manual do CRM funcionou
     if (refreshed) setLead(refreshed);
     await fetchActivities();
     window.dispatchEvent(new CustomEvent("leads:refresh"));
-    toast.success("Mensagem enviada via WhatsApp e interação registrada com sucesso.");
+    toast.success(
+      result.interactionRegistered
+        ? "Mensagem enviada via WhatsApp e interação registrada com sucesso."
+        : "Mensagem enviada via WhatsApp (interação não registrada)."
+    );
     setSendingWhatsApp(false);
   }
 

@@ -1,6 +1,5 @@
-import { supabase as cloudFunctions } from "@/integrations/supabase/client";
-
-const STORAGE_KEY = "evolution_api_settings";
+import { supabase as crm } from "@/lib/supabase";
+import { supabase as cloud } from "@/integrations/supabase/client";
 
 export type EvolutionSettings = {
   apiUrl: string;
@@ -11,33 +10,57 @@ export type EvolutionSettings = {
   lastTestError: string | null;
 };
 
-/**
- * Lê a configuração da Evolution API do armazenamento local do navegador.
- */
-export async function loadEvolutionSettings(): Promise<EvolutionSettings | null> {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object") return null;
-    return {
-      apiUrl: parsed.apiUrl ?? "",
-      apiKey: parsed.apiKey ?? "",
-      instanceName: parsed.instanceName ?? "",
-      connectionStatus: parsed.connectionStatus ?? null,
-      lastTestedAt: parsed.lastTestedAt ?? null,
-      lastTestError: parsed.lastTestError ?? null,
-    };
-  } catch {
-    return null;
-  }
+async function getCrmToken(): Promise<string | null> {
+  const { data } = await crm.auth.getSession();
+  return data.session?.access_token ?? null;
 }
 
 /**
- * Salva a configuração da Evolution API no armazenamento local do navegador.
+ * Lê a configuração da Evolution API da tabela `evolution_config` (via backend).
+ */
+export async function loadEvolutionSettings(): Promise<EvolutionSettings | null> {
+  const authToken = await getCrmToken();
+  if (!authToken) return null;
+
+  const { data, error } = await cloud.functions.invoke("evolution-config", {
+    body: { action: "get", authToken },
+  });
+
+  if (error || !data?.ok || !data?.config) return null;
+
+  const c = data.config;
+  return {
+    apiUrl: c.api_url ?? "",
+    apiKey: c.api_key ?? "",
+    instanceName: c.instance_name ?? "",
+    connectionStatus: c.connection_status ?? null,
+    lastTestedAt: c.last_tested_at ?? null,
+    lastTestError: c.last_test_error ?? null,
+  };
+}
+
+/**
+ * Salva a configuração da Evolution API na tabela `evolution_config` (via backend).
  */
 export async function saveEvolutionSettings(settings: EvolutionSettings): Promise<void> {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+  const authToken = await getCrmToken();
+  if (!authToken) throw new Error("Usuário não autenticado.");
+
+  const { data, error } = await cloud.functions.invoke("evolution-config", {
+    body: {
+      action: "save",
+      authToken,
+      apiUrl: settings.apiUrl,
+      apiKey: settings.apiKey,
+      instanceName: settings.instanceName,
+      connectionStatus: settings.connectionStatus,
+      lastTestedAt: settings.lastTestedAt,
+      lastTestError: settings.lastTestError,
+    },
+  });
+
+  if (error) throw new Error(error.message);
+  if (!data?.ok) throw new Error(data?.error ?? "Erro ao salvar configuração.");
 }
 
 export type EvolutionTestResult = {
@@ -50,7 +73,6 @@ export type EvolutionTestResult = {
 
 /**
  * Testa a conexão com a Evolution API via backend (evita CORS no navegador).
- * Envia as credenciais informadas e recebe o estado real da instância.
  */
 export async function testEvolutionConnection(
   settings: Pick<EvolutionSettings, "apiUrl" | "apiKey" | "instanceName">
@@ -58,7 +80,7 @@ export async function testEvolutionConnection(
   const testedAt = new Date().toISOString();
 
   try {
-    const { data, error } = await cloudFunctions.functions.invoke("test-evolution-connection", {
+    const { data, error } = await cloud.functions.invoke("test-evolution-connection", {
       body: {
         apiUrl: settings.apiUrl,
         apiKey: settings.apiKey,
@@ -87,5 +109,55 @@ export async function testEvolutionConnection(
       testedAt,
       error: `Erro de rede: não foi possível chamar o backend de teste. ${String(e?.message ?? e)}`,
     };
+  }
+}
+
+export type SendWhatsAppResult = {
+  ok: boolean;
+  error?: string | null;
+  messageId?: string | null;
+  interactionRegistered?: boolean;
+};
+
+/**
+ * Envia mensagem de WhatsApp pelo backend (Edge Function `evolution-send-message`),
+ * que busca a configuração na tabela `evolution_config` e usa a Evolution GO.
+ */
+export async function sendWhatsAppMessage(params: {
+  leadId?: string | null;
+  phone: string;
+  message?: string | null;
+}): Promise<SendWhatsAppResult> {
+  const authToken = await getCrmToken();
+  if (!authToken) return { ok: false, error: "Usuário não autenticado." };
+
+  try {
+    const { data, error } = await cloud.functions.invoke("evolution-send-message", {
+      body: {
+        authToken,
+        leadId: params.leadId ?? null,
+        phone: params.phone,
+        message: params.message ?? null,
+      },
+    });
+
+    if (error) {
+      // Tenta extrair a mensagem real do corpo da resposta de erro
+      let errMsg: string | undefined;
+      if ("context" in error) {
+        const body = await (error as { context?: Response }).context?.json?.().catch(() => null);
+        errMsg = body?.error;
+      }
+      return { ok: false, error: errMsg ?? error.message ?? "Erro ao enviar mensagem." };
+    }
+
+    return {
+      ok: data?.ok === true,
+      error: data?.error ?? null,
+      messageId: data?.messageId ?? null,
+      interactionRegistered: data?.interactionRegistered === true,
+    };
+  } catch (e: any) {
+    return { ok: false, error: String(e?.message ?? e) };
   }
 }
