@@ -60,12 +60,15 @@ async function getCrmUser(authToken: string): Promise<{ id: string } | null> {
   }
 }
 
-const BodySchema = z.object({
-  authToken: z.string().min(10),
-  leadId: z.string().uuid().nullable().optional(),
-  phone: z.string().min(1).max(50),
-  message: z.string().max(4000).nullable().optional(),
-});
+const BodySchema = z
+  .object({
+    authToken: z.string().min(10),
+    leadId: z.string().uuid().nullable().optional(),
+    phone: z.string().min(1).max(50).optional(),
+    phoneNumber: z.string().min(1).max(50).optional(),
+    message: z.string().max(4000).nullable().optional(),
+  })
+  .refine((d) => d.phone || d.phoneNumber, { message: "Telefone obrigatório" });
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -77,25 +80,29 @@ Deno.serve(async (req) => {
       return responseJson({ ok: false, error: "Telefone inválido ou requisição malformada." }, 400);
     }
     const { authToken, leadId } = parsed.data;
+    const rawPhone = parsed.data.phone ?? parsed.data.phoneNumber ?? "";
 
     // 1. Autenticação (token da sessão do CRM)
     const user = await getCrmUser(authToken);
     if (!user) return responseJson({ ok: false, error: "Não autenticado." }, 401);
 
     // 2. Telefone
-    const normalizedPhone = normalizePhone(parsed.data.phone);
+    const normalizedPhone = normalizePhone(rawPhone);
     console.log(
       `[evolution-send-message] leadId=${leadId ?? "-"} telefone original=${maskPhone(
-        (parsed.data.phone ?? "").replace(/\D/g, "")
+        rawPhone.replace(/\D/g, "")
       )} normalizado=${normalizedPhone ? maskPhone(normalizedPhone) : "INVÁLIDO"}`
     );
     if (!normalizedPhone) {
       return responseJson({ ok: false, error: "Telefone inválido" }, 400);
     }
 
-    // 3. Mensagem (padrão se vazia)
-    const message =
-      (parsed.data.message ?? "").trim().length > 0 ? parsed.data.message!.trim() : DEFAULT_MESSAGE;
+    // 3. Mensagem: usa exatamente o texto do frontend; padrão apenas como fallback se vazia
+    const trimmedMessage = (parsed.data.message ?? "").trim();
+    if (trimmedMessage.length > 0 && trimmedMessage.length < 5) {
+      return responseJson({ ok: false, error: "A mensagem deve ter pelo menos 5 caracteres." }, 400);
+    }
+    const message = trimmedMessage.length > 0 ? trimmedMessage : DEFAULT_MESSAGE;
 
     // 4. Configuração da Evolution (tabela evolution_config — mesma da tela Configurações)
     const serviceDb = createClient(
