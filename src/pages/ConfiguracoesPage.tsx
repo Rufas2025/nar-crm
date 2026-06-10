@@ -103,7 +103,7 @@ export default function ConfiguracoesPage() {
       toast.success("Configuração da Evolution API salva com sucesso.");
 
       // Após salvar com sucesso, roda automaticamente o teste de conexão
-      await runConnectionTest();
+      await runConnectionTest({ apiUrl: cleanUrl, apiKey: cleanKey, instanceName: cleanInstance });
     } catch (err: any) {
       toast.error("Erro ao salvar: " + String(err?.message ?? err));
     } finally {
@@ -137,7 +137,7 @@ export default function ConfiguracoesPage() {
       setApiKey(cleanKey);
       setInstanceName(cleanInstance);
 
-      await runConnectionTest();
+      await runConnectionTest({ apiUrl: cleanUrl, apiKey: cleanKey, instanceName: cleanInstance });
     } catch (err: any) {
       toast.error("Erro ao salvar configuração antes do teste: " + String(err?.message ?? err));
       setTesting(false);
