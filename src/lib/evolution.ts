@@ -1,6 +1,6 @@
-import { supabase } from "@/lib/supabase";
+import { supabase as cloudFunctions } from "@/integrations/supabase/client";
 
-const CACHE_KEY = "evolution_api_settings_cache";
+const STORAGE_KEY = "evolution_api_settings";
 
 export type EvolutionSettings = {
   apiUrl: string;
@@ -11,18 +11,18 @@ export type EvolutionSettings = {
   lastTestError: string | null;
 };
 
-// Cache visual: nunca guarda a API Key, apenas o necessário para exibir o
-// formulário/status instantaneamente enquanto o Supabase responde.
-type CachedSettings = Omit<EvolutionSettings, "apiKey">;
-
-function loadCache(): CachedSettings | null {
+/**
+ * Lê a configuração da Evolution API do armazenamento local do navegador.
+ */
+export async function loadEvolutionSettings(): Promise<EvolutionSettings | null> {
   try {
-    const raw = localStorage.getItem(CACHE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     if (!parsed || typeof parsed !== "object") return null;
     return {
       apiUrl: parsed.apiUrl ?? "",
+      apiKey: parsed.apiKey ?? "",
       instanceName: parsed.instanceName ?? "",
       connectionStatus: parsed.connectionStatus ?? null,
       lastTestedAt: parsed.lastTestedAt ?? null,
@@ -33,77 +33,11 @@ function loadCache(): CachedSettings | null {
   }
 }
 
-function saveCache(settings: EvolutionSettings) {
-  try {
-    const { apiKey: _apiKey, ...cacheable } = settings;
-    localStorage.setItem(CACHE_KEY, JSON.stringify(cacheable));
-  } catch {
-    // localStorage indisponível — cache visual é apenas otimização
-  }
-}
-
 /**
- * Lê a configuração da Evolution API a partir da tabela `evolution_config`
- * (fonte principal). Em caso de falha de rede, recai para o cache local
- * (sem API Key) apenas para exibição.
- */
-export async function loadEvolutionSettings(): Promise<EvolutionSettings | null> {
-  const { data: userData } = await supabase.auth.getUser();
-  const userId = userData?.user?.id;
-  if (!userId) return null;
-
-  const { data, error } = await supabase
-    .from("evolution_config")
-    .select("api_url, api_key, instance_name, connection_status, last_tested_at, last_test_error")
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  if (error) {
-    const cached = loadCache();
-    return cached ? { ...cached, apiKey: "" } : null;
-  }
-  if (!data) return null;
-
-  const settings: EvolutionSettings = {
-    apiUrl: data.api_url ?? "",
-    apiKey: data.api_key ?? "",
-    instanceName: data.instance_name ?? "",
-    connectionStatus: data.connection_status,
-    lastTestedAt: data.last_tested_at,
-    lastTestError: data.last_test_error,
-  };
-  saveCache(settings);
-  return settings;
-}
-
-/**
- * Salva a configuração da Evolution API na tabela `evolution_config`
- * (uma linha por usuário). O cache local é só uma cópia para exibição.
+ * Salva a configuração da Evolution API no armazenamento local do navegador.
  */
 export async function saveEvolutionSettings(settings: EvolutionSettings): Promise<void> {
-  const { data: userData, error: userErr } = await supabase.auth.getUser();
-  const userId = userData?.user?.id;
-  if (userErr || !userId) {
-    throw new Error("Usuário não autenticado.");
-  }
-
-  const { error } = await supabase.from("evolution_config").upsert(
-    {
-      user_id: userId,
-      api_url: settings.apiUrl,
-      api_key: settings.apiKey,
-      instance_name: settings.instanceName,
-      connection_status: settings.connectionStatus,
-      last_tested_at: settings.lastTestedAt,
-      last_test_error: settings.lastTestError,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: "user_id" }
-  );
-
-  if (error) throw error;
-
-  saveCache(settings);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
 }
 
 export type EvolutionTestResult = {
@@ -115,15 +49,22 @@ export type EvolutionTestResult = {
 };
 
 /**
- * Pede para a Edge Function testar a conexão com a Evolution API usando a
- * configuração já salva em `evolution_config` (lida no backend). A Edge
- * Function também atualiza connection_status/last_tested_at/last_test_error.
+ * Testa a conexão com a Evolution API via backend (evita CORS no navegador).
+ * Envia as credenciais informadas e recebe o estado real da instância.
  */
-export async function testEvolutionConnection(): Promise<EvolutionTestResult> {
+export async function testEvolutionConnection(
+  settings: Pick<EvolutionSettings, "apiUrl" | "apiKey" | "instanceName">
+): Promise<EvolutionTestResult> {
   const testedAt = new Date().toISOString();
 
   try {
-    const { data, error } = await supabase.functions.invoke("test-evolution-connection");
+    const { data, error } = await cloudFunctions.functions.invoke("test-evolution-connection", {
+      body: {
+        apiUrl: settings.apiUrl,
+        apiKey: settings.apiKey,
+        instanceName: settings.instanceName,
+      },
+    });
 
     if (error) {
       return {

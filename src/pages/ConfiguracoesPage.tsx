@@ -44,11 +44,11 @@ export default function ConfiguracoesPage() {
     })();
   }, []);
 
-  async function runConnectionTest() {
+  async function runConnectionTest(creds: { apiUrl: string; apiKey: string; instanceName: string }) {
     setTesting(true);
 
     try {
-      const result = await testEvolutionConnection();
+      const result = await testEvolutionConnection(creds);
       const status = result.state ?? (result.ok ? "open" : "error");
 
       if (result.ok) {
@@ -60,6 +60,14 @@ export default function ConfiguracoesPage() {
       setConnectionStatus(status);
       setLastTestedAt(result.testedAt);
       setLastTestError(result.error ?? null);
+
+      // Persiste o resultado do teste junto com as credenciais
+      await saveEvolutionSettings({
+        ...creds,
+        connectionStatus: status,
+        lastTestedAt: result.testedAt,
+        lastTestError: result.error ?? null,
+      });
     } finally {
       setTesting(false);
     }
@@ -95,7 +103,7 @@ export default function ConfiguracoesPage() {
       toast.success("Configuração da Evolution API salva com sucesso.");
 
       // Após salvar com sucesso, roda automaticamente o teste de conexão
-      await runConnectionTest();
+      await runConnectionTest({ apiUrl: cleanUrl, apiKey: cleanKey, instanceName: cleanInstance });
     } catch (err: any) {
       toast.error("Erro ao salvar: " + String(err?.message ?? err));
     } finally {
@@ -129,7 +137,7 @@ export default function ConfiguracoesPage() {
       setApiKey(cleanKey);
       setInstanceName(cleanInstance);
 
-      await runConnectionTest();
+      await runConnectionTest({ apiUrl: cleanUrl, apiKey: cleanKey, instanceName: cleanInstance });
     } catch (err: any) {
       toast.error("Erro ao salvar configuração antes do teste: " + String(err?.message ?? err));
       setTesting(false);
