@@ -1,6 +1,11 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
+function cleanMessage(value: unknown) {
+  const message = typeof value === "string" ? value : JSON.stringify(value ?? "");
+  return message.replace(/apikey\s*[:=]\s*[^\s,}"']+/gi, "apikey: ***").slice(0, 500);
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
@@ -31,7 +36,8 @@ Deno.serve(async (req) => {
 
     const { data: config, error: configErr } = await supabase
       .from("evolution_config")
-      .select("*")
+      .select("api_url, api_key, instance_name")
+      .eq("user_id", userId)
       .maybeSingle();
     if (configErr) throw configErr;
     if (!config) {
@@ -42,22 +48,40 @@ Deno.serve(async (req) => {
     }
 
     const cleanPhone = phone.replace(/\D/g, "");
-    const sendUrl = `${config.base_url.replace(/\/$/, "")}/message/sendText/${config.instance_name}`;
-    const evoResp = await fetch(sendUrl, {
-      method: "POST",
-      headers: { apikey: config.api_key, "Content-Type": "application/json" },
-      body: JSON.stringify({ number: cleanPhone, text: message }),
-    });
-    const evoData = await evoResp.json().catch(() => ({}));
+    const apiUrl = config.api_url.replace(/\/+$/, "");
+    const sendUrl = `${apiUrl}/send/text`;
 
-    if (!evoResp.ok) {
+    let evoResp: Response;
+    try {
+      evoResp = await fetch(sendUrl, {
+        method: "POST",
+        headers: { apikey: config.api_key, "Content-Type": "application/json" },
+        body: JSON.stringify({ number: cleanPhone, text: message }),
+      });
+    } catch (e) {
       return new Response(
-        JSON.stringify({ ok: false, error: evoData?.message ?? `Erro HTTP ${evoResp.status}`, raw: evoData }),
+        JSON.stringify({ ok: false, error: `Erro de rede ao enviar mensagem: ${cleanMessage((e as Error)?.message ?? e)}` }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const evolutionMessageId = evoData?.key?.id ?? null;
+    const evoText = await evoResp.text();
+    let evoData: any = {};
+    try {
+      evoData = JSON.parse(evoText);
+    } catch {
+      // resposta não-JSON
+    }
+
+    if (!evoResp.ok) {
+      const details = cleanMessage(evoData?.message ?? evoData?.error ?? evoText ?? "sem corpo de resposta");
+      return new Response(
+        JSON.stringify({ ok: false, error: `Erro ${evoResp.status} ao enviar mensagem: ${details}` }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const evolutionMessageId = evoData?.key?.id ?? evoData?.data?.key?.id ?? null;
 
     await supabase.from("whatsapp_messages").insert({
       lead_id: leadId ?? null,
@@ -88,7 +112,7 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    return new Response(JSON.stringify({ ok: false, error: String(e?.message ?? e) }), {
+    return new Response(JSON.stringify({ ok: false, error: cleanMessage((e as Error)?.message ?? e) }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

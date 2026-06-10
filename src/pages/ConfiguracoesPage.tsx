@@ -20,54 +20,46 @@ export default function ConfiguracoesPage() {
   const [baseUrl, setBaseUrl] = useState("");
   const [apiKey, setApiKey] = useState("");
   const [instanceName, setInstanceName] = useState("");
-  const [lastTestStatus, setLastTestStatus] = useState<string | null>(null);
-  const [lastTestAt, setLastTestAt] = useState<string | null>(null);
+  const [connectionStatus, setConnectionStatus] = useState<string | null>(null);
+  const [lastTestedAt, setLastTestedAt] = useState<string | null>(null);
   const [lastTestError, setLastTestError] = useState<string | null>(null);
 
   useEffect(() => {
-    const saved = loadEvolutionSettings();
-    if (saved) {
-      setBaseUrl(saved.baseUrl);
-      setApiKey(saved.apiKey);
-      setInstanceName(saved.instanceName);
-      setLastTestStatus(saved.lastTestStatus);
-      setLastTestAt(saved.lastTestAt);
-      setLastTestError(saved.lastTestError);
-    }
-    setLoading(false);
+    (async () => {
+      try {
+        const saved = await loadEvolutionSettings();
+        if (saved) {
+          setBaseUrl(saved.apiUrl);
+          setApiKey(saved.apiKey);
+          setInstanceName(saved.instanceName);
+          setConnectionStatus(saved.connectionStatus);
+          setLastTestedAt(saved.lastTestedAt);
+          setLastTestError(saved.lastTestError);
+        }
+      } catch (err: any) {
+        toast.error("Erro ao carregar configuração: " + String(err?.message ?? err));
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
-  async function runConnectionTest(url: string, key: string, instance: string) {
+  async function runConnectionTest() {
     setTesting(true);
 
     try {
-      const result = await testEvolutionConnection(url, key, instance);
-      const status = result.ok && result.state === "open" ? "open" : "error";
-      const errorMessage = result.ok
-        ? null
-        : result.error ??
-          (result.state
-            ? `Instância não conectada. Estado retornado: "${result.state}".`
-            : "Erro desconhecido no teste de conexão.");
+      const result = await testEvolutionConnection();
+      const status = result.state ?? (result.ok ? "open" : "error");
 
-      if (status === "open") {
+      if (result.ok) {
         toast.success('Conexão testada: estado "open" (Conectado).');
       } else {
-        toast.error(errorMessage ?? `Instância não conectada. Estado retornado: "${status}".`);
+        toast.error(result.error ?? `Instância não conectada. Estado retornado: "${status}".`);
       }
 
-      setLastTestStatus(status);
-      setLastTestAt(result.testedAt);
-      setLastTestError(errorMessage);
-
-      saveEvolutionSettings({
-        baseUrl: url,
-        apiKey: key,
-        instanceName: instance,
-        lastTestStatus: status,
-        lastTestAt: result.testedAt,
-        lastTestError: errorMessage,
-      });
+      setConnectionStatus(status);
+      setLastTestedAt(result.testedAt);
+      setLastTestError(result.error ?? null);
     } finally {
       setTesting(false);
     }
@@ -88,12 +80,12 @@ export default function ConfiguracoesPage() {
     setSaving(true);
 
     try {
-      saveEvolutionSettings({
-        baseUrl: cleanUrl,
+      await saveEvolutionSettings({
+        apiUrl: cleanUrl,
         apiKey: cleanKey,
         instanceName: cleanInstance,
-        lastTestStatus,
-        lastTestAt,
+        connectionStatus,
+        lastTestedAt,
         lastTestError,
       });
       setBaseUrl(cleanUrl);
@@ -103,7 +95,7 @@ export default function ConfiguracoesPage() {
       toast.success("Configuração da Evolution API salva com sucesso.");
 
       // Após salvar com sucesso, roda automaticamente o teste de conexão
-      await runConnectionTest(cleanUrl, cleanKey, cleanInstance);
+      await runConnectionTest();
     } catch (err: any) {
       toast.error("Erro ao salvar: " + String(err?.message ?? err));
     } finally {
@@ -121,26 +113,43 @@ export default function ConfiguracoesPage() {
       return;
     }
 
-    setBaseUrl(cleanUrl);
-    setApiKey(cleanKey);
-    setInstanceName(cleanInstance);
-    await runConnectionTest(cleanUrl, cleanKey, cleanInstance);
+    setTesting(true);
+
+    try {
+      // Garante que o backend testa exatamente o que está na tela
+      await saveEvolutionSettings({
+        apiUrl: cleanUrl,
+        apiKey: cleanKey,
+        instanceName: cleanInstance,
+        connectionStatus,
+        lastTestedAt,
+        lastTestError,
+      });
+      setBaseUrl(cleanUrl);
+      setApiKey(cleanKey);
+      setInstanceName(cleanInstance);
+
+      await runConnectionTest();
+    } catch (err: any) {
+      toast.error("Erro ao salvar configuração antes do teste: " + String(err?.message ?? err));
+      setTesting(false);
+    }
   }
 
   function statusBadge() {
-    if (!lastTestStatus) {
+    if (!connectionStatus) {
       return <Badge variant="secondary">Não testado</Badge>;
     }
-    if (lastTestStatus === "open") {
+    if (connectionStatus === "open") {
       return <Badge className="bg-emerald-500 hover:bg-emerald-500 text-white">Conectado</Badge>;
     }
-    if (lastTestStatus === "error") {
+    if (connectionStatus === "error") {
       return <Badge variant="destructive">Erro</Badge>;
     }
-    if (["close", "closed", "connecting"].includes(lastTestStatus)) {
-      return <Badge variant="secondary">Não conectado ({lastTestStatus})</Badge>;
+    if (["close", "closed", "connecting"].includes(connectionStatus)) {
+      return <Badge variant="secondary">Não conectado ({connectionStatus})</Badge>;
     }
-    return <Badge variant="secondary">Desconectado ({lastTestStatus})</Badge>;
+    return <Badge variant="secondary">Desconectado ({connectionStatus})</Badge>;
   }
 
   if (loading) {
@@ -207,9 +216,9 @@ export default function ConfiguracoesPage() {
         <div className="flex items-center gap-2 pt-2">
           <span className="text-sm text-muted-foreground">Status da conexão:</span>
           {statusBadge()}
-          {lastTestAt && (
+          {lastTestedAt && (
             <span className="text-xs text-muted-foreground/60">
-              Testado em {new Date(lastTestAt).toLocaleString("pt-BR")}
+              Testado em {new Date(lastTestedAt).toLocaleString("pt-BR")}
             </span>
           )}
         </div>

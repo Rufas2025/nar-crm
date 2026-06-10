@@ -1,15 +1,5 @@
+import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
-import { z } from "npm:zod@3";
-
-const BodySchema = z.object({
-  apiUrl: z.string().url().max(500).optional(),
-  baseUrl: z.string().url().max(500).optional(),
-  apiKey: z.string().min(1).max(500),
-  instanceName: z.string().min(1).max(200),
-}).refine((value) => Boolean(value.apiUrl || value.baseUrl), {
-  message: "apiUrl é obrigatório",
-  path: ["apiUrl"],
-});
 
 function responseJson(body: Record<string, unknown>, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -34,28 +24,51 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const parsed = BodySchema.safeParse(await req.json().catch(() => ({})));
-    if (!parsed.success) {
-      return responseJson({ ok: false, error: "URL da Evolution API, API Key e nome da instância são obrigatórios e válidos", testedAt: new Date().toISOString() });
-    }
-    const { apiKey, instanceName } = parsed.data;
-    const apiUrl = (parsed.data.apiUrl ?? parsed.data.baseUrl ?? "").replace(/\/+$/, "");
+    const authHeader = req.headers.get("Authorization") ?? "";
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
 
-    const url = `${apiUrl}/instance/connectionState/${encodeURIComponent(instanceName)}`;
+    const { data: userData, error: userErr } = await supabase.auth.getUser();
+    if (userErr || !userData?.user) {
+      return responseJson({ ok: false, error: "Não autenticado" }, 401);
+    }
+    const userId = userData.user.id;
+
+    const { data: config, error: configErr } = await supabase
+      .from("evolution_config")
+      .select("api_url, api_key, instance_name")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (configErr) throw configErr;
+    if (!config) {
+      return responseJson({
+        ok: false,
+        error: "Evolution API não configurada. Preencha e salve as credenciais.",
+        testedAt: new Date().toISOString(),
+      });
+    }
+
+    const apiUrl = config.api_url.replace(/\/+$/, "");
+    const url = `${apiUrl}/instance/info/${encodeURIComponent(config.instance_name)}`;
     const testedAt = new Date().toISOString();
+
     let resp: Response;
     try {
       resp = await fetch(url, {
         method: "GET",
-        headers: { apikey: apiKey, "Content-Type": "application/json" },
+        headers: { apikey: config.api_key, "Content-Type": "application/json" },
       });
     } catch (e) {
-      return responseJson({
-        ok: false,
-        status: 0,
-        testedAt,
-        error: `Erro de rede: não foi possível acessar a URL da Evolution API. ${cleanMessage((e as Error)?.message ?? e)}`,
-      });
+      const error = `Erro de rede: não foi possível acessar a URL da Evolution API. ${cleanMessage((e as Error)?.message ?? e)}`;
+      await supabase
+        .from("evolution_config")
+        .update({ connection_status: "error", last_tested_at: testedAt, last_test_error: error })
+        .eq("user_id", userId);
+      return responseJson({ ok: false, status: 0, testedAt, error });
     }
 
     const text = await resp.text();
@@ -66,22 +79,33 @@ Deno.serve(async (req) => {
       // resposta não-JSON
     }
 
+    let state: string | undefined;
+    let error: string | null = null;
+
     if (!resp.ok) {
-      return responseJson({ ok: false, status: resp.status, testedAt, error: formatHttpError(resp.status, text, data) });
+      error = formatHttpError(resp.status, text, data);
+    } else {
+      const instanceData = data?.data ?? data?.instance ?? data;
+      const connected = instanceData?.connected;
+      state = typeof connected === "boolean"
+        ? (connected ? "open" : "close")
+        : (instanceData?.state ?? data?.state);
+
+      if (!state) {
+        error = "Resposta 2xx, mas sem informação de estado da instância.";
+      } else if (state !== "open") {
+        error = `Instância não conectada. Estado retornado: "${state}".`;
+      }
     }
 
-    const state = data?.instance?.state ?? data?.state;
-    if (!state) {
-      return responseJson({ ok: false, status: resp.status, testedAt, error: "Resposta 2xx, mas sem instance.state." });
-    }
+    const connectionStatus = state ?? "error";
 
-    return responseJson({
-      ok: state === "open",
-      state,
-      status: resp.status,
-      testedAt,
-      error: state === "open" ? null : `Instância não conectada. Estado retornado: "${state}".`,
-    });
+    await supabase
+      .from("evolution_config")
+      .update({ connection_status: connectionStatus, last_tested_at: testedAt, last_test_error: error })
+      .eq("user_id", userId);
+
+    return responseJson({ ok: state === "open", state, status: resp.status, testedAt, error });
   } catch (e) {
     return responseJson({ ok: false, error: cleanMessage((e as Error)?.message ?? e), testedAt: new Date().toISOString() }, 500);
   }
