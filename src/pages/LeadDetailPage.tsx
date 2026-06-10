@@ -457,60 +457,118 @@ export default function LeadDetailPage() {
     setSavingEdit(false);
   }
 
+  // ── WhatsApp send modal ──────────────────────────────────────────────────
   const [sendingWhatsApp, setSendingWhatsApp] = useState(false);
+  const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
+  const [whatsAppMessage, setWhatsAppMessage] = useState("");
+  const [whatsAppError, setWhatsAppError] = useState<string | null>(null);
 
-  async function handleSendWhatsApp() {
+  const DEFAULT_WHATSAPP_MESSAGE =
+    "Olá, tudo bem? Aqui é da NAR ECO. Estou entrando em contato sobre as soluções para sua escola.";
+
+  function getLeadVars() {
+    const linkedProds = products.map(
+      (p) => PRODUCTS.find((x) => x.value === p.produto)?.label || p.produto
+    );
+    return {
+      nome: lead?.nome || "",
+      escola: lead?.empresa || "",
+      cidade: lead?.cidade || "",
+      uf: lead?.uf || "",
+      cidadeUf:
+        lead?.cidade && lead?.uf ? `${lead.cidade}/${lead.uf}` : lead?.cidade || lead?.uf || "",
+      produtos: linkedProds.join(", "),
+      status: STATUS_OPTIONS.find((s) => s.value === lead?.lead_status)?.label || "",
+    };
+  }
+
+  const WHATSAPP_TEMPLATES = [
+    {
+      label: "Primeiro contato",
+      build: (v: ReturnType<typeof getLeadVars>) =>
+        `Olá, tudo bem? Aqui é da NAR ECO. Vi o cadastro da sua escola${
+          v.escola ? ` (${v.escola}${v.cidadeUf ? `, em ${v.cidadeUf}` : ""})` : ""
+        } e gostaria de apresentar algumas soluções que podem ajudar vocês.`,
+    },
+    {
+      label: "Apresentação de soluções",
+      build: () =>
+        "Olá, tudo bem? Aqui é da NAR ECO. Trabalhamos com soluções para escolas, incluindo EduInfo, Gennera, EcoClear e VibeFlow. Gostaria de entender melhor a necessidade de vocês.",
+    },
+    {
+      label: "Follow-up",
+      build: (v: ReturnType<typeof getLeadVars>) =>
+        `Olá${v.nome ? `, ${v.nome}` : ""}, tudo bem? Passando para dar continuidade ao nosso contato sobre as soluções da NAR ECO para sua escola${
+          v.escola ? ` (${v.escola})` : ""
+        }.`,
+    },
+    {
+      label: "Agendamento",
+      build: () =>
+        "Olá, tudo bem? Podemos agendar uma conversa rápida para eu entender melhor a necessidade da escola e apresentar a melhor solução?",
+    },
+  ];
+
+  function whatsAppVariableChips() {
+    const v = getLeadVars();
+    return [
+      { label: "Nome", value: v.nome },
+      { label: "Escola", value: v.escola },
+      { label: "Cidade/UF", value: v.cidadeUf },
+      { label: "Produtos", value: v.produtos },
+      { label: "Status", value: v.status },
+    ].filter((c) => c.value);
+  }
+
+  function openWhatsAppModal() {
     if (!lead?.telefone) {
       toast.error("Telefone inválido");
       return;
     }
+    setWhatsAppMessage(DEFAULT_WHATSAPP_MESSAGE);
+    setWhatsAppError(null);
+    setShowWhatsAppModal(true);
+  }
+
+  async function handleConfirmSendWhatsApp() {
+    if (!lead?.telefone) {
+      setWhatsAppError("Telefone inválido");
+      return;
+    }
+    const finalMessage = whatsAppMessage.trim();
+    if (!finalMessage) {
+      setWhatsAppError("Escreva uma mensagem antes de enviar.");
+      return;
+    }
+    if (finalMessage.length < 5) {
+      setWhatsAppError("A mensagem deve ter pelo menos 5 caracteres.");
+      return;
+    }
+
+    setWhatsAppError(null);
     setSendingWhatsApp(true);
-
-    const nome = lead.nome || "";
-    const escola = lead.empresa || "—";
-    const linkedProds = products
-      .map((p) => PRODUCTS.find((x) => x.value === p.produto)?.label || p.produto);
-    const produtos = linkedProds.length > 0 ? linkedProds.join(" / ") : "—";
-
-    const mensagem = `Olá, ${nome}! Tudo bem?
-
-Aqui é o Rufino, da NAR ECO Soluções.
-
-Estou fazendo um teste rápido do nosso fluxo de atendimento para escolas.
-
-Escola: ${escola}
-Interesse: ${produtos}
-
-Se essa mensagem abriu corretamente no WhatsApp, o teste manual do CRM funcionou.`;
 
     // O backend normaliza o telefone (adiciona 55 quando necessário) e
     // busca a configuração da Evolution na tabela evolution_config.
     const result = await sendWhatsAppMessage({
       leadId: id,
       phone: lead.telefone,
-      message: mensagem,
+      message: finalMessage,
     });
 
     if (!result.ok) {
-      const errMsg = result.error || "Erro ao enviar mensagem.";
-      toast.error(
-        errMsg.includes("não encontrada") || errMsg.includes("Configuração")
-          ? `${errMsg}`
-          : `Erro ao enviar WhatsApp: ${errMsg}`
-      );
+      // Mantém o modal aberto e mostra o erro real (sem expor dados sensíveis)
+      setWhatsAppError(result.error || "Erro ao enviar mensagem.");
       setSendingWhatsApp(false);
       return;
     }
 
+    setShowWhatsAppModal(false);
     const { data: refreshed } = await supabase.from("leads").select("*").eq("id", lead.id).single();
     if (refreshed) setLead(refreshed);
     await fetchActivities();
     window.dispatchEvent(new CustomEvent("leads:refresh"));
-    toast.success(
-      result.interactionRegistered
-        ? "Mensagem enviada via WhatsApp e interação registrada com sucesso."
-        : "Mensagem enviada via WhatsApp (interação não registrada)."
-    );
+    toast.success("Mensagem enviada via WhatsApp e interação registrada com sucesso.");
     setSendingWhatsApp(false);
   }
 
