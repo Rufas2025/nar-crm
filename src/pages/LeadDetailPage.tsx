@@ -1064,6 +1064,122 @@ export default function LeadDetailPage() {
           </div>
         </div>
       )}
+
+      {/* ── WhatsApp send modal ── */}
+      <Dialog
+        open={showWhatsAppModal}
+        onOpenChange={(open) => {
+          if (!sendingWhatsApp) setShowWhatsAppModal(open);
+        }}
+      >
+        <DialogContent className="sm:max-w-lg rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>Enviar mensagem no WhatsApp</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {/* Lead info */}
+            <div className="rounded-xl bg-muted/40 border border-border/60 px-4 py-3 space-y-0.5">
+              <p className="text-sm font-medium text-foreground">{lead?.nome}</p>
+              <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                <Phone className="w-3 h-3" strokeWidth={1.5} />
+                {lead?.telefone}
+              </p>
+            </div>
+
+            {/* Templates */}
+            <div className="space-y-1.5">
+              <p className="text-xs text-muted-foreground">Modelos de mensagem</p>
+              <div className="flex flex-wrap gap-1.5">
+                {WHATSAPP_TEMPLATES.map((t) => (
+                  <button
+                    key={t.label}
+                    type="button"
+                    onClick={() => {
+                      setWhatsAppMessage(t.build(getLeadVars()));
+                      setWhatsAppError(null);
+                    }}
+                    className="text-xs px-2.5 py-1.5 rounded-lg border border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Variable chips */}
+            {whatsAppVariableChips().length > 0 && (
+              <div className="space-y-1.5">
+                <p className="text-xs text-muted-foreground">Inserir dados do lead</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {whatsAppVariableChips().map((c) => (
+                    <button
+                      key={c.label}
+                      type="button"
+                      onClick={() =>
+                        setWhatsAppMessage((prev) =>
+                          prev ? `${prev.replace(/\s+$/, "")} ${c.value}` : c.value
+                        )
+                      }
+                      className="text-[11px] px-2 py-1 rounded-full border border-primary/25 bg-primary/8 text-primary/90 hover:bg-primary/15 transition-colors"
+                    >
+                      + {c.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Message */}
+            <div className="space-y-1.5">
+              <p className="text-xs text-muted-foreground">Mensagem</p>
+              <Textarea
+                value={whatsAppMessage}
+                onChange={(e) => {
+                  setWhatsAppMessage(e.target.value);
+                  if (whatsAppError) setWhatsAppError(null);
+                }}
+                rows={6}
+                className="rounded-xl text-sm resize-none"
+                placeholder="Escreva a mensagem que será enviada no WhatsApp…"
+              />
+            </div>
+
+            {whatsAppError && (
+              <p className="text-xs text-destructive bg-destructive/10 rounded-xl px-3 py-2">
+                {whatsAppError}
+              </p>
+            )}
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setShowWhatsAppModal(false)}
+              disabled={sendingWhatsApp}
+              className="h-10 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground"
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              onClick={handleConfirmSendWhatsApp}
+              disabled={sendingWhatsApp || whatsAppMessage.trim().length < 5}
+              className="h-10 px-5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white text-sm font-medium shadow-[0_4px_14px_rgba(16,185,129,0.35)]"
+            >
+              {sendingWhatsApp ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <>
+                  <Send className="w-4 h-4 mr-1.5" strokeWidth={2} />
+                  Enviar agora
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
