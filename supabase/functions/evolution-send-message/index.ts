@@ -241,7 +241,7 @@ Deno.serve(async (req) => {
         lead_id: leadId,
         user_id: user.id,
         tipo: "whatsapp",
-        descricao: `Mensagem de WhatsApp enviada pelo CRM via Evolution GO: "${message.slice(0, 200)}"`,
+        descricao: `Mensagem de WhatsApp enviada pelo CRM (status: enviado): "${message.slice(0, 200)}"`,
       });
       interactionRegistered = !actErr;
       if (actErr) {
