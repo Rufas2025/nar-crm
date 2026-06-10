@@ -457,60 +457,118 @@ export default function LeadDetailPage() {
     setSavingEdit(false);
   }
 
+  // ── WhatsApp send modal ──────────────────────────────────────────────────
   const [sendingWhatsApp, setSendingWhatsApp] = useState(false);
+  const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
+  const [whatsAppMessage, setWhatsAppMessage] = useState("");
+  const [whatsAppError, setWhatsAppError] = useState<string | null>(null);
 
-  async function handleSendWhatsApp() {
+  const DEFAULT_WHATSAPP_MESSAGE =
+    "Olá, tudo bem? Aqui é da NAR ECO. Estou entrando em contato sobre as soluções para sua escola.";
+
+  function getLeadVars() {
+    const linkedProds = products.map(
+      (p) => PRODUCTS.find((x) => x.value === p.produto)?.label || p.produto
+    );
+    return {
+      nome: lead?.nome || "",
+      escola: lead?.empresa || "",
+      cidade: lead?.cidade || "",
+      uf: lead?.uf || "",
+      cidadeUf:
+        lead?.cidade && lead?.uf ? `${lead.cidade}/${lead.uf}` : lead?.cidade || lead?.uf || "",
+      produtos: linkedProds.join(", "),
+      status: STATUS_OPTIONS.find((s) => s.value === lead?.lead_status)?.label || "",
+    };
+  }
+
+  const WHATSAPP_TEMPLATES = [
+    {
+      label: "Primeiro contato",
+      build: (v: ReturnType<typeof getLeadVars>) =>
+        `Olá, tudo bem? Aqui é da NAR ECO. Vi o cadastro da sua escola${
+          v.escola ? ` (${v.escola}${v.cidadeUf ? `, em ${v.cidadeUf}` : ""})` : ""
+        } e gostaria de apresentar algumas soluções que podem ajudar vocês.`,
+    },
+    {
+      label: "Apresentação de soluções",
+      build: () =>
+        "Olá, tudo bem? Aqui é da NAR ECO. Trabalhamos com soluções para escolas, incluindo EduInfo, Gennera, EcoClear e VibeFlow. Gostaria de entender melhor a necessidade de vocês.",
+    },
+    {
+      label: "Follow-up",
+      build: (v: ReturnType<typeof getLeadVars>) =>
+        `Olá${v.nome ? `, ${v.nome}` : ""}, tudo bem? Passando para dar continuidade ao nosso contato sobre as soluções da NAR ECO para sua escola${
+          v.escola ? ` (${v.escola})` : ""
+        }.`,
+    },
+    {
+      label: "Agendamento",
+      build: () =>
+        "Olá, tudo bem? Podemos agendar uma conversa rápida para eu entender melhor a necessidade da escola e apresentar a melhor solução?",
+    },
+  ];
+
+  function whatsAppVariableChips() {
+    const v = getLeadVars();
+    return [
+      { label: "Nome", value: v.nome },
+      { label: "Escola", value: v.escola },
+      { label: "Cidade/UF", value: v.cidadeUf },
+      { label: "Produtos", value: v.produtos },
+      { label: "Status", value: v.status },
+    ].filter((c) => c.value);
+  }
+
+  function openWhatsAppModal() {
     if (!lead?.telefone) {
       toast.error("Telefone inválido");
       return;
     }
+    setWhatsAppMessage(DEFAULT_WHATSAPP_MESSAGE);
+    setWhatsAppError(null);
+    setShowWhatsAppModal(true);
+  }
+
+  async function handleConfirmSendWhatsApp() {
+    if (!lead?.telefone) {
+      setWhatsAppError("Telefone inválido");
+      return;
+    }
+    const finalMessage = whatsAppMessage.trim();
+    if (!finalMessage) {
+      setWhatsAppError("Escreva uma mensagem antes de enviar.");
+      return;
+    }
+    if (finalMessage.length < 5) {
+      setWhatsAppError("A mensagem deve ter pelo menos 5 caracteres.");
+      return;
+    }
+
+    setWhatsAppError(null);
     setSendingWhatsApp(true);
-
-    const nome = lead.nome || "";
-    const escola = lead.empresa || "—";
-    const linkedProds = products
-      .map((p) => PRODUCTS.find((x) => x.value === p.produto)?.label || p.produto);
-    const produtos = linkedProds.length > 0 ? linkedProds.join(" / ") : "—";
-
-    const mensagem = `Olá, ${nome}! Tudo bem?
-
-Aqui é o Rufino, da NAR ECO Soluções.
-
-Estou fazendo um teste rápido do nosso fluxo de atendimento para escolas.
-
-Escola: ${escola}
-Interesse: ${produtos}
-
-Se essa mensagem abriu corretamente no WhatsApp, o teste manual do CRM funcionou.`;
 
     // O backend normaliza o telefone (adiciona 55 quando necessário) e
     // busca a configuração da Evolution na tabela evolution_config.
     const result = await sendWhatsAppMessage({
       leadId: id,
       phone: lead.telefone,
-      message: mensagem,
+      message: finalMessage,
     });
 
     if (!result.ok) {
-      const errMsg = result.error || "Erro ao enviar mensagem.";
-      toast.error(
-        errMsg.includes("não encontrada") || errMsg.includes("Configuração")
-          ? `${errMsg}`
-          : `Erro ao enviar WhatsApp: ${errMsg}`
-      );
+      // Mantém o modal aberto e mostra o erro real (sem expor dados sensíveis)
+      setWhatsAppError(result.error || "Erro ao enviar mensagem.");
       setSendingWhatsApp(false);
       return;
     }
 
+    setShowWhatsAppModal(false);
     const { data: refreshed } = await supabase.from("leads").select("*").eq("id", lead.id).single();
     if (refreshed) setLead(refreshed);
     await fetchActivities();
     window.dispatchEvent(new CustomEvent("leads:refresh"));
-    toast.success(
-      result.interactionRegistered
-        ? "Mensagem enviada via WhatsApp e interação registrada com sucesso."
-        : "Mensagem enviada via WhatsApp (interação não registrada)."
-    );
+    toast.success("Mensagem enviada via WhatsApp e interação registrada com sucesso.");
     setSendingWhatsApp(false);
   }
 
@@ -631,7 +689,7 @@ Se essa mensagem abriu corretamente no WhatsApp, o teste manual do CRM funcionou
             {/* WhatsApp action */}
             <div className="mt-5 pt-5 border-t border-border/40">
               <button
-                onClick={handleSendWhatsApp}
+                onClick={openWhatsAppModal}
                 disabled={sendingWhatsApp || !lead.telefone}
                 className="w-full sm:w-auto h-10 px-5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 shadow-[0_4px_14px_rgba(16,185,129,0.35)]"
               >
@@ -1006,6 +1064,122 @@ Se essa mensagem abriu corretamente no WhatsApp, o teste manual do CRM funcionou
           </div>
         </div>
       )}
+
+      {/* ── WhatsApp send modal ── */}
+      <Dialog
+        open={showWhatsAppModal}
+        onOpenChange={(open) => {
+          if (!sendingWhatsApp) setShowWhatsAppModal(open);
+        }}
+      >
+        <DialogContent className="sm:max-w-lg rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>Enviar mensagem no WhatsApp</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {/* Lead info */}
+            <div className="rounded-xl bg-muted/40 border border-border/60 px-4 py-3 space-y-0.5">
+              <p className="text-sm font-medium text-foreground">{lead?.nome}</p>
+              <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                <Phone className="w-3 h-3" strokeWidth={1.5} />
+                {lead?.telefone}
+              </p>
+            </div>
+
+            {/* Templates */}
+            <div className="space-y-1.5">
+              <p className="text-xs text-muted-foreground">Modelos de mensagem</p>
+              <div className="flex flex-wrap gap-1.5">
+                {WHATSAPP_TEMPLATES.map((t) => (
+                  <button
+                    key={t.label}
+                    type="button"
+                    onClick={() => {
+                      setWhatsAppMessage(t.build(getLeadVars()));
+                      setWhatsAppError(null);
+                    }}
+                    className="text-xs px-2.5 py-1.5 rounded-lg border border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Variable chips */}
+            {whatsAppVariableChips().length > 0 && (
+              <div className="space-y-1.5">
+                <p className="text-xs text-muted-foreground">Inserir dados do lead</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {whatsAppVariableChips().map((c) => (
+                    <button
+                      key={c.label}
+                      type="button"
+                      onClick={() =>
+                        setWhatsAppMessage((prev) =>
+                          prev ? `${prev.replace(/\s+$/, "")} ${c.value}` : c.value
+                        )
+                      }
+                      className="text-[11px] px-2 py-1 rounded-full border border-primary/25 bg-primary/8 text-primary/90 hover:bg-primary/15 transition-colors"
+                    >
+                      + {c.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Message */}
+            <div className="space-y-1.5">
+              <p className="text-xs text-muted-foreground">Mensagem</p>
+              <Textarea
+                value={whatsAppMessage}
+                onChange={(e) => {
+                  setWhatsAppMessage(e.target.value);
+                  if (whatsAppError) setWhatsAppError(null);
+                }}
+                rows={6}
+                className="rounded-xl text-sm resize-none"
+                placeholder="Escreva a mensagem que será enviada no WhatsApp…"
+              />
+            </div>
+
+            {whatsAppError && (
+              <p className="text-xs text-destructive bg-destructive/10 rounded-xl px-3 py-2">
+                {whatsAppError}
+              </p>
+            )}
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setShowWhatsAppModal(false)}
+              disabled={sendingWhatsApp}
+              className="h-10 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground"
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              onClick={handleConfirmSendWhatsApp}
+              disabled={sendingWhatsApp || whatsAppMessage.trim().length < 5}
+              className="h-10 px-5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white text-sm font-medium shadow-[0_4px_14px_rgba(16,185,129,0.35)]"
+            >
+              {sendingWhatsApp ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <>
+                  <Send className="w-4 h-4 mr-1.5" strokeWidth={2} />
+                  Enviar agora
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
