@@ -1,0 +1,1 @@
+REVOKE ALL ON public.evolution_config FROM anon, authenticated;
