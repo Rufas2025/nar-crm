@@ -8,6 +8,7 @@ export type EvolutionSettings = {
   instanceName: string;
   lastTestStatus: string | null;
   lastTestAt: string | null;
+  lastTestError: string | null;
 };
 
 export function loadEvolutionSettings(): EvolutionSettings | null {
@@ -22,6 +23,7 @@ export function loadEvolutionSettings(): EvolutionSettings | null {
       instanceName: parsed.instanceName ?? "",
       lastTestStatus: parsed.lastTestStatus ?? null,
       lastTestAt: parsed.lastTestAt ?? null,
+      lastTestError: parsed.lastTestError ?? null,
     };
   } catch {
     return null;
@@ -35,67 +37,50 @@ export function saveEvolutionSettings(settings: EvolutionSettings) {
 export type EvolutionTestResult = {
   ok: boolean;
   state?: string;
+  status?: number;
   error?: string;
+  testedAt: string;
 };
 
-/**
- * Testa a conexão com a Evolution API.
- * Tenta fetch direto do navegador; se falhar por rede/CORS,
- * usa a edge function `test-evolution-connection` no backend.
- */
 export async function testEvolutionConnection(
   apiUrl: string,
   apiKey: string,
   instanceName: string
 ): Promise<EvolutionTestResult> {
-  const url = `${apiUrl.replace(/\/$/, "")}/instance/connectionState/${encodeURIComponent(instanceName)}`;
+  const testedAt = new Date().toISOString();
+  const cleanApiUrl = apiUrl.trim().replace(/\/+$/, "");
+  const cleanApiKey = apiKey.trim();
+  const cleanInstanceName = instanceName.trim();
+
+  if (!cleanApiUrl || !cleanApiKey || !cleanInstanceName) {
+    return { ok: false, testedAt, error: "Preencha URL, API Key e nome da instância." };
+  }
 
   try {
-    const resp = await fetch(url, {
-      method: "GET",
-      headers: {
-        apikey: apiKey,
-        "Content-Type": "application/json",
-      },
+    const { data, error } = await cloudClient.functions.invoke("test-evolution-connection", {
+      body: { apiUrl: cleanApiUrl, apiKey: cleanApiKey, instanceName: cleanInstanceName },
     });
 
-    const text = await resp.text();
-    let data: any = {};
-    try {
-      data = JSON.parse(text);
-    } catch {
-      // resposta não-JSON
-    }
-
-    if (!resp.ok) {
+    if (error) {
       return {
         ok: false,
-        error: `HTTP ${resp.status}: ${text ? text.slice(0, 300) : "sem corpo de resposta"}`,
+        testedAt,
+        error: `Erro de rede ao chamar o backend de teste: ${error.message}`,
       };
     }
 
-    const state = data?.instance?.state ?? data?.state;
-    if (!state) {
-      return { ok: false, error: "Resposta 2xx, mas sem 'instance.state'." };
-    }
-
-    return { ok: true, state };
-  } catch {
-    // Provável erro de CORS/rede no navegador — usar edge function no backend
-    try {
-      const { data, error } = await cloudClient.functions.invoke("test-evolution-connection", {
-        body: { baseUrl: apiUrl, apiKey, instanceName },
-      });
-
-      if (error) {
-        return { ok: false, error: error.message };
-      }
-      if (!data?.ok) {
-        return { ok: false, error: data?.error ?? "Erro desconhecido no teste de conexão." };
-      }
-      return { ok: true, state: data.state };
-    } catch (e: any) {
-      return { ok: false, error: String(e?.message ?? e) };
-    }
+    return {
+      ok: data?.ok === true && data?.state === "open",
+      state: data?.state,
+      status: data?.status,
+      error: data?.error,
+      testedAt: data?.testedAt ?? testedAt,
+    };
+  } catch (e: any) {
+    return {
+      ok: false,
+      testedAt,
+      error: `Erro de rede: não foi possível chamar o backend de teste. ${String(e?.message ?? e)}`,
+    };
   }
 }

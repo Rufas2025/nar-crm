@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import { Eye, EyeOff, Loader2, Plug, Save } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ export default function ConfiguracoesPage() {
   const [instanceName, setInstanceName] = useState("");
   const [lastTestStatus, setLastTestStatus] = useState<string | null>(null);
   const [lastTestAt, setLastTestAt] = useState<string | null>(null);
+  const [lastTestError, setLastTestError] = useState<string | null>(null);
 
   useEffect(() => {
     const saved = loadEvolutionSettings();
@@ -31,6 +32,7 @@ export default function ConfiguracoesPage() {
       setInstanceName(saved.instanceName);
       setLastTestStatus(saved.lastTestStatus);
       setLastTestAt(saved.lastTestAt);
+      setLastTestError(saved.lastTestError);
     }
     setLoading(false);
   }, []);
@@ -38,40 +40,43 @@ export default function ConfiguracoesPage() {
   async function runConnectionTest(url: string, key: string, instance: string) {
     setTesting(true);
 
-    const result = await testEvolutionConnection(url, key, instance);
+    try {
+      const result = await testEvolutionConnection(url, key, instance);
+      const status = result.ok && result.state === "open" ? "open" : "error";
+      const errorMessage = result.ok
+        ? null
+        : result.error ??
+          (result.state
+            ? `Instância não conectada. Estado retornado: "${result.state}".`
+            : "Erro desconhecido no teste de conexão.");
 
-    const testedAt = new Date().toISOString();
-    let status: string;
+      if (status === "open") {
+        toast.success('Conexão testada: estado "open" (Conectado).');
+      } else {
+        toast.error(errorMessage ?? `Instância não conectada. Estado retornado: "${status}".`);
+      }
 
-    if (result.ok && result.state === "open") {
-      status = "open";
-      toast.success('Conexão testada: estado "open" (Conectado).');
-    } else if (result.ok) {
-      status = result.state ?? "unknown";
-      toast.error(`Instância não conectada. Estado retornado: "${status}".`);
-    } else {
-      status = "error";
-      toast.error("Falha ao testar conexão: " + (result.error ?? "erro desconhecido"));
+      setLastTestStatus(status);
+      setLastTestAt(result.testedAt);
+      setLastTestError(errorMessage);
+
+      saveEvolutionSettings({
+        baseUrl: url,
+        apiKey: key,
+        instanceName: instance,
+        lastTestStatus: status,
+        lastTestAt: result.testedAt,
+        lastTestError: errorMessage,
+      });
+    } finally {
+      setTesting(false);
     }
-
-    setLastTestStatus(status);
-    setLastTestAt(testedAt);
-
-    saveEvolutionSettings({
-      baseUrl: url,
-      apiKey: key,
-      instanceName: instance,
-      lastTestStatus: status,
-      lastTestAt: testedAt,
-    });
-
-    setTesting(false);
   }
 
-  async function handleSave(e?: React.FormEvent) {
+  async function handleSave(e?: FormEvent) {
     e?.preventDefault();
 
-    const cleanUrl = baseUrl.trim().replace(/\/$/, "");
+    const cleanUrl = baseUrl.trim().replace(/\/+$/, "");
     const cleanKey = apiKey.trim();
     const cleanInstance = instanceName.trim();
 
@@ -89,8 +94,11 @@ export default function ConfiguracoesPage() {
         instanceName: cleanInstance,
         lastTestStatus,
         lastTestAt,
+        lastTestError,
       });
       setBaseUrl(cleanUrl);
+      setApiKey(cleanKey);
+      setInstanceName(cleanInstance);
 
       toast.success("Configuração da Evolution API salva com sucesso.");
 
@@ -104,7 +112,7 @@ export default function ConfiguracoesPage() {
   }
 
   async function handleTestConnection() {
-    const cleanUrl = baseUrl.trim().replace(/\/$/, "");
+    const cleanUrl = baseUrl.trim().replace(/\/+$/, "");
     const cleanKey = apiKey.trim();
     const cleanInstance = instanceName.trim();
 
@@ -113,6 +121,9 @@ export default function ConfiguracoesPage() {
       return;
     }
 
+    setBaseUrl(cleanUrl);
+    setApiKey(cleanKey);
+    setInstanceName(cleanInstance);
     await runConnectionTest(cleanUrl, cleanKey, cleanInstance);
   }
 
@@ -125,6 +136,9 @@ export default function ConfiguracoesPage() {
     }
     if (lastTestStatus === "error") {
       return <Badge variant="destructive">Erro</Badge>;
+    }
+    if (["close", "closed", "connecting"].includes(lastTestStatus)) {
+      return <Badge variant="secondary">Não conectado ({lastTestStatus})</Badge>;
     }
     return <Badge variant="secondary">Desconectado ({lastTestStatus})</Badge>;
   }
@@ -199,6 +213,9 @@ export default function ConfiguracoesPage() {
             </span>
           )}
         </div>
+        {lastTestError && (
+          <p className="text-sm text-destructive -mt-3">{lastTestError}</p>
+        )}
 
         <div className="pt-4 flex flex-col sm:flex-row gap-3">
           <Button type="submit" disabled={saving || testing} className="h-11 gap-2">
