@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import { supabase, Lead, LeadProduct } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { WhatsappSendModal } from "@/components/WhatsappSendModal";
 import {
   Dialog,
   DialogContent,
@@ -456,62 +456,14 @@ export default function LeadDetailPage() {
     setSavingEdit(false);
   }
 
-  const [sendingWhatsApp, setSendingWhatsApp] = useState(false);
+  const [showWhatsappModal, setShowWhatsappModal] = useState(false);
 
-  async function handleSendWhatsApp() {
-    if (!lead?.telefone) return;
-    setSendingWhatsApp(true);
-
-    // Limpa telefone removendo tudo que não for dígito
-    let phone = lead.telefone.replace(/\D/g, "");
-    if (!phone.startsWith("55")) phone = "55" + phone;
-
-    const nome = lead.nome || "";
-    const escola = lead.empresa || "—";
-    const linkedProds = products
-      .map((p) => PRODUCTS.find((x) => x.value === p.produto)?.label || p.produto);
-    const produtos = linkedProds.length > 0 ? linkedProds.join(" / ") : "—";
-
-    const mensagem = `Olá, ${nome}! Tudo bem?
-
-Aqui é o Rufino, da NAR ECO Soluções.
-
-Estou fazendo um teste rápido do nosso fluxo de atendimento para escolas.
-
-Escola: ${escola}
-Interesse: ${produtos}
-
-Se essa mensagem abriu corretamente no WhatsApp, o teste manual do CRM funcionou.`;
-
-    const { data, error } = await supabase.functions.invoke("evolution-send-message", {
-      body: { leadId: id, phone, message: mensagem },
-    });
-
-    if (error || !data?.ok) {
-      let errMsg = data?.error as string | undefined;
-      if (!errMsg && error && "context" in error) {
-        const body = await (error as { context?: Response }).context?.json?.().catch(() => null);
-        errMsg = body?.error;
-      }
-      errMsg = errMsg || error?.message || "Erro ao enviar mensagem.";
-      toast.error(
-        errMsg.includes("não configurada")
-          ? `${errMsg} Acesse Configurações para conectar a Evolution API.`
-          : `Erro ao enviar WhatsApp: ${errMsg}`
-      );
-      setSendingWhatsApp(false);
-      return;
-    }
-
-    const { data: refreshed } = await supabase.from("leads").select("*").eq("id", lead.id).single();
+  async function handleWhatsappSent() {
+    const { data: refreshed } = await supabase.from("leads").select("*").eq("id", id!).single();
     if (refreshed) setLead(refreshed);
     await fetchActivities();
     window.dispatchEvent(new CustomEvent("leads:refresh"));
-    toast.success("Mensagem enviada via WhatsApp e interação registrada com sucesso.");
-    setSendingWhatsApp(false);
   }
-
-
 
   if (loading) {
     return (
@@ -628,18 +580,12 @@ Se essa mensagem abriu corretamente no WhatsApp, o teste manual do CRM funcionou
             {/* WhatsApp action */}
             <div className="mt-5 pt-5 border-t border-border/40">
               <button
-                onClick={handleSendWhatsApp}
-                disabled={sendingWhatsApp || !lead.telefone}
+                onClick={() => setShowWhatsappModal(true)}
+                disabled={!lead.telefone}
                 className="w-full sm:w-auto h-10 px-5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 shadow-[0_4px_14px_rgba(16,185,129,0.35)]"
               >
-                {sendingWhatsApp ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" strokeWidth={2} />
-                    Enviar WhatsApp
-                  </>
-                )}
+                <Send className="w-4 h-4" strokeWidth={2} />
+                Enviar WhatsApp
               </button>
               {!lead.telefone && (
                 <p className="text-[11px] text-muted-foreground/60 mt-2">
@@ -1003,6 +949,15 @@ Se essa mensagem abriu corretamente no WhatsApp, o teste manual do CRM funcionou
           </div>
         </div>
       )}
+
+      {/* ── WhatsApp Send Modal ── */}
+      <WhatsappSendModal
+        open={showWhatsappModal}
+        onClose={() => setShowWhatsappModal(false)}
+        lead={lead}
+        produtos={linkedProducts}
+        onSent={handleWhatsappSent}
+      />
     </div>
   );
 }
