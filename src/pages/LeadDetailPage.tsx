@@ -1115,7 +1115,7 @@ export default function LeadDetailPage() {
               </p>
             </div>
 
-            {/* Templates */}
+            {/* Templates (preenchem o corpo da mensagem) */}
             <div className="space-y-1.5">
               <p className="text-xs text-muted-foreground">Modelos de mensagem</p>
               <div className="flex flex-wrap gap-1.5">
@@ -1124,7 +1124,7 @@ export default function LeadDetailPage() {
                     key={t.label}
                     type="button"
                     onClick={() => {
-                      setWhatsAppMessage(t.build(getLeadVars()));
+                      setWhatsAppBody(t.build(getLeadVars()));
                       setWhatsAppError(null);
                     }}
                     className="text-xs px-2.5 py-1.5 rounded-lg border border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
@@ -1135,17 +1135,17 @@ export default function LeadDetailPage() {
               </div>
             </div>
 
-            {/* Variable chips */}
+            {/* Variable chips (inserem no corpo) */}
             {whatsAppVariableChips().length > 0 && (
               <div className="space-y-1.5">
-                <p className="text-xs text-muted-foreground">Inserir dados do lead</p>
+                <p className="text-xs text-muted-foreground">Inserir dados do lead no corpo</p>
                 <div className="flex flex-wrap gap-1.5">
                   {whatsAppVariableChips().map((c) => (
                     <button
                       key={c.label}
                       type="button"
                       onClick={() =>
-                        setWhatsAppMessage((prev) =>
+                        setWhatsAppBody((prev) =>
                           prev ? `${prev.replace(/\s+$/, "")} ${c.value}` : c.value
                         )
                       }
@@ -1158,19 +1158,63 @@ export default function LeadDetailPage() {
               </div>
             )}
 
-            {/* Message */}
+            {/* Saudação */}
             <div className="space-y-1.5">
-              <p className="text-xs text-muted-foreground">Mensagem</p>
-              <Textarea
-                value={whatsAppMessage}
+              <p className="text-xs text-muted-foreground">Saudação</p>
+              <input
+                type="text"
+                value={whatsAppGreeting}
                 onChange={(e) => {
-                  setWhatsAppMessage(e.target.value);
+                  setWhatsAppGreeting(e.target.value);
                   if (whatsAppError) setWhatsAppError(null);
                 }}
-                rows={6}
-                className="rounded-xl text-sm resize-none"
-                placeholder="Escreva a mensagem que será enviada no WhatsApp…"
+                className="w-full h-10 px-3 rounded-xl text-sm bg-background border border-input focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                placeholder="Olá, {nome}, tudo bem?"
               />
+            </div>
+
+            {/* Corpo da mensagem */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-muted-foreground">Corpo da mensagem</p>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={handleInsertLink}
+                    className="text-[11px] px-2 py-1 rounded-lg border border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors flex items-center gap-1"
+                  >
+                    <Link2 className="w-3 h-3" strokeWidth={2} /> Inserir link
+                  </button>
+                  <button
+                    type="button"
+                    disabled
+                    title="Envio de anexo em breve"
+                    className="text-[11px] px-2 py-1 rounded-lg border border-border/60 bg-muted/20 text-muted-foreground/60 cursor-not-allowed flex items-center gap-1"
+                  >
+                    <Paperclip className="w-3 h-3" strokeWidth={2} /> Anexo (em breve)
+                  </button>
+                </div>
+              </div>
+              <Textarea
+                value={whatsAppBody}
+                onChange={(e) => {
+                  setWhatsAppBody(e.target.value);
+                  if (whatsAppError) setWhatsAppError(null);
+                }}
+                rows={5}
+                className="rounded-xl text-sm resize-none"
+                placeholder="Escreva o corpo da mensagem. Você pode incluir links (https://...)."
+              />
+            </div>
+
+            {/* Preview */}
+            <div className="space-y-1.5">
+              <p className="text-xs text-muted-foreground">Pré-visualização</p>
+              <div className="rounded-xl bg-emerald-500/5 border border-emerald-500/20 px-4 py-3 text-sm whitespace-pre-wrap text-foreground min-h-[60px]">
+                {buildFinalWhatsAppMessage() || (
+                  <span className="text-muted-foreground italic">A mensagem final aparecerá aqui…</span>
+                )}
+              </div>
             </div>
 
             {whatsAppError && (
@@ -1179,6 +1223,7 @@ export default function LeadDetailPage() {
               </p>
             )}
           </div>
+
 
           <DialogFooter className="gap-2 sm:gap-2">
             <Button
