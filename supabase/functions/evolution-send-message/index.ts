@@ -327,7 +327,9 @@ Deno.serve(async (req) => {
       messageId,
       interactionRegistered,
       sentTo: maskPhone(normalizedPhone),
+      attachmentDeferred,
     });
+
   } catch (e) {
     console.error("[evolution-send-message] erro inesperado:", cleanMessage((e as Error)?.message ?? e));
     return responseJson({ ok: false, error: cleanMessage((e as Error)?.message ?? e) }, 500);
