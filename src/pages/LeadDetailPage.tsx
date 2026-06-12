@@ -462,11 +462,17 @@ export default function LeadDetailPage() {
   // ── WhatsApp send modal ──────────────────────────────────────────────────
   const [sendingWhatsApp, setSendingWhatsApp] = useState(false);
   const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
-  const [whatsAppMessage, setWhatsAppMessage] = useState("");
+  const [whatsAppGreeting, setWhatsAppGreeting] = useState("");
+  const [whatsAppBody, setWhatsAppBody] = useState("");
   const [whatsAppError, setWhatsAppError] = useState<string | null>(null);
 
-  const DEFAULT_WHATSAPP_MESSAGE =
-    "Olá, tudo bem? Aqui é da NAR ECO. Estou entrando em contato sobre as soluções para sua escola.";
+  const DEFAULT_WHATSAPP_BODY =
+    "Aqui é da NAR ECO. Estou entrando em contato sobre as soluções para sua escola.";
+
+  function buildGreeting(name?: string | null) {
+    const trimmed = (name ?? "").trim();
+    return trimmed ? `Olá, ${trimmed}, tudo bem?` : "Olá, tudo bem?";
+  }
 
   function getLeadVars() {
     const linkedProds = products.map(
@@ -488,33 +494,32 @@ export default function LeadDetailPage() {
     {
       label: "Primeiro contato",
       build: (v: ReturnType<typeof getLeadVars>) =>
-        `Olá, tudo bem? Aqui é da NAR ECO. Vi o cadastro da sua escola${
+        `Aqui é da NAR ECO. Vi o cadastro da sua escola${
           v.escola ? ` (${v.escola}${v.cidadeUf ? `, em ${v.cidadeUf}` : ""})` : ""
         } e gostaria de apresentar algumas soluções que podem ajudar vocês.`,
     },
     {
       label: "Apresentação de soluções",
       build: () =>
-        "Olá, tudo bem? Aqui é da NAR ECO. Trabalhamos com soluções para escolas, incluindo EduInfo, Gennera, EcoClear e VibeFlow. Gostaria de entender melhor a necessidade de vocês.",
+        "Aqui é da NAR ECO. Trabalhamos com soluções para escolas, incluindo EduInfo, Gennera, EcoClear e VibeFlow. Gostaria de entender melhor a necessidade de vocês.",
     },
     {
       label: "Follow-up",
       build: (v: ReturnType<typeof getLeadVars>) =>
-        `Olá${v.nome ? `, ${v.nome}` : ""}, tudo bem? Passando para dar continuidade ao nosso contato sobre as soluções da NAR ECO para sua escola${
+        `Passando para dar continuidade ao nosso contato sobre as soluções da NAR ECO para sua escola${
           v.escola ? ` (${v.escola})` : ""
         }.`,
     },
     {
       label: "Agendamento",
       build: () =>
-        "Olá, tudo bem? Podemos agendar uma conversa rápida para eu entender melhor a necessidade da escola e apresentar a melhor solução?",
+        "Podemos agendar uma conversa rápida para eu entender melhor a necessidade da escola e apresentar a melhor solução?",
     },
   ];
 
   function whatsAppVariableChips() {
     const v = getLeadVars();
     return [
-      { label: "Nome", value: v.nome },
       { label: "Escola", value: v.escola },
       { label: "Cidade/UF", value: v.cidadeUf },
       { label: "Produtos", value: v.produtos },
@@ -522,14 +527,34 @@ export default function LeadDetailPage() {
     ].filter((c) => c.value);
   }
 
+  function buildFinalWhatsAppMessage() {
+    const g = whatsAppGreeting.trim();
+    const b = whatsAppBody.trim();
+    if (!g) return b;
+    if (!b) return g;
+    return `${g}\n\n${b}`;
+  }
+
   function openWhatsAppModal() {
     if (!lead?.telefone) {
       toast.error("Telefone inválido");
       return;
     }
-    setWhatsAppMessage(DEFAULT_WHATSAPP_MESSAGE);
+    setWhatsAppGreeting(buildGreeting(lead?.nome));
+    setWhatsAppBody(DEFAULT_WHATSAPP_BODY);
     setWhatsAppError(null);
     setShowWhatsAppModal(true);
+  }
+
+  function handleInsertLink() {
+    const url = window.prompt("Cole o link (https://...)", "https://");
+    if (!url) return;
+    const trimmed = url.trim();
+    if (!/^https?:\/\/\S+/i.test(trimmed)) {
+      toast.error("Link inválido. Use http:// ou https://");
+      return;
+    }
+    setWhatsAppBody((prev) => (prev ? `${prev.replace(/\s+$/, "")} ${trimmed}` : trimmed));
   }
 
   async function handleConfirmSendWhatsApp() {
@@ -537,7 +562,7 @@ export default function LeadDetailPage() {
       setWhatsAppError("Telefone inválido");
       return;
     }
-    const finalMessage = whatsAppMessage.trim();
+    const finalMessage = buildFinalWhatsAppMessage();
     if (!finalMessage) {
       setWhatsAppError("Escreva uma mensagem antes de enviar.");
       return;
@@ -573,6 +598,7 @@ export default function LeadDetailPage() {
     toast.success("Mensagem enviada via WhatsApp e interação registrada com sucesso.");
     setSendingWhatsApp(false);
   }
+
 
 
 
