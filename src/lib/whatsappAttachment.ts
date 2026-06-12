@@ -44,10 +44,9 @@ export type UploadedAttachment = {
  */
 export async function uploadWhatsAppAttachment(file: File): Promise<UploadedAttachment> {
   const validated = validateAttachment(file);
-  if (!validated.ok) {
-    throw new Error(validated.error);
-  }
+  if (!validated.ok) throw new Error(validated.error || "Arquivo inválido.");
   const kind: AttachmentKind = validated.kind;
+
 
 
 
