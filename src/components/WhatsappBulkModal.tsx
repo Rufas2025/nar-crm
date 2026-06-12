@@ -37,15 +37,16 @@ function buildGreeting(template: string, nome: string): string {
   const first = firstName(nome);
   if (!template.includes("{{nome}}")) return template;
   if (!first) return "Olá, tudo bem?";
-  return template.replaceAll("{{nome}}", first);
+  return template.split("{{nome}}").join(first);
 }
 
 function renderTemplate(template: string, vars: { nome: string; link: string }) {
   const first = firstName(vars.nome);
   return template
-    .replaceAll("{{nome}}", first || "")
-    .replaceAll("{{link}}", vars.link || "");
+    .split("{{nome}}").join(first || "")
+    .split("{{link}}").join(vars.link || "");
 }
+
 
 function isValidPhone(phone: string | null | undefined): boolean {
   if (!phone) return false;
