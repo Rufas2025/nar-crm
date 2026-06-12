@@ -67,8 +67,12 @@ const BodySchema = z
     phone: z.string().min(1).max(50).optional(),
     phoneNumber: z.string().min(1).max(50).optional(),
     message: z.string().max(4000).nullable().optional(),
+    mediaUrl: z.string().url().nullable().optional(),
+    mediaType: z.enum(["image", "document"]).nullable().optional(),
+    fileName: z.string().max(255).nullable().optional(),
   })
   .refine((d) => d.phone || d.phoneNumber, { message: "Telefone obrigatório" });
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -167,68 +171,129 @@ Deno.serve(async (req) => {
       return responseJson({ ok: false, error: "Erro da Evolution GO: instância sem token de acesso." });
     }
 
-    // 6. Envio
-    const sendUrl = `${apiUrl}/send/text`;
-    console.log(
-      `[evolution-send-message] endpoint=${sendUrl} numero=${maskPhone(normalizedPhone)} instancia=${config.instance_name}`
-    );
+    // 6. Envio — se houver mídia, tenta endpoint de mídia primeiro; em falha, faz fallback para texto
+    const mediaUrl = parsed.data.mediaUrl ?? null;
+    const mediaType = parsed.data.mediaType ?? null;
+    const fileName = parsed.data.fileName ?? null;
+    let attachmentDeferred = false;
 
-    let evoResp: Response;
-    try {
-      evoResp = await fetch(sendUrl, {
-        method: "POST",
-        headers: { apikey: instance.token, "Content-Type": "application/json" },
-        body: JSON.stringify({ number: normalizedPhone, text: message }),
-      });
-    } catch (e) {
-      return responseJson({
-        ok: false,
-        error: `Erro de rede ao enviar mensagem: ${cleanMessage((e as Error)?.message ?? e)}`,
-      });
+    async function postEvo(path: string, payload: Record<string, unknown>) {
+      const url = `${apiUrl}${path}`;
+      console.log(`[evolution-send-message] POST ${url} numero=${maskPhone(normalizedPhone)}`);
+      try {
+        const r = await fetch(url, {
+          method: "POST",
+          headers: { apikey: instance.token, "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const text = await r.text();
+        let data: any = {};
+        try { data = JSON.parse(text); } catch { /* not json */ }
+        return { status: r.status, ok: r.ok, text, data };
+      } catch (e) {
+        return { status: 0, ok: false, text: String((e as Error)?.message ?? e), data: {} as any };
+      }
     }
 
-    const evoText = await evoResp.text();
+    if (mediaUrl && mediaType) {
+      const mediaPath = mediaType === "image" ? "/send/image" : "/send/document";
+      const mediaPayload: Record<string, unknown> = {
+        number: normalizedPhone,
+        caption: message,
+      };
+      if (mediaType === "image") {
+        mediaPayload.image = mediaUrl;
+      } else {
+        mediaPayload.document = mediaUrl;
+        if (fileName) mediaPayload.fileName = fileName;
+      }
+      const mediaResp = await postEvo(mediaPath, mediaPayload);
+      console.log(
+        `[evolution-send-message] media status=${mediaResp.status} body=${cleanMessage(mediaResp.text).slice(0, 200)}`
+      );
+      if (mediaResp.status === 404) {
+        // Endpoint de mídia ainda não deployado — sinaliza para o frontend e segue com texto
+        attachmentDeferred = true;
+      } else if (mediaResp.status === 401 || mediaResp.status === 403) {
+        return responseJson({ ok: false, error: `Erro ${mediaResp.status}: API Key inválida` });
+      } else {
+        const mediaMessageId =
+          mediaResp.data?.messageId ?? mediaResp.data?.id ?? mediaResp.data?.data?.Info?.ID ?? mediaResp.data?.data?.key?.id ?? null;
+        const mediaSuccess =
+          mediaResp.ok &&
+          (mediaResp.data?.success === true ||
+            mediaResp.data?.status === "success" ||
+            mediaResp.data?.message === "success" ||
+            Boolean(mediaMessageId) ||
+            (mediaResp.data?.data != null && mediaResp.data?.error == null));
+        if (mediaSuccess) {
+          // Mídia enviada com sucesso (caption já inclui o texto) — pular envio de texto
+          const evoResp_dummyOk = true;
+          // continua para registro de interação
+          // overwrite variables used later
+          (globalThis as any).__mediaSentMessageId = mediaMessageId;
+        } else {
+          // Outros erros: cair em fallback para texto e marcar como diferido
+          attachmentDeferred = true;
+        }
+      }
+    }
+
+    // Se NÃO houve mídia enviada com sucesso, envia o texto normalmente
+    const mediaSentMessageId = (globalThis as any).__mediaSentMessageId ?? null;
+    let evoResp: Response | null = null;
+    let evoText = "";
     let evoData: any = {};
-    try {
-      evoData = JSON.parse(evoText);
-    } catch {
-      // resposta não-JSON
+    let messageId: string | null = mediaSentMessageId;
+    let success = Boolean(mediaSentMessageId);
+
+    if (!mediaSentMessageId) {
+      const sendUrl = `${apiUrl}/send/text`;
+      try {
+        evoResp = await fetch(sendUrl, {
+          method: "POST",
+          headers: { apikey: instance.token, "Content-Type": "application/json" },
+          body: JSON.stringify({ number: normalizedPhone, text: message }),
+        });
+      } catch (e) {
+        return responseJson({
+          ok: false,
+          error: `Erro de rede ao enviar mensagem: ${cleanMessage((e as Error)?.message ?? e)}`,
+        });
+      }
+      evoText = await evoResp.text();
+      try { evoData = JSON.parse(evoText); } catch { /* */ }
+      console.log(`[evolution-send-message] text status=${evoResp.status} body=${cleanMessage(evoText).slice(0, 300)}`);
+
+      if (evoResp.status === 401 || evoResp.status === 403) {
+        return responseJson({ ok: false, error: `Erro ${evoResp.status}: API Key inválida` });
+      }
+      if (evoResp.status === 404) {
+        return responseJson({ ok: false, error: "Erro 404: endpoint não encontrado" });
+      }
+
+      messageId =
+        evoData?.messageId ?? evoData?.id ?? evoData?.data?.Info?.ID ?? evoData?.data?.key?.id ?? null;
+      success =
+        evoResp.ok &&
+        (evoData?.success === true ||
+          evoData?.status === "success" ||
+          evoData?.message === "success" ||
+          Boolean(messageId) ||
+          (evoData?.data != null && evoData?.error == null));
     }
 
-    console.log(
-      `[evolution-send-message] status=${evoResp.status} body=${cleanMessage(evoText).slice(0, 300)}`
-    );
-
-    if (evoResp.status === 401 || evoResp.status === 403) {
-      return responseJson({ ok: false, error: `Erro ${evoResp.status}: API Key inválida` });
-    }
-    if (evoResp.status === 404) {
-      return responseJson({ ok: false, error: "Erro 404: endpoint não encontrado" });
-    }
-
-    // 7. Parser flexível de sucesso
-    const messageId =
-      evoData?.messageId ??
-      evoData?.id ??
-      evoData?.data?.Info?.ID ??
-      evoData?.data?.key?.id ??
-      null;
-
-    const success =
-      evoResp.ok &&
-      (evoData?.success === true ||
-        evoData?.status === "success" ||
-        evoData?.message === "success" ||
-        Boolean(messageId) ||
-        (evoData?.data != null && evoData?.error == null));
+    // Limpa estado global temporário
+    (globalThis as any).__mediaSentMessageId = undefined;
 
     if (!success) {
       const details = cleanMessage(evoData?.error ?? evoData?.message ?? evoText ?? "sem corpo de resposta");
       return responseJson({
         ok: false,
-        error: `Erro da Evolution GO: mensagem não enviada. (HTTP ${evoResp.status}) ${details}`,
+        error: `Erro da Evolution GO: mensagem não enviada. (HTTP ${evoResp?.status ?? 0}) ${details}`,
       });
     }
+
 
     // 8. Só registra interação após confirmação de sucesso — no banco do CRM, como o usuário
     const crmDb = createClient(CRM_URL, CRM_ANON_KEY, {
@@ -262,7 +327,9 @@ Deno.serve(async (req) => {
       messageId,
       interactionRegistered,
       sentTo: maskPhone(normalizedPhone),
+      attachmentDeferred,
     });
+
   } catch (e) {
     console.error("[evolution-send-message] erro inesperado:", cleanMessage((e as Error)?.message ?? e));
     return responseJson({ ok: false, error: cleanMessage((e as Error)?.message ?? e) }, 500);

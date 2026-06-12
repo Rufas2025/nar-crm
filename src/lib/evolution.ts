@@ -117,16 +117,25 @@ export type SendWhatsAppResult = {
   error?: string | null;
   messageId?: string | null;
   interactionRegistered?: boolean;
+  attachmentDeferred?: boolean;
+};
+
+export type WhatsAppMediaInput = {
+  url: string;
+  type: "image" | "document";
+  fileName?: string | null;
 };
 
 /**
  * Envia mensagem de WhatsApp pelo backend (Edge Function `evolution-send-message`),
  * que busca a configuração na tabela `evolution_config` e usa a Evolution GO.
+ * Suporta opcionalmente um anexo (imagem ou documento) já hospedado em storage acessível.
  */
 export async function sendWhatsAppMessage(params: {
   leadId?: string | null;
   phone: string;
   message?: string | null;
+  media?: WhatsAppMediaInput | null;
 }): Promise<SendWhatsAppResult> {
   const authToken = await getCrmToken();
   if (!authToken) return { ok: false, error: "Usuário não autenticado." };
@@ -138,6 +147,9 @@ export async function sendWhatsAppMessage(params: {
         leadId: params.leadId ?? null,
         phone: params.phone,
         message: params.message ?? null,
+        mediaUrl: params.media?.url ?? null,
+        mediaType: params.media?.type ?? null,
+        fileName: params.media?.fileName ?? null,
       },
     });
 
@@ -156,8 +168,10 @@ export async function sendWhatsAppMessage(params: {
       error: data?.error ?? null,
       messageId: data?.messageId ?? null,
       interactionRegistered: data?.interactionRegistered === true,
+      attachmentDeferred: data?.attachmentDeferred === true,
     };
   } catch (e: any) {
     return { ok: false, error: String(e?.message ?? e) };
   }
 }
+

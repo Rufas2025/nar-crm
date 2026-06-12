@@ -1,8 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase, Lead, LeadProduct } from "@/lib/supabase";
 import { sendWhatsAppMessage } from "@/lib/evolution";
+import {
+  ATTACHMENT_ACCEPT,
+  formatBytes,
+  uploadWhatsAppAttachment,
+  validateAttachment,
+} from "@/lib/whatsappAttachment";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,7 +34,10 @@ import {
   Send,
   Paperclip,
   Link2,
+  X,
+  Image as ImageIcon,
 } from "lucide-react";
+
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -465,6 +474,30 @@ export default function LeadDetailPage() {
   const [whatsAppGreeting, setWhatsAppGreeting] = useState("");
   const [whatsAppBody, setWhatsAppBody] = useState("");
   const [whatsAppError, setWhatsAppError] = useState<string | null>(null);
+  const [whatsAppAttachment, setWhatsAppAttachment] = useState<File | null>(null);
+  const [whatsAppAttachmentPreview, setWhatsAppAttachmentPreview] = useState<string | null>(null);
+  const whatsAppFileRef = useRef<HTMLInputElement>(null);
+
+  function handleWhatsAppFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    e.target.value = "";
+    if (!f) return;
+    const v = validateAttachment(f);
+    if (!v.ok) {
+      toast.error(v.error || "Arquivo inválido");
+      return;
+    }
+    if (whatsAppAttachmentPreview) URL.revokeObjectURL(whatsAppAttachmentPreview);
+    setWhatsAppAttachment(f);
+    setWhatsAppAttachmentPreview(v.kind === "image" ? URL.createObjectURL(f) : null);
+  }
+
+  function removeWhatsAppAttachment() {
+    if (whatsAppAttachmentPreview) URL.revokeObjectURL(whatsAppAttachmentPreview);
+    setWhatsAppAttachment(null);
+    setWhatsAppAttachmentPreview(null);
+  }
+
 
   const DEFAULT_WHATSAPP_BODY =
     "Aqui é da NAR ECO. Estou entrando em contato sobre as soluções para sua escola.";
@@ -543,8 +576,10 @@ export default function LeadDetailPage() {
     setWhatsAppGreeting(buildGreeting(lead?.nome));
     setWhatsAppBody(DEFAULT_WHATSAPP_BODY);
     setWhatsAppError(null);
+    removeWhatsAppAttachment();
     setShowWhatsAppModal(true);
   }
+
 
   function handleInsertLink() {
     const url = window.prompt("Cole o link (https://...)", "https://");
@@ -575,12 +610,27 @@ export default function LeadDetailPage() {
     setWhatsAppError(null);
     setSendingWhatsApp(true);
 
+    // Upload do anexo (se houver) antes de chamar a Edge Function
+    let uploaded: Awaited<ReturnType<typeof uploadWhatsAppAttachment>> | null = null;
+    if (whatsAppAttachment) {
+      try {
+        uploaded = await uploadWhatsAppAttachment(whatsAppAttachment);
+      } catch (e: any) {
+        setWhatsAppError(e?.message || "Falha no upload do anexo.");
+        setSendingWhatsApp(false);
+        return;
+      }
+    }
+
     // O backend normaliza o telefone (adiciona 55 quando necessário) e
     // busca a configuração da Evolution na tabela evolution_config.
     const result = await sendWhatsAppMessage({
       leadId: id,
       phone: lead.telefone,
       message: finalMessage,
+      media: uploaded
+        ? { url: uploaded.signedUrl, type: uploaded.kind, fileName: uploaded.fileName }
+        : null,
     });
 
     if (!result.ok) {
@@ -591,13 +641,18 @@ export default function LeadDetailPage() {
     }
 
     setShowWhatsAppModal(false);
+    removeWhatsAppAttachment();
     const { data: refreshed } = await supabase.from("leads").select("*").eq("id", lead.id).single();
     if (refreshed) setLead(refreshed);
     await fetchActivities();
     window.dispatchEvent(new CustomEvent("leads:refresh"));
+    if (result.attachmentDeferred) {
+      toast.message("Upload realizado, mas envio de anexo ainda depende do deploy da função de mídia.");
+    }
     toast.success("Mensagem enviada via WhatsApp e interação registrada com sucesso.");
     setSendingWhatsApp(false);
   }
+
 
 
 
@@ -1187,12 +1242,18 @@ export default function LeadDetailPage() {
                   </button>
                   <button
                     type="button"
-                    disabled
-                    title="Envio de anexo em breve"
-                    className="text-[11px] px-2 py-1 rounded-lg border border-border/60 bg-muted/20 text-muted-foreground/60 cursor-not-allowed flex items-center gap-1"
+                    onClick={() => whatsAppFileRef.current?.click()}
+                    className="text-[11px] px-2 py-1 rounded-lg border border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors flex items-center gap-1"
                   >
-                    <Paperclip className="w-3 h-3" strokeWidth={2} /> Anexo (em breve)
+                    <Paperclip className="w-3 h-3" strokeWidth={2} /> Anexar arquivo
                   </button>
+                  <input
+                    ref={whatsAppFileRef}
+                    type="file"
+                    accept={ATTACHMENT_ACCEPT}
+                    className="hidden"
+                    onChange={handleWhatsAppFileChange}
+                  />
                 </div>
               </div>
               <Textarea
@@ -1205,7 +1266,39 @@ export default function LeadDetailPage() {
                 className="rounded-xl text-sm resize-none"
                 placeholder="Escreva o corpo da mensagem. Você pode incluir links (https://...)."
               />
+              {whatsAppAttachment && (
+                <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-muted/30 p-2">
+                  {whatsAppAttachmentPreview ? (
+                    <img
+                      src={whatsAppAttachmentPreview}
+                      alt={whatsAppAttachment.name}
+                      className="w-12 h-12 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center">
+                      {whatsAppAttachment.type.startsWith("image/") ? (
+                        <ImageIcon className="w-5 h-5 text-muted-foreground" />
+                      ) : (
+                        <FileText className="w-5 h-5 text-muted-foreground" />
+                      )}
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-foreground truncate">{whatsAppAttachment.name}</p>
+                    <p className="text-[11px] text-muted-foreground">{formatBytes(whatsAppAttachment.size)}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={removeWhatsAppAttachment}
+                    className="p-1 rounded-md hover:bg-secondary/60 text-muted-foreground hover:text-foreground"
+                    aria-label="Remover anexo"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
             </div>
+
 
             {/* Preview */}
             <div className="space-y-1.5">

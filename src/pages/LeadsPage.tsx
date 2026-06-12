@@ -9,7 +9,7 @@ import * as XLSX from "xlsx";
 import {
   Plus, Search, ChevronRight, X, Loader2,
   CheckCircle2, AlertTriangle, AlertCircle, Upload,
-  Copy, Phone, Mail, Trash2, Building2, User, Table2,
+  Copy, Phone, Mail, Trash2, Building2, User, Table2, MessageSquare,
 } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
+import WhatsappBulkModal from "@/components/WhatsappBulkModal";
+
 
 // ─── Enums ───────────────────────────────────────────────────────────────────
 
@@ -592,6 +594,8 @@ export default function LeadsPage() {
   const [showImport, setShowImport] = useState(false);
 
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [showBulkWhatsApp, setShowBulkWhatsApp] = useState(false);
+
 
   async function fetchLeads() {
     setLoading(true);
@@ -1040,6 +1044,24 @@ export default function LeadsPage() {
               <Phone className="w-3.5 h-3.5" /> Copiar celulares
             </Button>
             <Button
+              size="sm"
+              className="h-8 rounded-lg text-xs gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-white shadow-[0_2px_8px_rgba(16,185,129,0.35)]"
+              onClick={() => {
+                const eligible = getSelectedLeads().filter((l) => {
+                  const d = (l.telefone ?? "").replace(/\D/g, "");
+                  return d.length >= 10 && d.length <= 13;
+                });
+                if (eligible.length === 0) {
+                  toast.error("Nenhum lead selecionado tem telefone válido.");
+                  return;
+                }
+                setShowBulkWhatsApp(true);
+              }}
+            >
+              <MessageSquare className="w-3.5 h-3.5" /> Enviar WhatsApp
+            </Button>
+
+            <Button
               variant="destructive"
               size="sm"
               className="h-8 rounded-lg text-xs gap-1.5 shadow-[0_2px_8px_hsl(var(--destructive)/0.3)]"
@@ -1240,6 +1262,15 @@ export default function LeadsPage() {
           onDone={() => { fetchLeads(); }}
         />
       )}
+
+      {/* Modal Enviar WhatsApp em lote */}
+      <WhatsappBulkModal
+        leads={getSelectedLeads()}
+        open={showBulkWhatsApp}
+        onOpenChange={setShowBulkWhatsApp}
+        onDone={() => { fetchLeads(); }}
+      />
     </div>
   );
+
 }
