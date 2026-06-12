@@ -1262,6 +1262,15 @@ export default function LeadsPage() {
           onDone={() => { fetchLeads(); }}
         />
       )}
+
+      {/* Modal Enviar WhatsApp em lote */}
+      <WhatsappBulkModal
+        leads={getSelectedLeads()}
+        open={showBulkWhatsApp}
+        onOpenChange={setShowBulkWhatsApp}
+        onDone={() => { fetchLeads(); }}
+      />
     </div>
   );
+
 }
