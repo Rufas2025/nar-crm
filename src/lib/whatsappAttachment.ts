@@ -41,6 +41,7 @@ export async function uploadWhatsAppAttachment(file: File): Promise<UploadedAtta
   const validated = validateAttachment(file);
   if (!validated.ok) throw new Error(validated.error);
 
+
   const { data: sess } = await supabase.auth.getSession();
   const userId = sess.session?.user?.id;
   if (!userId) throw new Error("Usuário não autenticado.");
