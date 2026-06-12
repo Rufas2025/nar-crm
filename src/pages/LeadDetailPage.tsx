@@ -576,8 +576,10 @@ export default function LeadDetailPage() {
     setWhatsAppGreeting(buildGreeting(lead?.nome));
     setWhatsAppBody(DEFAULT_WHATSAPP_BODY);
     setWhatsAppError(null);
+    removeWhatsAppAttachment();
     setShowWhatsAppModal(true);
   }
+
 
   function handleInsertLink() {
     const url = window.prompt("Cole o link (https://...)", "https://");
