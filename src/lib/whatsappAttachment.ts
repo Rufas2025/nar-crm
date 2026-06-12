@@ -10,7 +10,11 @@ export const ATTACHMENT_ACCEPT = ".jpg,.jpeg,.png,.webp,.pdf";
 
 export type AttachmentKind = "image" | "document";
 
-export function validateAttachment(file: File): { ok: true; kind: AttachmentKind } | { ok: false; error: string } {
+export type AttachmentValidation =
+  | { ok: true; kind: AttachmentKind; error?: undefined }
+  | { ok: false; kind?: undefined; error: string };
+
+export function validateAttachment(file: File): AttachmentValidation {
   if (file.size > MAX_ATTACHMENT_BYTES) {
     return { ok: false, error: "Arquivo muito grande. Máximo 10 MB." };
   }
@@ -19,6 +23,7 @@ export function validateAttachment(file: File): { ok: true; kind: AttachmentKind
   if (ALLOWED_DOC_MIMES.includes(mime)) return { ok: true, kind: "document" };
   return { ok: false, error: "Formato inválido. Aceitos: JPG, PNG, WEBP ou PDF." };
 }
+
 
 export function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
