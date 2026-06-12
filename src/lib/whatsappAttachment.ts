@@ -71,7 +71,8 @@ export async function uploadWhatsAppAttachment(file: File): Promise<UploadedAtta
   return {
     signedUrl: signed.signedUrl,
     fileName: file.name,
-    kind: validated.kind,
+    kind,
     path,
   };
+
 }
