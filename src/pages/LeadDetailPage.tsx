@@ -474,6 +474,30 @@ export default function LeadDetailPage() {
   const [whatsAppGreeting, setWhatsAppGreeting] = useState("");
   const [whatsAppBody, setWhatsAppBody] = useState("");
   const [whatsAppError, setWhatsAppError] = useState<string | null>(null);
+  const [whatsAppAttachment, setWhatsAppAttachment] = useState<File | null>(null);
+  const [whatsAppAttachmentPreview, setWhatsAppAttachmentPreview] = useState<string | null>(null);
+  const whatsAppFileRef = useRef<HTMLInputElement>(null);
+
+  function handleWhatsAppFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    e.target.value = "";
+    if (!f) return;
+    const v = validateAttachment(f);
+    if (!v.ok) {
+      toast.error(v.error || "Arquivo inválido");
+      return;
+    }
+    if (whatsAppAttachmentPreview) URL.revokeObjectURL(whatsAppAttachmentPreview);
+    setWhatsAppAttachment(f);
+    setWhatsAppAttachmentPreview(v.kind === "image" ? URL.createObjectURL(f) : null);
+  }
+
+  function removeWhatsAppAttachment() {
+    if (whatsAppAttachmentPreview) URL.revokeObjectURL(whatsAppAttachmentPreview);
+    setWhatsAppAttachment(null);
+    setWhatsAppAttachmentPreview(null);
+  }
+
 
   const DEFAULT_WHATSAPP_BODY =
     "Aqui é da NAR ECO. Estou entrando em contato sobre as soluções para sua escola.";
