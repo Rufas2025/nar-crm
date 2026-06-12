@@ -610,12 +610,27 @@ export default function LeadDetailPage() {
     setWhatsAppError(null);
     setSendingWhatsApp(true);
 
+    // Upload do anexo (se houver) antes de chamar a Edge Function
+    let uploaded: Awaited<ReturnType<typeof uploadWhatsAppAttachment>> | null = null;
+    if (whatsAppAttachment) {
+      try {
+        uploaded = await uploadWhatsAppAttachment(whatsAppAttachment);
+      } catch (e: any) {
+        setWhatsAppError(e?.message || "Falha no upload do anexo.");
+        setSendingWhatsApp(false);
+        return;
+      }
+    }
+
     // O backend normaliza o telefone (adiciona 55 quando necessário) e
     // busca a configuração da Evolution na tabela evolution_config.
     const result = await sendWhatsAppMessage({
       leadId: id,
       phone: lead.telefone,
       message: finalMessage,
+      media: uploaded
+        ? { url: uploaded.signedUrl, type: uploaded.kind, fileName: uploaded.fileName }
+        : null,
     });
 
     if (!result.ok) {
@@ -626,13 +641,18 @@ export default function LeadDetailPage() {
     }
 
     setShowWhatsAppModal(false);
+    removeWhatsAppAttachment();
     const { data: refreshed } = await supabase.from("leads").select("*").eq("id", lead.id).single();
     if (refreshed) setLead(refreshed);
     await fetchActivities();
     window.dispatchEvent(new CustomEvent("leads:refresh"));
+    if (result.attachmentDeferred) {
+      toast.message("Upload realizado, mas envio de anexo ainda depende do deploy da função de mídia.");
+    }
     toast.success("Mensagem enviada via WhatsApp e interação registrada com sucesso.");
     setSendingWhatsApp(false);
   }
+
 
 
 
