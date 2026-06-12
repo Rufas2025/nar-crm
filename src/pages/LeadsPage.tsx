@@ -9,7 +9,7 @@ import * as XLSX from "xlsx";
 import {
   Plus, Search, ChevronRight, X, Loader2,
   CheckCircle2, AlertTriangle, AlertCircle, Upload,
-  Copy, Phone, Mail, Trash2, Building2, User, Table2,
+  Copy, Phone, Mail, Trash2, Building2, User, Table2, MessageSquare,
 } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
+import WhatsappBulkModal from "@/components/WhatsappBulkModal";
+
 
 // ─── Enums ───────────────────────────────────────────────────────────────────
 
