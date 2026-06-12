@@ -26,6 +26,8 @@ import {
   Package2,
   Pencil,
   Send,
+  Paperclip,
+  Link2,
 } from "lucide-react";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
