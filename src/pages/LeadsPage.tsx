@@ -1044,6 +1044,24 @@ export default function LeadsPage() {
               <Phone className="w-3.5 h-3.5" /> Copiar celulares
             </Button>
             <Button
+              size="sm"
+              className="h-8 rounded-lg text-xs gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-white shadow-[0_2px_8px_rgba(16,185,129,0.35)]"
+              onClick={() => {
+                const eligible = getSelectedLeads().filter((l) => {
+                  const d = (l.telefone ?? "").replace(/\D/g, "");
+                  return d.length >= 10 && d.length <= 13;
+                });
+                if (eligible.length === 0) {
+                  toast.error("Nenhum lead selecionado tem telefone válido.");
+                  return;
+                }
+                setShowBulkWhatsApp(true);
+              }}
+            >
+              <MessageSquare className="w-3.5 h-3.5" /> Enviar WhatsApp
+            </Button>
+
+            <Button
               variant="destructive"
               size="sm"
               className="h-8 rounded-lg text-xs gap-1.5 shadow-[0_2px_8px_hsl(var(--destructive)/0.3)]"
