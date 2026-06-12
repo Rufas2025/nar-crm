@@ -1,8 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase, Lead, LeadProduct } from "@/lib/supabase";
 import { sendWhatsAppMessage } from "@/lib/evolution";
+import {
+  ATTACHMENT_ACCEPT,
+  formatBytes,
+  uploadWhatsAppAttachment,
+  validateAttachment,
+} from "@/lib/whatsappAttachment";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,7 +34,10 @@ import {
   Send,
   Paperclip,
   Link2,
+  X,
+  Image as ImageIcon,
 } from "lucide-react";
+
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
