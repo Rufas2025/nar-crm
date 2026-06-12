@@ -26,6 +26,8 @@ import {
   Package2,
   Pencil,
   Send,
+  Paperclip,
+  Link2,
 } from "lucide-react";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -460,11 +462,17 @@ export default function LeadDetailPage() {
   // ── WhatsApp send modal ──────────────────────────────────────────────────
   const [sendingWhatsApp, setSendingWhatsApp] = useState(false);
   const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
-  const [whatsAppMessage, setWhatsAppMessage] = useState("");
+  const [whatsAppGreeting, setWhatsAppGreeting] = useState("");
+  const [whatsAppBody, setWhatsAppBody] = useState("");
   const [whatsAppError, setWhatsAppError] = useState<string | null>(null);
 
-  const DEFAULT_WHATSAPP_MESSAGE =
-    "Olá, tudo bem? Aqui é da NAR ECO. Estou entrando em contato sobre as soluções para sua escola.";
+  const DEFAULT_WHATSAPP_BODY =
+    "Aqui é da NAR ECO. Estou entrando em contato sobre as soluções para sua escola.";
+
+  function buildGreeting(name?: string | null) {
+    const trimmed = (name ?? "").trim();
+    return trimmed ? `Olá, ${trimmed}, tudo bem?` : "Olá, tudo bem?";
+  }
 
   function getLeadVars() {
     const linkedProds = products.map(
@@ -486,33 +494,32 @@ export default function LeadDetailPage() {
     {
       label: "Primeiro contato",
       build: (v: ReturnType<typeof getLeadVars>) =>
-        `Olá, tudo bem? Aqui é da NAR ECO. Vi o cadastro da sua escola${
+        `Aqui é da NAR ECO. Vi o cadastro da sua escola${
           v.escola ? ` (${v.escola}${v.cidadeUf ? `, em ${v.cidadeUf}` : ""})` : ""
         } e gostaria de apresentar algumas soluções que podem ajudar vocês.`,
     },
     {
       label: "Apresentação de soluções",
       build: () =>
-        "Olá, tudo bem? Aqui é da NAR ECO. Trabalhamos com soluções para escolas, incluindo EduInfo, Gennera, EcoClear e VibeFlow. Gostaria de entender melhor a necessidade de vocês.",
+        "Aqui é da NAR ECO. Trabalhamos com soluções para escolas, incluindo EduInfo, Gennera, EcoClear e VibeFlow. Gostaria de entender melhor a necessidade de vocês.",
     },
     {
       label: "Follow-up",
       build: (v: ReturnType<typeof getLeadVars>) =>
-        `Olá${v.nome ? `, ${v.nome}` : ""}, tudo bem? Passando para dar continuidade ao nosso contato sobre as soluções da NAR ECO para sua escola${
+        `Passando para dar continuidade ao nosso contato sobre as soluções da NAR ECO para sua escola${
           v.escola ? ` (${v.escola})` : ""
         }.`,
     },
     {
       label: "Agendamento",
       build: () =>
-        "Olá, tudo bem? Podemos agendar uma conversa rápida para eu entender melhor a necessidade da escola e apresentar a melhor solução?",
+        "Podemos agendar uma conversa rápida para eu entender melhor a necessidade da escola e apresentar a melhor solução?",
     },
   ];
 
   function whatsAppVariableChips() {
     const v = getLeadVars();
     return [
-      { label: "Nome", value: v.nome },
       { label: "Escola", value: v.escola },
       { label: "Cidade/UF", value: v.cidadeUf },
       { label: "Produtos", value: v.produtos },
@@ -520,14 +527,34 @@ export default function LeadDetailPage() {
     ].filter((c) => c.value);
   }
 
+  function buildFinalWhatsAppMessage() {
+    const g = whatsAppGreeting.trim();
+    const b = whatsAppBody.trim();
+    if (!g) return b;
+    if (!b) return g;
+    return `${g}\n\n${b}`;
+  }
+
   function openWhatsAppModal() {
     if (!lead?.telefone) {
       toast.error("Telefone inválido");
       return;
     }
-    setWhatsAppMessage(DEFAULT_WHATSAPP_MESSAGE);
+    setWhatsAppGreeting(buildGreeting(lead?.nome));
+    setWhatsAppBody(DEFAULT_WHATSAPP_BODY);
     setWhatsAppError(null);
     setShowWhatsAppModal(true);
+  }
+
+  function handleInsertLink() {
+    const url = window.prompt("Cole o link (https://...)", "https://");
+    if (!url) return;
+    const trimmed = url.trim();
+    if (!/^https?:\/\/\S+/i.test(trimmed)) {
+      toast.error("Link inválido. Use http:// ou https://");
+      return;
+    }
+    setWhatsAppBody((prev) => (prev ? `${prev.replace(/\s+$/, "")} ${trimmed}` : trimmed));
   }
 
   async function handleConfirmSendWhatsApp() {
@@ -535,7 +562,7 @@ export default function LeadDetailPage() {
       setWhatsAppError("Telefone inválido");
       return;
     }
-    const finalMessage = whatsAppMessage.trim();
+    const finalMessage = buildFinalWhatsAppMessage();
     if (!finalMessage) {
       setWhatsAppError("Escreva uma mensagem antes de enviar.");
       return;
@@ -571,6 +598,7 @@ export default function LeadDetailPage() {
     toast.success("Mensagem enviada via WhatsApp e interação registrada com sucesso.");
     setSendingWhatsApp(false);
   }
+
 
 
 
@@ -1087,7 +1115,7 @@ export default function LeadDetailPage() {
               </p>
             </div>
 
-            {/* Templates */}
+            {/* Templates (preenchem o corpo da mensagem) */}
             <div className="space-y-1.5">
               <p className="text-xs text-muted-foreground">Modelos de mensagem</p>
               <div className="flex flex-wrap gap-1.5">
@@ -1096,7 +1124,7 @@ export default function LeadDetailPage() {
                     key={t.label}
                     type="button"
                     onClick={() => {
-                      setWhatsAppMessage(t.build(getLeadVars()));
+                      setWhatsAppBody(t.build(getLeadVars()));
                       setWhatsAppError(null);
                     }}
                     className="text-xs px-2.5 py-1.5 rounded-lg border border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
@@ -1107,17 +1135,17 @@ export default function LeadDetailPage() {
               </div>
             </div>
 
-            {/* Variable chips */}
+            {/* Variable chips (inserem no corpo) */}
             {whatsAppVariableChips().length > 0 && (
               <div className="space-y-1.5">
-                <p className="text-xs text-muted-foreground">Inserir dados do lead</p>
+                <p className="text-xs text-muted-foreground">Inserir dados do lead no corpo</p>
                 <div className="flex flex-wrap gap-1.5">
                   {whatsAppVariableChips().map((c) => (
                     <button
                       key={c.label}
                       type="button"
                       onClick={() =>
-                        setWhatsAppMessage((prev) =>
+                        setWhatsAppBody((prev) =>
                           prev ? `${prev.replace(/\s+$/, "")} ${c.value}` : c.value
                         )
                       }
@@ -1130,19 +1158,63 @@ export default function LeadDetailPage() {
               </div>
             )}
 
-            {/* Message */}
+            {/* Saudação */}
             <div className="space-y-1.5">
-              <p className="text-xs text-muted-foreground">Mensagem</p>
-              <Textarea
-                value={whatsAppMessage}
+              <p className="text-xs text-muted-foreground">Saudação</p>
+              <input
+                type="text"
+                value={whatsAppGreeting}
                 onChange={(e) => {
-                  setWhatsAppMessage(e.target.value);
+                  setWhatsAppGreeting(e.target.value);
                   if (whatsAppError) setWhatsAppError(null);
                 }}
-                rows={6}
-                className="rounded-xl text-sm resize-none"
-                placeholder="Escreva a mensagem que será enviada no WhatsApp…"
+                className="w-full h-10 px-3 rounded-xl text-sm bg-background border border-input focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                placeholder="Olá, {nome}, tudo bem?"
               />
+            </div>
+
+            {/* Corpo da mensagem */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-muted-foreground">Corpo da mensagem</p>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={handleInsertLink}
+                    className="text-[11px] px-2 py-1 rounded-lg border border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors flex items-center gap-1"
+                  >
+                    <Link2 className="w-3 h-3" strokeWidth={2} /> Inserir link
+                  </button>
+                  <button
+                    type="button"
+                    disabled
+                    title="Envio de anexo em breve"
+                    className="text-[11px] px-2 py-1 rounded-lg border border-border/60 bg-muted/20 text-muted-foreground/60 cursor-not-allowed flex items-center gap-1"
+                  >
+                    <Paperclip className="w-3 h-3" strokeWidth={2} /> Anexo (em breve)
+                  </button>
+                </div>
+              </div>
+              <Textarea
+                value={whatsAppBody}
+                onChange={(e) => {
+                  setWhatsAppBody(e.target.value);
+                  if (whatsAppError) setWhatsAppError(null);
+                }}
+                rows={5}
+                className="rounded-xl text-sm resize-none"
+                placeholder="Escreva o corpo da mensagem. Você pode incluir links (https://...)."
+              />
+            </div>
+
+            {/* Preview */}
+            <div className="space-y-1.5">
+              <p className="text-xs text-muted-foreground">Pré-visualização</p>
+              <div className="rounded-xl bg-emerald-500/5 border border-emerald-500/20 px-4 py-3 text-sm whitespace-pre-wrap text-foreground min-h-[60px]">
+                {buildFinalWhatsAppMessage() || (
+                  <span className="text-muted-foreground italic">A mensagem final aparecerá aqui…</span>
+                )}
+              </div>
             </div>
 
             {whatsAppError && (
@@ -1151,6 +1223,7 @@ export default function LeadDetailPage() {
               </p>
             )}
           </div>
+
 
           <DialogFooter className="gap-2 sm:gap-2">
             <Button
@@ -1165,7 +1238,7 @@ export default function LeadDetailPage() {
             <Button
               type="button"
               onClick={handleConfirmSendWhatsApp}
-              disabled={sendingWhatsApp || whatsAppMessage.trim().length < 5}
+              disabled={sendingWhatsApp || buildFinalWhatsAppMessage().trim().length < 5}
               className="h-10 px-5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white text-sm font-medium shadow-[0_4px_14px_rgba(16,185,129,0.35)]"
             >
               {sendingWhatsApp ? (
