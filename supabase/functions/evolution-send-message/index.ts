@@ -67,8 +67,12 @@ const BodySchema = z
     phone: z.string().min(1).max(50).optional(),
     phoneNumber: z.string().min(1).max(50).optional(),
     message: z.string().max(4000).nullable().optional(),
+    mediaUrl: z.string().url().nullable().optional(),
+    mediaType: z.enum(["image", "document"]).nullable().optional(),
+    fileName: z.string().max(255).nullable().optional(),
   })
   .refine((d) => d.phone || d.phoneNumber, { message: "Telefone obrigatório" });
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
