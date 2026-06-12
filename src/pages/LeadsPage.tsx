@@ -594,6 +594,8 @@ export default function LeadsPage() {
   const [showImport, setShowImport] = useState(false);
 
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [showBulkWhatsApp, setShowBulkWhatsApp] = useState(false);
+
 
   async function fetchLeads() {
     setLoading(true);
