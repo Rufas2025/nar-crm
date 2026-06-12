@@ -1238,7 +1238,7 @@ export default function LeadDetailPage() {
             <Button
               type="button"
               onClick={handleConfirmSendWhatsApp}
-              disabled={sendingWhatsApp || whatsAppMessage.trim().length < 5}
+              disabled={sendingWhatsApp || buildFinalWhatsAppMessage().trim().length < 5}
               className="h-10 px-5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white text-sm font-medium shadow-[0_4px_14px_rgba(16,185,129,0.35)]"
             >
               {sendingWhatsApp ? (
