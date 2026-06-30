@@ -557,10 +557,10 @@ export default function EmailStudioPage() {
 
 function Section({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
   return (
-    <div className="space-y-3 rounded-xl border bg-white p-4">
+    <div className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-5">
       <div>
-        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
-        {hint && <p className="text-[11px] text-muted-foreground">{hint}</p>}
+        <h3 className="text-sm font-semibold text-[#333333]">{title}</h3>
+        {hint && <p className="text-[11px] text-[#6B7280]">{hint}</p>}
       </div>
       {children}
     </div>
