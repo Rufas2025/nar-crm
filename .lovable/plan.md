@@ -1,73 +1,107 @@
-## Email Studio — NAR CRM
+## Integração Gmail Drafts — NAR CRM + Email Studio
 
-Módulo de email integrado aos leads, com envio individual, em lote, biblioteca de templates e histórico. Envio via Resend (conector). Editor de texto simples com variáveis `{{nome}}`, `{{empresa}}`, `{{email}}`, `{{link}}`.
+Objetivo: conectar Gmail (rufino@eduinfo.com.br) via OAuth, criar **rascunhos** (nunca envios) individuais e em lote (≤20) a partir dos leads. Não toca em Resend nem no Studio existente — apenas adiciona.
 
-### 1. Conector Resend
-- Vincular o conector Resend ao projeto (gateway). Sem expor `RESEND_API_KEY` no frontend.
-- Domínio remetente configurado no Resend pelo usuário (ex.: `contato@seudominio.com`). Para testes: `onboarding@resend.dev`.
+---
 
-### 2. Banco de dados (novas tabelas)
+### 1. Banco (1 migration)
 
-**`email_templates`** — biblioteca reutilizável
-- `id`, `user_id`, `nome`, `assunto`, `corpo` (texto), `created_at`, `updated_at`
-- RLS: dono gerencia os próprios templates.
+**`gmail_connections`** — guarda token da conta Gmail por user
+- `user_id` (unique), `email`, `access_token`, `refresh_token`, `expires_at`, `scope`, `connected_at`
+- RLS: dono lê/atualiza o próprio. Tokens nunca expostos ao client (só edge functions com service_role).
+- GRANTs: `authenticated` (SELECT do próprio para mostrar status/email), `service_role` (ALL).
 
-**`email_logs`** — histórico de envios (individual e lote)
-- `id`, `user_id`, `lead_id` (nullable), `campaign_id` (nullable), `recipient_email`, `recipient_name`, `assunto`, `corpo_final`, `status` (`pending|sent|failed`), `provider_message_id`, `error_message`, `sent_at`, `created_at`
-- RLS: dono lê os próprios.
+**`gmail_drafts`** — histórico de rascunhos criados
+- `user_id`, `lead_id` (nullable), `campaign_id` (nullable), `gmail_draft_id`, `to_email`, `subject`, `template_type`, `status` (`created|failed`), `error_message`, `is_test` (bool), `created_at`.
+- RLS: dono CRUD próprio.
 
-**`email_campaigns`** — agrupador de envios em lote
-- `id`, `user_id`, `nome`, `assunto`, `corpo`, `total`, `enviados`, `falhas`, `status` (`processing|done|partial`), `created_at`
-- RLS: dono gerencia as próprias.
+**`gmail_test_approvals`** — marca aprovação do teste antes de liberar lote
+- `user_id`, `campaign_id` (text/uuid livre), `approved_at`.
 
-Cada envio bem-sucedido também cria uma `activity` no lead (tipo `email`) para aparecer em "Últimas Interações".
+---
 
-### 3. Edge Function `send-email`
-Recebe `{ leadId?, to, name?, subject, body, templateVars?, campaignId? }`.
-- Renderiza variáveis: `{{nome}}` → primeiro nome, `{{empresa}}`, `{{email}}`, `{{link}}`.
-- Chama Resend via gateway: `POST /emails` com `from`, `to`, `subject`, `html` (texto convertido com quebras `<br>`).
-- Grava `email_logs` (sent/failed) + activity no lead se sucesso.
-- Não expõe chave no frontend.
+### 2. Edge Functions (4 novas)
 
-### 4. Frontend
+Todas usam secrets já configurados: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`.
 
-**Página `/email-studio`** (nova rota + item na sidebar)
-- Aba **Templates**: CRUD da biblioteca (nome, assunto, corpo + preview de variáveis).
-- Aba **Campanhas**: lista de envios em lote com status (X de Y enviados).
-- Aba **Histórico**: tabela de `email_logs` filtrável por lead/status/data; cards de métricas (total, enviados, falhas, taxa de sucesso).
+**`google-oauth-start`** (`verify_jwt = true`)
+- Monta URL: `https://accounts.google.com/o/oauth2/v2/auth` com `scope=gmail.compose`, `access_type=offline`, `prompt=consent`, `state=<user_id>:<nonce>`.
+- Retorna `{ url }` (frontend faz `window.location = url`).
 
-**Botão "Enviar Email" no `LeadDetailPage`**
-- Abre `EmailSendModal` com: destinatário (email do lead, editável), assunto, corpo, dropdown para carregar template salvo, preview com variáveis renderizadas.
-- Valida email; desabilita se lead não tem email.
-- Após envio: toast + atualiza "Últimas Interações".
+**`google-oauth-callback`** (`verify_jwt = false`, público — Google chama)
+- Recebe `code` + `state`; troca por tokens em `oauth2.googleapis.com/token`.
+- Busca email via `gmail.googleapis.com/gmail/v1/users/me/profile`.
+- Valida `emailAddress === "rufino@eduinfo.com.br"` (configurável via constante). Se errado: redireciona com `?gmail=wrong_account`.
+- Upsert em `gmail_connections` com service_role.
+- Redireciona para `/configuracoes?gmail=connected`.
 
-**Ação em lote "Enviar Email" no `LeadsPage`**
-- Aparece na barra de ações em massa (segue padrão do WhatsApp em lote).
-- Modal `EmailBulkModal`: assunto, corpo com `{{nome}}`/`{{empresa}}`, dropdown de template, lista dos leads selecionados (descartando sem email), preview rotativo dos 3 primeiros.
-- Envio sequencial com 600ms de intervalo, progresso por lead (Pendente / Enviando / ✅ / ❌ + motivo).
-- Cria registro em `email_campaigns` e linka cada `email_logs` via `campaign_id`.
+**`create-gmail-draft`** (`verify_jwt = true`)
+- Body: `{ leadId?, to, subject, htmlBody, plainTextBody, templateType, campaignId?, isTest? }`.
+- Validação Gmail-safe: rejeita HTML contendo `data:`, `blob:`, `localhost`, `/src/assets`, `base64,`.
+- Refresh token se `expires_at` venceu.
+- Monta MIME `multipart/alternative` (plain + html), base64url-encode.
+- POST `gmail.googleapis.com/gmail/v1/users/me/drafts` com `{ message: { raw } }`.
+- Grava `gmail_drafts`. Retorna `{ gmailDraftId, draftUrl }`.
 
-### 5. Métricas no Dashboard de Email
-Cards: total enviados (7/30 dias), taxa de sucesso, top template usado, últimas falhas.
+**`create-gmail-draft-batch`** (`verify_jwt = true`)
+- Body: `{ leads: [{leadId,to,name,empresa}], subject, htmlBody, plainTextBody, templateType, campaignId }`.
+- Hard cap: `leads.length <= 20`.
+- Exige registro em `gmail_test_approvals` para o `campaignId` antes de processar (sem aprovação → 403).
+- Loop sequencial (300ms entre cada), substitui `{{nome}}`/`{{empresa}}` por lead, chama mesma lógica de criação.
+- Retorna `{ created: [...], failed: [...], pending: [...] }`.
 
-### 6. Arquivos previstos
-- `supabase/migrations/*` — tabelas + RLS + grants.
-- `supabase/functions/send-email/index.ts` — envio via Resend gateway.
-- `src/pages/EmailStudioPage.tsx` — página com tabs.
-- `src/components/EmailSendModal.tsx`, `EmailBulkModal.tsx`, `EmailTemplatesManager.tsx`, `EmailHistoryTable.tsx`, `EmailCampaignsList.tsx`.
-- `src/lib/email.ts` — helpers (render de variáveis, validação, chamada da function).
-- `src/pages/LeadDetailPage.tsx` — botão "Enviar Email".
-- `src/pages/LeadsPage.tsx` — ação em lote.
-- `src/components/Sidebar.tsx` — item "Email Studio".
-- `src/App.tsx` — rota `/email-studio`.
+---
 
-### 7. Não-mudanças
-- Não toca em WhatsApp/Evolution.
-- Não altera tabelas existentes (`leads`, `activities`) além de inserts novos.
-- Sem editor rich text (texto simples + variáveis, como combinado).
+### 3. Frontend
+
+**`src/lib/gmail.ts`** — helpers: `startGmailConnect()`, `getGmailStatus()`, `disconnectGmail()`, `createDraft()`, `createDraftBatch()`, `approveTestCampaign()`.
+
+**`ConfiguracoesPage.tsx`** — nova seção "Gmail da Eduinfo":
+- Card mostra status (Conectado/Desconectado), email conectado, conta esperada (`rufino@eduinfo.com.br`).
+- Botões: "Conectar Gmail" / "Desconectar Gmail".
+- Trata query `?gmail=connected|wrong_account|error` com toast.
+
+**`EmailStudioPage.tsx`** — barra de ações de rascunho (não substitui exportação atual):
+- Botão **"Criar rascunho de teste"** → abre dialog para escolher 1 dos 2 leads de teste (Colégio Rufas, Colégio Serrano) e cria 1 draft (`isTest=true`). Mostra link "Abrir no Gmail".
+- Botão **"Aprovar teste"** (habilita após criar teste) → grava `gmail_test_approvals` para o `campaignId` atual.
+- Botão **"Criar rascunhos do lote"** (habilita após aprovação) → abre dialog com seleção de até 20 leads (lista vinda de `leads` com email válido), mostra progresso por lead.
+- `campaignId` é gerado por sessão do Studio (uuid local), reaproveitado nas 3 ações.
+
+Leads de teste hard-coded no dialog se não existirem no banco; se existirem com esses nomes, usa o registro real.
+
+---
+
+### 4. Garantias
+
+- Não toca em Resend, Evolution, WhatsApp, templates existentes, tabelas de leads/activities.
+- Nenhum envio automático — apenas `drafts.create`.
+- Tokens só vivem em edge functions (service_role); frontend nunca vê access/refresh token.
+- Validador Gmail-safe roda no servidor antes do MIME.
+
+---
+
+### Arquivos
+
+Novos:
+- `supabase/migrations/<timestamp>_gmail_drafts.sql`
+- `supabase/functions/google-oauth-start/index.ts`
+- `supabase/functions/google-oauth-callback/index.ts`
+- `supabase/functions/create-gmail-draft/index.ts`
+- `supabase/functions/create-gmail-draft-batch/index.ts`
+- `src/lib/gmail.ts`
+- `src/components/GmailConnectionCard.tsx`
+- `src/components/GmailDraftActions.tsx`
+
+Editados:
+- `src/pages/ConfiguracoesPage.tsx` (insere `<GmailConnectionCard/>`)
+- `src/pages/EmailStudioPage.tsx` (insere `<GmailDraftActions/>`)
+- `supabase/config.toml` (verify_jwt do callback = false)
+
+---
 
 ### Pergunta antes de implementar
-1. **Domínio remetente**: você já tem um domínio verificado no Resend? Se sim, qual email usar como `from` padrão? Se não, posso começar com `onboarding@resend.dev` (apenas testes, recipient = email da conta Resend).
-2. **Item na sidebar**: posso adicionar "Email Studio" entre "Leads" e "Teste WhatsApp"?
+
+1. O `GOOGLE_REDIRECT_URI` que vocês configuraram aponta para a URL pública do `google-oauth-callback` (`https://iwoatxmezwqytvsqjaoe.supabase.co/functions/v1/google-oauth-callback`)? Se for outra URL, me diga qual — preciso bater certinho senão o Google rejeita.
+2. Posso travar a validação em `rufino@eduinfo.com.br` como única conta aceita, ou prefere uma allowlist (ex.: também aceitar outras contas `@eduinfo.com.br`)?
 
 Posso seguir?

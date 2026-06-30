@@ -32,6 +32,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ArrowLeft } from "lucide-react";
+import GmailDraftActions from "@/components/GmailDraftActions";
 import classroomImg from "@/assets/edu-classroom.jpg";
 import receptionImg from "@/assets/edu-reception.jpg";
 import techImg from "@/assets/edu-tech.jpg";
@@ -420,6 +421,18 @@ export default function EmailStudioPage() {
           <ValidationPanel validation={validation} storageUrl={storageStatusUrl()}>
             {manualStorageButton()}
           </ValidationPanel>
+
+          <GmailDraftActions
+            subject={data.title || `Eduinfo · ${TEMPLATE_LABELS[data.template]}`}
+            htmlBody={html}
+            plainTextBody={text}
+            templateType={data.template}
+            prepareHtml={async () => {
+              const preparedHtml = await prepareForExport("copy");
+              if (!preparedHtml) return null;
+              return { html: preparedHtml, text };
+            }}
+          />
 
           <Section title="Imagem principal (hero)" hint="Foto principal exibida no topo do e-mail.">
             <ImagePicker
