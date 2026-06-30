@@ -83,6 +83,108 @@ export type Database = {
         }
         Relationships: []
       }
+      gmail_connections: {
+        Row: {
+          access_token: string
+          connected_at: string
+          email: string
+          expires_at: string
+          id: string
+          refresh_token: string
+          scope: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          connected_at?: string
+          email: string
+          expires_at: string
+          id?: string
+          refresh_token: string
+          scope?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          connected_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          refresh_token?: string
+          scope?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      gmail_drafts: {
+        Row: {
+          campaign_id: string | null
+          created_at: string
+          error_message: string | null
+          gmail_draft_id: string | null
+          id: string
+          is_test: boolean
+          lead_id: string | null
+          status: string
+          subject: string
+          template_type: string | null
+          to_email: string
+          user_id: string
+        }
+        Insert: {
+          campaign_id?: string | null
+          created_at?: string
+          error_message?: string | null
+          gmail_draft_id?: string | null
+          id?: string
+          is_test?: boolean
+          lead_id?: string | null
+          status?: string
+          subject: string
+          template_type?: string | null
+          to_email: string
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string | null
+          created_at?: string
+          error_message?: string | null
+          gmail_draft_id?: string | null
+          id?: string
+          is_test?: boolean
+          lead_id?: string | null
+          status?: string
+          subject?: string
+          template_type?: string | null
+          to_email?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      gmail_test_approvals: {
+        Row: {
+          approved_at: string
+          campaign_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          approved_at?: string
+          campaign_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          approved_at?: string
+          campaign_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
