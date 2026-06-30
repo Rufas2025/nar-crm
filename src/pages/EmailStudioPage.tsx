@@ -764,13 +764,9 @@ function ValidationPanel({
   const hasLocalImage =
     v.needsStorage.length > 0 || v.unsafe.length > 0 || v.hasBase64 || v.hasBlob || v.hasLocalhost || v.hasSrcAssets;
   return (
-    <div
-      className={`space-y-2 rounded-xl border p-3 text-[12px] ${
-        v.ok ? "border-[var(--edu-green)] bg-[#EAFBEC]" : "border-[var(--edu-coral)] bg-[#FFEEF0]"
-      }`}
-    >
+    <div className="space-y-2 rounded-xl border border-[#E5E7EB] bg-white p-4 text-[12px]">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-foreground">Validação Gmail-safe</h3>
+        <h3 className="text-sm font-semibold text-[#333333]">Validação Gmail-safe</h3>
         <span
           className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
             v.ok ? "bg-[var(--edu-green)] text-white" : "bg-[var(--edu-coral)] text-white"
