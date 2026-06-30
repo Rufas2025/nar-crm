@@ -292,8 +292,9 @@ export default function EmailStudioPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--edu-light)]">
+    <div className="email-studio-light min-h-screen bg-[#F5F6F8] text-[#333333]">
       <header className="border-b border-[#E5E7EB] bg-white">
+
         <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-3 px-6 py-3">
           <div className="flex items-center gap-3">
             <button
