@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import GmailConnectionCard from "@/components/GmailConnectionCard";
 import {
   loadEvolutionSettings,
   saveEvolutionSettings,
@@ -251,6 +252,8 @@ export default function ConfiguracoesPage() {
           </Button>
         </div>
       </form>
+
+      <GmailConnectionCard />
     </div>
   );
 }
