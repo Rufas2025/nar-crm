@@ -75,12 +75,15 @@ export async function uploadImage(file: Blob, hintName?: string): Promise<string
 
   // Best-effort registry — don't block on schema mismatch.
   try {
-    // @ts-expect-error untyped public table
-    await supabase.from("email_assets").insert({
-      user_id: userId === "anonymous" ? null : userId,
-      file_path: path,
-      public_url: publicUrl,
-    });
+    await (supabase as unknown as {
+      from: (t: string) => { insert: (row: Record<string, unknown>) => Promise<unknown> };
+    })
+      .from("email_assets")
+      .insert({
+        user_id: userId === "anonymous" ? null : userId,
+        file_path: path,
+        public_url: publicUrl,
+      });
   } catch {
     /* ignore */
   }
