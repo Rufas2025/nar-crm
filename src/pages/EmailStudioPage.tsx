@@ -293,26 +293,22 @@ export default function EmailStudioPage() {
 
   return (
     <div className="min-h-screen bg-[var(--edu-light)]">
-      <header className="border-b bg-white">
-        <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-3 px-6 py-4">
+      <header className="border-b border-[#E5E7EB] bg-white">
+        <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-3 px-6 py-3">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate(-1)}
-              className="flex h-9 w-9 items-center justify-center rounded-lg border bg-white hover:bg-[var(--edu-light)] text-[var(--edu-graphite)]"
+              className="flex h-8 w-8 items-center justify-center rounded-md border border-[#E5E7EB] bg-white text-[#333333] hover:bg-[var(--edu-light)]"
               title="Voltar"
             >
               <ArrowLeft className="h-4 w-4" />
             </button>
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--edu-coral)] text-white font-extrabold">
-              E
-            </div>
-            <div>
-              <div className="text-lg font-bold tracking-tight" style={{ color: EDU.graphite }}>
-                eduinfo
-                <span className="ml-2 font-medium text-muted-foreground">Email Studio</span>
+            <div className="leading-tight">
+              <div className="text-[15px] font-semibold tracking-tight text-[#333333]">
+                eduinfo <span className="font-normal text-[#6B7280]">Email Studio</span>
               </div>
-              <div className="text-[10px] uppercase tracking-[1.5px] text-muted-foreground">
-                Templates visuais · Paleta institucional · Gmail-safe
+              <div className="text-[10px] uppercase tracking-[1.4px] text-[#6B7280]">
+                Templates · Gmail-safe
               </div>
             </div>
           </div>
@@ -321,8 +317,8 @@ export default function EmailStudioPage() {
           </div>
         </div>
         {prefill && (
-          <div className="mx-auto max-w-[1400px] px-6 pb-3 text-xs text-muted-foreground">
-            Pré-preenchido a partir do lead: <strong className="text-[var(--edu-graphite)]">{prefill.nomeContato || "—"}</strong>
+          <div className="mx-auto max-w-[1400px] px-6 pb-3 text-xs text-[#6B7280]">
+            Pré-preenchido a partir do lead: <strong className="text-[#333333]">{prefill.nomeContato || "—"}</strong>
             {prefill.nomeEscola ? ` · ${prefill.nomeEscola}` : ""}
             {prefill.email ? ` · ${prefill.email}` : ""}
           </div>
@@ -517,24 +513,21 @@ export default function EmailStudioPage() {
 
         <section className="min-w-0">
           <Tabs defaultValue="preview" className="w-full">
-            <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="mb-3 flex items-center justify-between gap-2">
               <TabsList>
                 <TabsTrigger value="preview">Preview</TabsTrigger>
                 <TabsTrigger value="html">Código HTML</TabsTrigger>
                 <TabsTrigger value="text">Texto puro</TabsTrigger>
               </TabsList>
-              <div className="flex flex-wrap gap-2">
-                <ActionButtons />
-              </div>
+              <span className="rounded-full border border-[#E5E7EB] bg-white px-3 py-1 text-[11px] font-medium text-[#333333]">
+                {TEMPLATE_LABELS[data.template]}
+              </span>
             </div>
 
             <TabsContent value="preview">
-              <div className="rounded-xl border bg-white p-4">
-                <div className="mb-3 flex items-center justify-between text-xs text-muted-foreground">
-                  <span>Largura fixa de 600px · Gmail-safe</span>
-                  <span className="rounded-full bg-[var(--edu-light)] px-3 py-1 font-medium text-foreground">
-                    {TEMPLATE_LABELS[data.template]}
-                  </span>
+              <div className="rounded-xl border border-[#E5E7EB] bg-white p-4">
+                <div className="mb-3 text-xs text-[#6B7280]">
+                  Largura fixa de 600px · Gmail-safe
                 </div>
                 <PreviewFrame html={html} />
               </div>
@@ -564,10 +557,10 @@ export default function EmailStudioPage() {
 
 function Section({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
   return (
-    <div className="space-y-3 rounded-xl border bg-white p-4">
+    <div className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-5">
       <div>
-        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
-        {hint && <p className="text-[11px] text-muted-foreground">{hint}</p>}
+        <h3 className="text-sm font-semibold text-[#333333]">{title}</h3>
+        {hint && <p className="text-[11px] text-[#6B7280]">{hint}</p>}
       </div>
       {children}
     </div>
@@ -771,13 +764,9 @@ function ValidationPanel({
   const hasLocalImage =
     v.needsStorage.length > 0 || v.unsafe.length > 0 || v.hasBase64 || v.hasBlob || v.hasLocalhost || v.hasSrcAssets;
   return (
-    <div
-      className={`space-y-2 rounded-xl border p-3 text-[12px] ${
-        v.ok ? "border-[var(--edu-green)] bg-[#EAFBEC]" : "border-[var(--edu-coral)] bg-[#FFEEF0]"
-      }`}
-    >
+    <div className="space-y-2 rounded-xl border border-[#E5E7EB] bg-white p-4 text-[12px]">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-foreground">Validação Gmail-safe</h3>
+        <h3 className="text-sm font-semibold text-[#333333]">Validação Gmail-safe</h3>
         <span
           className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
             v.ok ? "bg-[var(--edu-green)] text-white" : "bg-[var(--edu-coral)] text-white"
