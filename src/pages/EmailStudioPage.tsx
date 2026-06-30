@@ -513,24 +513,21 @@ export default function EmailStudioPage() {
 
         <section className="min-w-0">
           <Tabs defaultValue="preview" className="w-full">
-            <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="mb-3 flex items-center justify-between gap-2">
               <TabsList>
                 <TabsTrigger value="preview">Preview</TabsTrigger>
                 <TabsTrigger value="html">Código HTML</TabsTrigger>
                 <TabsTrigger value="text">Texto puro</TabsTrigger>
               </TabsList>
-              <div className="flex flex-wrap gap-2">
-                <ActionButtons />
-              </div>
+              <span className="rounded-full border border-[#E5E7EB] bg-white px-3 py-1 text-[11px] font-medium text-[#333333]">
+                {TEMPLATE_LABELS[data.template]}
+              </span>
             </div>
 
             <TabsContent value="preview">
-              <div className="rounded-xl border bg-white p-4">
-                <div className="mb-3 flex items-center justify-between text-xs text-muted-foreground">
-                  <span>Largura fixa de 600px · Gmail-safe</span>
-                  <span className="rounded-full bg-[var(--edu-light)] px-3 py-1 font-medium text-foreground">
-                    {TEMPLATE_LABELS[data.template]}
-                  </span>
+              <div className="rounded-xl border border-[#E5E7EB] bg-white p-4">
+                <div className="mb-3 text-xs text-[#6B7280]">
+                  Largura fixa de 600px · Gmail-safe
                 </div>
                 <PreviewFrame html={html} />
               </div>
