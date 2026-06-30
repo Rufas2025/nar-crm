@@ -792,6 +792,27 @@ export default function LeadDetailPage() {
               )}
             </div>
 
+            {/* Email Studio action */}
+            <div className="mt-3">
+              <button
+                onClick={() =>
+                  navigate("/email-studio", {
+                    state: {
+                      leadPrefill: {
+                        nomeContato: lead.nome || "",
+                        nomeEscola: lead.empresa || "",
+                        email: lead.email || "",
+                      },
+                    },
+                  })
+                }
+                className="w-full sm:w-auto h-10 px-5 rounded-xl bg-[hsl(var(--primary))] hover:opacity-90 text-white text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                <Mail className="w-4 h-4" strokeWidth={2} />
+                Abrir no Email Studio
+              </button>
+            </div>
+
           </div>
 
           {/* ── Activities block ── */}

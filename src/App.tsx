@@ -11,6 +11,7 @@ import LeadsPage from "./pages/LeadsPage";
 import LeadDetailPage from "./pages/LeadDetailPage";
 import TesteWhatsAppPage from "./pages/TesteWhatsAppPage";
 import ConfiguracoesPage from "./pages/ConfiguracoesPage";
+import EmailStudioPage from "./pages/EmailStudioPage";
 import Sidebar from "./components/Sidebar";
 import { Loader2 } from "lucide-react";
 
@@ -61,6 +62,7 @@ const App = () => (
               <Route path="/leads" element={<LeadsPage />} />
               <Route path="/leads/:id" element={<LeadDetailPage />} />
               <Route path="/teste-whatsapp" element={<TesteWhatsAppPage />} />
+              <Route path="/email-studio" element={<EmailStudioPage />} />
               <Route path="/configuracoes" element={<ConfiguracoesPage />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />

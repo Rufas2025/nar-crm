@@ -43,6 +43,14 @@
     --sidebar-accent-foreground: 0 0% 90%;
     --sidebar-border: 240 4% 14%;
     --sidebar-ring: 211 100% 52%;
+
+    /* Eduinfo Email Studio palette (Gmail-safe brand tokens) */
+    --edu-graphite: #333333;
+    --edu-coral: #FE455C;
+    --edu-yellow: #FEBD5F;
+    --edu-blue: #009BCE;
+    --edu-green: #38D64D;
+    --edu-light: #F5F6F8;
   }
 }
 

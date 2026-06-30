@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   Users,
   MessageCircle,
+  Mail,
   Settings,
   LogOut,
   ChevronRight,
@@ -12,6 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 const navItems = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
   { to: "/leads", label: "Leads", icon: Users },
+  { to: "/email-studio", label: "Email Studio", icon: Mail },
   { to: "/teste-whatsapp", label: "Teste WhatsApp", icon: MessageCircle },
   { to: "/configuracoes", label: "Configurações", icon: Settings },
 ];
