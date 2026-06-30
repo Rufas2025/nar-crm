@@ -62,7 +62,7 @@ export default function GmailDraftActions({ subject, htmlBody, plainTextBody, te
       const prepared = await withPreparedHtml();
       if (!prepared) return;
       const lead = TEST_LEADS[selectedTestLead];
-      const subj = subject.replaceAll("{{empresa}}", lead.empresa ?? "");
+      const subj = subject.replace(/\{\{empresa\}\}/g, lead.empresa ?? "");
       const res = await createGmailDraft({
         to: lead.to,
         subject: subj,
@@ -100,13 +100,13 @@ export default function GmailDraftActions({ subject, htmlBody, plainTextBody, te
   async function openBatch() {
     setBatchOpen(true);
     if (leads.length === 0) {
-      const { data } = await supabase
+      const { data } = await (supabase as unknown as { from: (t: string) => { select: (s: string) => { not: (c: string, op: string, v: unknown) => { order: (c: string, o: { ascending: boolean }) => { limit: (n: number) => Promise<{ data: LeadRow[] | null }> } } } } })
         .from("leads")
         .select("id, nome_contato, instituicao, email")
         .not("email", "is", null)
         .order("created_at", { ascending: false })
         .limit(200);
-      setLeads(((data as LeadRow[] | null) ?? []).filter((l) => l.email && l.email.includes("@")));
+      setLeads((data ?? []).filter((l) => l.email && l.email.includes("@")));
     }
   }
 
