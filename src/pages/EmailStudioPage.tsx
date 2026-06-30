@@ -293,26 +293,22 @@ export default function EmailStudioPage() {
 
   return (
     <div className="min-h-screen bg-[var(--edu-light)]">
-      <header className="border-b bg-white">
-        <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-3 px-6 py-4">
+      <header className="border-b border-[#E5E7EB] bg-white">
+        <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-3 px-6 py-3">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate(-1)}
-              className="flex h-9 w-9 items-center justify-center rounded-lg border bg-white hover:bg-[var(--edu-light)] text-[var(--edu-graphite)]"
+              className="flex h-8 w-8 items-center justify-center rounded-md border border-[#E5E7EB] bg-white text-[#333333] hover:bg-[var(--edu-light)]"
               title="Voltar"
             >
               <ArrowLeft className="h-4 w-4" />
             </button>
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--edu-coral)] text-white font-extrabold">
-              E
-            </div>
-            <div>
-              <div className="text-lg font-bold tracking-tight" style={{ color: EDU.graphite }}>
-                eduinfo
-                <span className="ml-2 font-medium text-muted-foreground">Email Studio</span>
+            <div className="leading-tight">
+              <div className="text-[15px] font-semibold tracking-tight text-[#333333]">
+                eduinfo <span className="font-normal text-[#6B7280]">Email Studio</span>
               </div>
-              <div className="text-[10px] uppercase tracking-[1.5px] text-muted-foreground">
-                Templates visuais · Paleta institucional · Gmail-safe
+              <div className="text-[10px] uppercase tracking-[1.4px] text-[#6B7280]">
+                Templates · Gmail-safe
               </div>
             </div>
           </div>
@@ -321,8 +317,8 @@ export default function EmailStudioPage() {
           </div>
         </div>
         {prefill && (
-          <div className="mx-auto max-w-[1400px] px-6 pb-3 text-xs text-muted-foreground">
-            Pré-preenchido a partir do lead: <strong className="text-[var(--edu-graphite)]">{prefill.nomeContato || "—"}</strong>
+          <div className="mx-auto max-w-[1400px] px-6 pb-3 text-xs text-[#6B7280]">
+            Pré-preenchido a partir do lead: <strong className="text-[#333333]">{prefill.nomeContato || "—"}</strong>
             {prefill.nomeEscola ? ` · ${prefill.nomeEscola}` : ""}
             {prefill.email ? ` · ${prefill.email}` : ""}
           </div>
