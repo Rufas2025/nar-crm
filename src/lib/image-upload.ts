@@ -186,6 +186,11 @@ async function callPrepareEmailAssets(
   const publishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
   if (!supabaseUrl) throw new Error("Configuração do Storage indisponível no app.");
 
+  // Need the *user's* access token so the edge function can identify them.
+  const { data: { session } } = await supabase.auth.getSession();
+  const accessToken = session?.access_token;
+  if (!accessToken) throw new Error("Sessão expirada. Faça login novamente para enviar imagens.");
+
   let response: Response;
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), 45000);
@@ -195,7 +200,7 @@ async function callPrepareEmailAssets(
       headers: {
         "Content-Type": "application/json",
         ...(publishableKey ? { apikey: publishableKey } : {}),
-        ...(publishableKey ? { Authorization: `Bearer ${publishableKey}` } : {}),
+        Authorization: `Bearer ${accessToken}`,
       },
       signal: controller.signal,
       body: JSON.stringify({ html, campaignId, images }),
