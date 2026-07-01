@@ -328,7 +328,7 @@ export default function EmailStudioPage() {
             </button>
             <div className="leading-tight">
               <div className="text-[15px] font-semibold tracking-tight text-[#333333]">
-                eduinfo <span className="font-normal text-[#6B7280]">Email Studio</span>
+                {brand.logoText} <span className="font-normal text-[#6B7280]">Email Studio</span>
               </div>
               <div className="text-[10px] uppercase tracking-[1.4px] text-[#6B7280]">
                 Templates · Gmail-safe
