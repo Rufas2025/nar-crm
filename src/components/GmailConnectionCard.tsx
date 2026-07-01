@@ -63,7 +63,13 @@ export default function GmailConnectionCard() {
       const url = await startGmailConnect();
       window.location.href = url;
     } catch (e: unknown) {
-      toast.error("Erro ao iniciar conexão: " + (e instanceof Error ? e.message : String(e)));
+      const msg = e instanceof Error ? e.message : String(e);
+      if (isMissingSecretsError(msg)) {
+        setNotConfigured(true);
+        toast.error(OAUTH_NOT_CONFIGURED_MSG);
+      } else {
+        toast.error("Erro ao iniciar conexão: " + msg);
+      }
       setBusy(false);
     }
   }
