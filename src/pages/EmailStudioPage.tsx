@@ -537,6 +537,29 @@ export default function EmailStudioPage() {
             </div>
           </Section>
 
+          <Section title="Contexto do lead" hint="Campos opcionais que podem alimentar a copy.">
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Cidade / Estado">
+                <Input value={data.cidade ?? ""} onChange={(e) => patch("cidade", e.target.value)} />
+              </Field>
+              <Field label="Momento da escola">
+                <Input value={data.momento ?? ""} onChange={(e) => patch("momento", e.target.value)} placeholder="Ex: pré-matrícula" />
+              </Field>
+              <Field label="Objetivo do e-mail">
+                <Input value={data.objetivo ?? ""} onChange={(e) => patch("objetivo", e.target.value)} />
+              </Field>
+              <Field label="Nível de relacionamento">
+                <Input value={data.relacionamento ?? ""} onChange={(e) => patch("relacionamento", e.target.value)} placeholder="Frio, morno, quente" />
+              </Field>
+              <Field label="Tom de voz">
+                <Input value={data.tomVoz ?? ""} onChange={(e) => patch("tomVoz", e.target.value)} placeholder="Consultivo, direto…" />
+              </Field>
+            </div>
+            <Field label="Observações">
+              <Textarea rows={2} value={data.observacoes ?? ""} onChange={(e) => patch("observacoes", e.target.value)} />
+            </Field>
+          </Section>
+
           <Section title="Rodapé / Contato">
             <div className="grid grid-cols-2 gap-3">
               <Field label="Telefone">
@@ -557,17 +580,37 @@ export default function EmailStudioPage() {
                 <TabsTrigger value="html">Código HTML</TabsTrigger>
                 <TabsTrigger value="text">Texto puro</TabsTrigger>
               </TabsList>
-              <span className="rounded-full border border-[#E5E7EB] bg-white px-3 py-1 text-[11px] font-medium text-[#333333]">
-                {TEMPLATE_LABELS[data.template]}
-              </span>
+              <div className="flex items-center gap-2">
+                <div className="inline-flex overflow-hidden rounded-md border border-[#E5E7EB] bg-white">
+                  <button
+                    type="button"
+                    onClick={() => setPreviewMode("desktop")}
+                    className={`flex items-center gap-1 px-3 py-1 text-[11px] font-medium ${previewMode === "desktop" ? "bg-[#333333] text-white" : "text-[#333333]"}`}
+                  >
+                    <Monitor className="h-3 w-3" /> Desktop
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewMode("mobile")}
+                    className={`flex items-center gap-1 px-3 py-1 text-[11px] font-medium ${previewMode === "mobile" ? "bg-[#333333] text-white" : "text-[#333333]"}`}
+                  >
+                    <Smartphone className="h-3 w-3" /> Mobile
+                  </button>
+                </div>
+                <span className="rounded-full border border-[#E5E7EB] bg-white px-3 py-1 text-[11px] font-medium text-[#333333]">
+                  {brand.name} · {TEMPLATE_LABELS[data.template]}
+                </span>
+              </div>
             </div>
 
             <TabsContent value="preview">
               <div className="rounded-xl border border-[#E5E7EB] bg-white p-4">
                 <div className="mb-3 text-xs text-[#6B7280]">
-                  Largura fixa de 600px · Gmail-safe
+                  {previewMode === "mobile" ? "Simulando 390px · mobile" : "Largura até 600px · Gmail-safe"}
                 </div>
-                <PreviewFrame html={html} />
+                <div className={previewMode === "mobile" ? "mx-auto" : ""} style={previewMode === "mobile" ? { width: 390 } : undefined}>
+                  <PreviewFrame html={html} />
+                </div>
               </div>
             </TabsContent>
 
