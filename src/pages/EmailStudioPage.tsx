@@ -86,16 +86,18 @@ export default function EmailStudioPage() {
   const navigate = useNavigate();
   const prefill = (location.state as { leadPrefill?: LeadPrefill } | null)?.leadPrefill;
 
-  const [data, setData] = useState<EmailData>(() => makeInitial("campanha", prefill));
+  const [data, setData] = useState<EmailData>(() => makeInitial("campanha", "eduinfo", prefill));
   const [preparingAction, setPreparingAction] = useState<
     "preview" | "download" | "copy" | "manual" | null
   >(null);
+  const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop");
 
+  const brand = getBrand(data.brand);
   const html = useMemo(() => renderEmail(data), [data]);
   const text = useMemo(() => renderPlainText(data), [data]);
 
   function changeTemplate(t: TemplateType) {
-    const d = defaultsFor(t);
+    const d = defaultsFor(t, (data.brand ?? "eduinfo") as BrandId);
     setData((prev) => ({
       ...prev,
       template: t,
@@ -104,6 +106,23 @@ export default function EmailStudioPage() {
       body: d.body ?? prev.body,
       cta: d.cta ?? prev.cta,
       cards: d.cards ?? prev.cards,
+    }));
+  }
+
+  function changeBrand(id: BrandId) {
+    const b = getBrand(id);
+    const d = defaultsFor(data.template, id);
+    setData((prev) => ({
+      ...prev,
+      brand: id,
+      title: d.title ?? prev.title,
+      subtitle: d.subtitle ?? prev.subtitle,
+      body: d.body ?? prev.body,
+      cta: d.cta ?? b.defaultCTAs[0],
+      cards: d.cards ?? prev.cards,
+      ctaUrl: b.whatsappUrl,
+      contato: b.contato,
+      site: b.site,
     }));
   }
 
