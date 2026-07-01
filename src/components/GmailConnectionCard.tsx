@@ -1,15 +1,32 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Loader2, Mail, Plug, Unplug } from "lucide-react";
+import { AlertTriangle, Loader2, Mail, Plug, Unplug } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   GMAIL_EXPECTED_ACCOUNT, disconnectGmail, getGmailStatus, startGmailConnect, type GmailStatus,
 } from "@/lib/gmail";
 
+const OAUTH_NOT_CONFIGURED_MSG =
+  "Gmail OAuth ainda não configurado. Configure GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET e GOOGLE_REDIRECT_URI nos Supabase Edge Function Secrets.";
+
+function isMissingSecretsError(msg: string): boolean {
+  const m = msg.toLowerCase();
+  return (
+    m.includes("missing google oauth") ||
+    m.includes("missing google_client") ||
+    m.includes("google_client_id") ||
+    m.includes("google_client_secret") ||
+    m.includes("google_redirect_uri") ||
+    (m.includes("non-2xx") && m.includes("edge function"))
+  );
+}
+
 export default function GmailConnectionCard() {
   const [status, setStatus] = useState<GmailStatus | null>(null);
+  const [notConfigured, setNotConfigured] = useState(false);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [params, setParams] = useSearchParams();
