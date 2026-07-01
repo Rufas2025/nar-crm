@@ -350,13 +350,28 @@ export default function EmailStudioPage() {
 
       <main className="mx-auto grid max-w-[1400px] gap-6 px-6 py-6 lg:grid-cols-[420px_1fr]">
         <aside className="space-y-4">
+          <Section title="Marca / Frente" hint="Define paleta, textos padrão, CTAs e footer do e-mail.">
+            <Select value={data.brand ?? "eduinfo"} onValueChange={(v) => changeBrand(v as BrandId)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {BRAND_LIST.map((b) => (
+                  <SelectItem key={b.id} value={b.id}>
+                    {b.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Section>
+
           <Section title="Tipo de template" hint="Cada opção muda a estrutura visual do e-mail.">
             <Select value={data.template} onValueChange={(v) => changeTemplate(v as TemplateType)}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {(Object.keys(TEMPLATE_LABELS) as TemplateType[]).map((k) => (
+                {TEMPLATE_ORDER.map((k) => (
                   <SelectItem key={k} value={k}>
                     {TEMPLATE_LABELS[k]}
                   </SelectItem>
