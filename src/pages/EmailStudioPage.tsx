@@ -445,7 +445,7 @@ export default function EmailStudioPage() {
             </div>
             <button
               type="button"
-              onClick={() => patch("ctaUrl", WHATSAPP_URL)}
+              onClick={() => patch("ctaUrl", brand.whatsappUrl)}
               className="text-[11px] font-medium text-[var(--edu-coral)] hover:underline"
             >
               ↻ Restaurar link padrão (WhatsApp Anderson Rufino)
