@@ -4,13 +4,14 @@ import { toast } from "@/hooks/use-toast";
 import {
   EDU,
   TEMPLATE_LABELS,
-  WHATSAPP_URL,
+  TEMPLATE_ORDER,
   type EmailData,
   type TemplateType,
   defaultsFor,
   renderEmail,
   renderPlainText,
 } from "@/lib/email-templates";
+import { BRAND_LIST, getBrand, type BrandId } from "@/lib/brands";
 import {
   isEmailStorageUrl,
   isUnsafeImageUrl,
@@ -31,7 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Monitor, Smartphone } from "lucide-react";
 import GmailDraftActions from "@/components/GmailDraftActions";
 import classroomImg from "@/assets/edu-classroom.jpg";
 import receptionImg from "@/assets/edu-reception.jpg";
@@ -58,10 +59,12 @@ type LeadPrefill = {
   email?: string;
 };
 
-function makeInitial(t: TemplateType, prefill?: LeadPrefill): EmailData {
-  const d = defaultsFor(t);
+function makeInitial(t: TemplateType, brandId: BrandId, prefill?: LeadPrefill): EmailData {
+  const brand = getBrand(brandId);
+  const d = defaultsFor(t, brandId);
   return {
     template: t,
+    brand: brandId,
     tratamento: "Diretora",
     artigo: "a",
     nomeContato: prefill?.nomeContato || "",
@@ -69,12 +72,12 @@ function makeInitial(t: TemplateType, prefill?: LeadPrefill): EmailData {
     title: d.title ?? "",
     subtitle: d.subtitle ?? "",
     body: d.body ?? "",
-    cta: d.cta ?? "Planejar melhorias agora",
-    ctaUrl: WHATSAPP_URL,
+    cta: d.cta ?? brand.defaultCTAs[0],
+    ctaUrl: brand.whatsappUrl,
     heroImage: DEFAULT_HERO,
     cards: d.cards ?? [],
-    contato: "(11) 93278-9123",
-    site: "www.eduinfo.com.br",
+    contato: brand.contato,
+    site: brand.site,
   };
 }
 
