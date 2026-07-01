@@ -124,6 +124,15 @@ export default function GmailConnectionCard() {
         </div>
       )}
 
+      {notConfigured && (
+        <Alert variant="destructive" className="mt-4">
+          <AlertTriangle className="w-4 h-4" />
+          <AlertTitle>Configuração pendente</AlertTitle>
+          <AlertDescription>{OAUTH_NOT_CONFIGURED_MSG}</AlertDescription>
+        </Alert>
+      )}
+
+
       <div className="mt-5 flex gap-3">
         {status?.connected ? (
           <Button variant="outline" onClick={handleDisconnect} disabled={busy} className="gap-2">
