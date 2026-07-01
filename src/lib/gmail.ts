@@ -22,8 +22,12 @@ export async function getGmailStatus(): Promise<GmailStatus> {
 }
 
 export async function startGmailConnect(returnTo?: string): Promise<string> {
+  const { data: sessionData } = await supabase.auth.getSession();
+  const accessToken = sessionData?.session?.access_token;
+  if (!accessToken) throw new Error("Você precisa estar autenticado para conectar o Gmail.");
   const { data, error } = await supabase.functions.invoke("google-oauth-start", {
     body: { returnTo: returnTo ?? `${window.location.origin}/configuracoes` },
+    headers: { Authorization: `Bearer ${accessToken}` },
   });
   if (error) throw error;
   const url = (data as { url?: string })?.url;
