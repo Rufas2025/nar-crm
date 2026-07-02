@@ -1,9 +1,11 @@
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 
 const BUCKET = "email-assets";
 const STORAGE_PUBLIC_FRAGMENT = "/storage/v1/object/public/email-assets/";
 const STORAGE_SIGNED_FRAGMENT = "/storage/v1/object/sign/email-assets/";
 const STORAGE_URL_RE = /https?:\/\/[^"'\s<>]*\.supabase\.co\/storage\/v1\/object\/(?:public|sign)\/email-assets\//i;
+// Signed URL: 1 year — the private bucket is the source of truth for Gmail/Apps Script.
+const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24 * 365;
 
 function extFromMime(mime: string): string {
   if (mime.includes("png")) return "png";
@@ -69,9 +71,18 @@ export async function uploadImage(file: Blob, hintName?: string): Promise<string
     .upload(path, blob, { contentType: blob.type || "image/jpeg", upsert: false });
   if (upErr) throw new Error(`Falha no upload: ${upErr.message}`);
 
-  const { data: pub } = supabase.storage.from(BUCKET).getPublicUrl(path);
-  const publicUrl = pub?.publicUrl;
-  if (!publicUrl) throw new Error("Não foi possível obter a URL pública.");
+  // Bucket is private (workspace blocks public buckets). Always use a signed URL
+  // valid for 1 year — this is the absolute https URL that ships in the HTML.
+  const { data: signed, error: signErr } = await supabase.storage
+    .from(BUCKET)
+    .createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
+  let finalUrl = signed?.signedUrl ?? "";
+  if (signErr || !finalUrl) {
+    // Fallback: public URL (only works if bucket is public in workspace)
+    const { data: pub } = supabase.storage.from(BUCKET).getPublicUrl(path);
+    finalUrl = pub?.publicUrl ?? "";
+    if (!finalUrl) throw new Error("Não foi possível gerar URL da imagem no Storage.");
+  }
 
   // Best-effort registry — don't block on schema mismatch.
   try {
@@ -82,13 +93,13 @@ export async function uploadImage(file: Blob, hintName?: string): Promise<string
       .insert({
         user_id: userId === "anonymous" ? null : userId,
         file_path: path,
-        public_url: publicUrl,
+        public_url: finalUrl,
       });
   } catch {
     /* ignore */
   }
 
-  return publicUrl;
+  return finalUrl;
 }
 
 export async function uploadFromUrl(localUrl: string, hintName?: string): Promise<string> {

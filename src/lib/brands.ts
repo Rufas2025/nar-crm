@@ -67,7 +67,7 @@ export const BRANDS: Record<BrandId, BrandConfig> = {
         subtitle:
           "Ambientes bem planejados comunicam valor, acolhimento e inovação antes da primeira conversa com a família.",
         body:
-          "A Eduinfo conecta arquitetura, mobiliário, tecnologia e estratégia para que cada espaço fortaleça a percepção institucional.",
+          "A Eduinfo conecta arquitetura, mobiliário, tecnologia e estratégia para que cada espaço fortaleça a percepção institucional. Se {{artigo_col}} quiser evoluir estrutura, percepção e experiência, vale uma conversa.",
         cta: "Planejar melhorias agora",
         cards: [
           { title: "Sala Maker", text: "Ambiente para criatividade, experimentação e aprendizagem prática." },
@@ -109,7 +109,7 @@ export const BRANDS: Record<BrandId, BrandConfig> = {
       convite: {
         title: "Podemos conversar 20 minutos sobre a sua escola?",
         subtitle: "Uma conversa curta, sem compromisso, para entender o momento e o que faria sentido no próximo ciclo.",
-        body: "Se fizer sentido, posso preparar uma leitura personalizada dos ambientes e prioridades da sua instituição.",
+        body: "Se fizer sentido, posso preparar uma leitura personalizada dos ambientes e prioridades da sua instituição. Se {{artigo_col}} tiver 20 minutos, mostro possibilidades concretas.",
         cta: "Marcar uma conversa",
       },
     },
