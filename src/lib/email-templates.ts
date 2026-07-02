@@ -196,9 +196,21 @@ ${responsiveStyle(brand)}
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" class="eml-container" style="max-width:600px;width:100%;background:${p.white};border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.05);">
 ${headerBar(brand)}
 ${inner}
+${closingBlock(d, brand)}
 ${footerBlock(d, brand)}
 </table>
 </center></body></html>`;
+}
+
+// Closing paragraph carrying the Apps Script placeholder {{sufixo_cidade}}.
+// Rendered as literal text so Apps Script can substitute per recipient later.
+function closingBlock(d: EmailData, brand: BrandConfig): string {
+  const p = brand.palette;
+  return `<tr><td class="eml-pad-x" style="padding:8px 32px 28px;font-family:${FONT};">
+    <p class="eml-body" style="margin:0;font-size:14px;line-height:1.7;color:${p.graphite};opacity:.85;">
+      Minha proposta é uma conversa online, rápida e objetiva, de cerca de 30 minutos, para eu te apresentar melhor a ${esc(brand.name)}, compartilhar algumas possibilidades para a sua instituição e entender o que hoje faz mais sentido para a realidade da escola{{sufixo_cidade}}.
+    </p>
+  </td></tr>`;
 }
 
 function headerBar(brand: BrandConfig): string {
