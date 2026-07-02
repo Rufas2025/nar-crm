@@ -140,10 +140,12 @@ function esc(s: string): string {
 export function buildGreeting(d: EmailData): string {
   const nome = d.nomeContato?.trim();
   const trat = d.tratamento?.trim();
-  if (!nome && !trat) return "";
+  // Apps Script flow: when no explicit name is filled in the CRM, keep the
+  // {{nome}} placeholder so Google Sheets can substitute per-recipient later.
+  if (!nome && !trat) return "Olá, {{nome}},";
   if (trat && nome) return `${trat}, ${nome},`;
   if (nome) return `Olá, ${nome},`;
-  return `${trat},`;
+  return `${trat}, {{nome}},`;
 }
 
 // ---------- responsive shell ----------
