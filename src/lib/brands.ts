@@ -67,7 +67,7 @@ export const BRANDS: Record<BrandId, BrandConfig> = {
         subtitle:
           "Ambientes bem planejados comunicam valor, acolhimento e inovação antes da primeira conversa com a família.",
         body:
-          "A Eduinfo conecta arquitetura, mobiliário, tecnologia e estratégia para que cada espaço fortaleça a percepção institucional.",
+          "A Eduinfo conecta arquitetura, mobiliário, tecnologia e estratégia para que cada espaço fortaleça a percepção institucional. Se {{artigo_col}} quiser evoluir estrutura, percepção e experiência, vale uma conversa.",
         cta: "Planejar melhorias agora",
         cards: [
           { title: "Sala Maker", text: "Ambiente para criatividade, experimentação e aprendizagem prática." },
