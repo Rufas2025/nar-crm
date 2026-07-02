@@ -307,7 +307,7 @@ export default function EmailStudioPage() {
           style={{ backgroundColor: EDU.graphite }}
           className="text-white hover:opacity-90"
         >
-          {exportButtonText("copy", "Copiar HTML")}
+          {exportButtonText("copy", "Copiar HTML para Apps Script")}
         </Button>
       </>
     );
