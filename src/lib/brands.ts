@@ -109,7 +109,7 @@ export const BRANDS: Record<BrandId, BrandConfig> = {
       convite: {
         title: "Podemos conversar 20 minutos sobre a sua escola?",
         subtitle: "Uma conversa curta, sem compromisso, para entender o momento e o que faria sentido no próximo ciclo.",
-        body: "Se fizer sentido, posso preparar uma leitura personalizada dos ambientes e prioridades da sua instituição.",
+        body: "Se fizer sentido, posso preparar uma leitura personalizada dos ambientes e prioridades da sua instituição. Se {{artigo_col}} tiver 20 minutos, mostro possibilidades concretas.",
         cta: "Marcar uma conversa",
       },
     },
