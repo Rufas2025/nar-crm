@@ -1,9 +1,11 @@
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 
 const BUCKET = "email-assets";
 const STORAGE_PUBLIC_FRAGMENT = "/storage/v1/object/public/email-assets/";
 const STORAGE_SIGNED_FRAGMENT = "/storage/v1/object/sign/email-assets/";
 const STORAGE_URL_RE = /https?:\/\/[^"'\s<>]*\.supabase\.co\/storage\/v1\/object\/(?:public|sign)\/email-assets\//i;
+// Signed URL: 1 year — the private bucket is the source of truth for Gmail/Apps Script.
+const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24 * 365;
 
 function extFromMime(mime: string): string {
   if (mime.includes("png")) return "png";
