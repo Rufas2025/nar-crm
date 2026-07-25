@@ -7,6 +7,12 @@
       "skillPath": "skills/core/clerk-backend-api/SKILL.md",
       "computedHash": "723ee35b2727923bbc9050c103369985d3d2ced00c9d25d79ff6383a23d8fea9"
     },
+    "n8n-workflow": {
+      "source": "claude-office-skills/skills",
+      "sourceType": "github",
+      "skillPath": "n8n-workflow/SKILL.md",
+      "computedHash": "3923e1fbf10b8b53ff4c82f9e56a03aa69dd874cc51b04639b064de44dfcb000"
+    },
     "nodejs-backend-patterns": {
       "source": "wshobson/agents",
       "sourceType": "github",
