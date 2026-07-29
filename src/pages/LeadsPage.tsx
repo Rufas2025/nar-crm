@@ -9,7 +9,7 @@ import * as XLSX from "xlsx";
 import {
   Plus, Search, ChevronRight, X, Loader2,
   CheckCircle2, AlertTriangle, AlertCircle, Upload,
-  Copy, Phone, Mail, Trash2, Building2, User, Table2, MessageSquare,
+  Copy, Phone, Mail, Trash2, Building2, User, Table2, MessageSquare, Eye,
 } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
@@ -19,6 +19,8 @@ import {
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
 import WhatsappBulkModal from "@/components/WhatsappBulkModal";
+import SelectedLeadsPanel from "@/components/SelectedLeadsPanel";
+
 
 
 // ─── Enums ───────────────────────────────────────────────────────────────────
@@ -595,6 +597,12 @@ export default function LeadsPage() {
 
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [showBulkWhatsApp, setShowBulkWhatsApp] = useState(false);
+  const [showSelectedPanel, setShowSelectedPanel] = useState(false);
+  const [bulkLeads, setBulkLeads] = useState<Lead[]>([]);
+  const [resolvingSelection, setResolvingSelection] = useState(false);
+  // Cache de leads selecionados que não estão na lista atual (fora do filtro/paginação)
+  const resolvedSelectedRef = useRef<Map<string, Lead>>(new Map());
+
 
 
   async function fetchLeads() {
@@ -763,19 +771,48 @@ export default function LeadsPage() {
     });
   }
 
+  const allFilteredSelected = filtered.length > 0 && filtered.every((l) => selectedIds.has(l.id));
+
   function toggleSelectAll() {
-    if (selectedIds.size === filtered.length) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(filtered.map((l) => l.id)));
-    }
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (allFilteredSelected) {
+        filtered.forEach((l) => next.delete(l.id));
+      } else {
+        filtered.forEach((l) => next.add(l.id));
+      }
+      return next;
+    });
   }
 
   function clearSelection() { setSelectedIds(new Set()); }
 
-  function getSelectedLeads() {
-    return filtered.filter((l) => selectedIds.has(l.id));
+  /**
+   * Fonte única da seleção: selectedIds. Resolve contra a lista completa `leads`,
+   * nunca apenas contra `filtered` (busca/filtros não devem perder selecionados).
+   */
+  function getSelectedLeads(): Lead[] {
+    const byId = new Map(leads.map((l) => [l.id, l]));
+    return Array.from(selectedIds)
+      .map((id) => byId.get(id) ?? resolvedSelectedRef.current.get(id))
+      .filter(Boolean) as Lead[];
   }
+
+  /** Busca no Supabase quaisquer IDs selecionados que não estejam carregados em memória. */
+  async function resolveSelectedLeads(): Promise<Lead[]> {
+    const byId = new Map<string, Lead>(leads.map((l) => [l.id, l]));
+    resolvedSelectedRef.current.forEach((l, id) => { if (!byId.has(id)) byId.set(id, l); });
+    const missing = Array.from(selectedIds).filter((id) => !byId.has(id));
+    if (missing.length > 0) {
+      const { data } = await supabase.from("leads").select("*").in("id", missing);
+      (data ?? []).forEach((l: Lead) => {
+        byId.set(l.id, l);
+        resolvedSelectedRef.current.set(l.id, l);
+      });
+    }
+    return Array.from(selectedIds).map((id) => byId.get(id)).filter(Boolean) as Lead[];
+  }
+
 
   function safeValue(val: string | null | undefined): string {
     if (!val) return "";
@@ -1044,10 +1081,32 @@ export default function LeadsPage() {
               <Phone className="w-3.5 h-3.5" /> Copiar celulares
             </Button>
             <Button
+              variant="outline"
               size="sm"
+              className="h-8 rounded-lg text-xs gap-1.5"
+              onClick={async () => {
+                setResolvingSelection(true);
+                const resolved = await resolveSelectedLeads();
+                setBulkLeads(resolved);
+                setResolvingSelection(false);
+                setShowSelectedPanel(true);
+              }}
+            >
+              <Eye className="w-3.5 h-3.5" /> Ver selecionados
+            </Button>
+            <Button
+              size="sm"
+              disabled={resolvingSelection}
               className="h-8 rounded-lg text-xs gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-white shadow-[0_2px_8px_rgba(16,185,129,0.35)]"
-              onClick={() => {
-                const eligible = getSelectedLeads().filter((l) => {
+              onClick={async () => {
+                setResolvingSelection(true);
+                const resolved = await resolveSelectedLeads();
+                setResolvingSelection(false);
+                if (resolved.length === 0) {
+                  toast.error("Nenhum lead selecionado.");
+                  return;
+                }
+                const eligible = resolved.filter((l) => {
                   const d = (l.telefone ?? "").replace(/\D/g, "");
                   return d.length >= 10 && d.length <= 13;
                 });
@@ -1055,7 +1114,9 @@ export default function LeadsPage() {
                   toast.error("Nenhum lead selecionado tem telefone válido.");
                   return;
                 }
+                setBulkLeads(resolved);
                 setShowBulkWhatsApp(true);
+
               }}
             >
               <MessageSquare className="w-3.5 h-3.5" /> Enviar WhatsApp
@@ -1103,7 +1164,7 @@ export default function LeadsPage() {
         <div className="grid grid-cols-[36px_minmax(180px,1.8fr)_minmax(140px,1.2fr)_100px_80px_60px_minmax(120px,1.5fr)_110px_36px] px-4 py-3 border-b border-border items-center">
           <div className="flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
             <Checkbox
-              checked={filtered.length > 0 && selectedIds.size === filtered.length}
+              checked={allFilteredSelected}
               onCheckedChange={toggleSelectAll}
               className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
             />
@@ -1263,13 +1324,23 @@ export default function LeadsPage() {
         />
       )}
 
+      {/* Painel: leads selecionados */}
+      <SelectedLeadsPanel
+        leads={bulkLeads.filter((l) => selectedIds.has(l.id))}
+        open={showSelectedPanel}
+        onOpenChange={setShowSelectedPanel}
+        onRemove={(id) => toggleSelect(id)}
+        onClearAll={() => { clearSelection(); setShowSelectedPanel(false); }}
+      />
+
       {/* Modal Enviar WhatsApp em lote */}
       <WhatsappBulkModal
-        leads={getSelectedLeads()}
+        leads={bulkLeads.filter((l) => selectedIds.has(l.id))}
         open={showBulkWhatsApp}
         onOpenChange={setShowBulkWhatsApp}
         onDone={() => { fetchLeads(); }}
       />
+
     </div>
   );
 
