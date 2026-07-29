@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Send, Phone, Paperclip, X, Image as ImageIcon, FileText, CheckCircle2, XCircle, Link2 } from "lucide-react";
+import { Loader2, Send, Phone, Paperclip, X, Image as ImageIcon, FileText, CheckCircle2, XCircle, Link2, MinusCircle, Building2 } from "lucide-react";
 import type { Lead } from "@/lib/supabase";
 import { sendWhatsAppMessage } from "@/lib/evolution";
 import {
@@ -20,7 +20,7 @@ import {
   type UploadedAttachment,
 } from "@/lib/whatsappAttachment";
 
-type Status = "pending" | "sending" | "sent" | "error";
+type Status = "pending" | "sending" | "sent" | "error" | "skipped";
 
 type Row = {
   lead: Lead;
@@ -47,15 +47,34 @@ function renderTemplate(template: string, vars: { nome: string; link: string }) 
     .split("{{link}}").join(vars.link || "");
 }
 
-
-function isValidPhone(phone: string | null | undefined): boolean {
+export function isValidPhone(phone: string | null | undefined): boolean {
   if (!phone) return false;
   const d = phone.replace(/\D/g, "");
   return d.length >= 10 && d.length <= 13;
 }
 
+export function formatPhone(phone: string | null | undefined): string {
+  const d = (phone ?? "").replace(/\D/g, "");
+  if (!d) return "—";
+  const withCc = d.length <= 11 ? `55${d}` : d;
+  const cc = withCc.slice(0, 2);
+  const ddd = withCc.slice(2, 4);
+  const rest = withCc.slice(4);
+  if (!rest) return `+${withCc}`;
+  const mid = rest.length > 4 ? rest.slice(0, rest.length - 4) : rest;
+  const end = rest.length > 4 ? rest.slice(-4) : "";
+  return `+${cc} (${ddd}) ${mid}${end ? `-${end}` : ""}`;
+}
+
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
+}
+
+function formatDuration(ms: number): string {
+  const total = Math.round(ms / 1000);
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return m > 0 ? `${m}min ${s}s` : `${s}s`;
 }
 
 export default function WhatsappBulkModal({
@@ -70,12 +89,13 @@ export default function WhatsappBulkModal({
   onDone?: () => void;
 }) {
   const eligibleLeads = useMemo(() => leads.filter((l) => isValidPhone(l.telefone)), [leads]);
-  const skippedCount = leads.length - eligibleLeads.length;
+  const invalidLeads = useMemo(() => leads.filter((l) => !isValidPhone(l.telefone)), [leads]);
 
   const [greeting, setGreeting] = useState("Olá, {{nome}}, tudo bem?");
   const [body, setBody] = useState("Quero compartilhar este link:\n{{link}}");
   const [link, setLink] = useState("");
   const [linkError, setLinkError] = useState<string | null>(null);
+  const [intervalSeconds, setIntervalSeconds] = useState(90);
 
   const [attachment, setAttachment] = useState<File | null>(null);
   const [attachmentPreview, setAttachmentPreview] = useState<string | null>(null);
@@ -83,7 +103,19 @@ export default function WhatsappBulkModal({
 
   const [rows, setRows] = useState<Row[]>([]);
   const [sending, setSending] = useState(false);
-  const [doneSummary, setDoneSummary] = useState<{ sent: number; failed: number } | null>(null);
+  const [currentIndex, setCurrentIndex] = useState<number | null>(null);
+  const [doneSummary, setDoneSummary] = useState<
+    { total: number; sent: number; failed: number; skipped: number; elapsedMs: number } | null
+  >(null);
+  const [showAllPreviews, setShowAllPreviews] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setRows([]);
+      setDoneSummary(null);
+      setCurrentIndex(null);
+    }
+  }, [open]);
 
   function buildMessageFor(lead: Lead): string {
     const g = buildGreeting(greeting, lead.nome ?? "");
@@ -95,7 +127,7 @@ export default function WhatsappBulkModal({
     return `${trimmedG}\n\n${trimmedB}`;
   }
 
-  const previewLeads = eligibleLeads.slice(0, 3);
+  const previewLeads = showAllPreviews ? eligibleLeads : eligibleLeads.slice(0, 3);
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
@@ -142,7 +174,6 @@ export default function WhatsappBulkModal({
       setLinkError("Link inválido. Use http:// ou https://");
       return;
     }
-    // Pelo menos uma mensagem mínima
     const firstMsg = buildMessageFor(eligibleLeads[0]);
     if (firstMsg.trim().length < 5) {
       toast.error("Mensagem muito curta. Escreva pelo menos 5 caracteres.");
@@ -151,6 +182,7 @@ export default function WhatsappBulkModal({
 
     setSending(true);
     setDoneSummary(null);
+    const startedAt = Date.now();
 
     let uploaded: UploadedAttachment | null = null;
     if (attachment) {
@@ -163,29 +195,41 @@ export default function WhatsappBulkModal({
       }
     }
 
-    const initial: Row[] = eligibleLeads.map((l) => ({
-      lead: l,
-      status: "pending",
-      message: buildMessageFor(l),
-    }));
+    // Ordem: elegíveis primeiro, ignorados marcados no fim
+    const initial: Row[] = [
+      ...eligibleLeads.map((l) => ({ lead: l, status: "pending" as Status, message: buildMessageFor(l) })),
+      ...invalidLeads.map((l) => ({
+        lead: l,
+        status: "skipped" as Status,
+        message: "",
+        error: "Telefone ausente ou inválido",
+      })),
+    ];
     setRows(initial);
 
     let sent = 0;
     let failed = 0;
     let deferredOnce = false;
+    const delayMs = Math.max(0, Math.round(intervalSeconds * 1000));
 
-    for (let i = 0; i < initial.length; i++) {
+    for (let i = 0; i < eligibleLeads.length; i++) {
       const row = initial[i];
+      setCurrentIndex(i);
       setRows((prev) => prev.map((r, idx) => (idx === i ? { ...r, status: "sending" } : r)));
 
-      const result = await sendWhatsAppMessage({
-        leadId: row.lead.id,
-        phone: row.lead.telefone!,
-        message: row.message,
-        media: uploaded
-          ? { url: uploaded.signedUrl, type: uploaded.kind, fileName: uploaded.fileName }
-          : null,
-      });
+      let result: Awaited<ReturnType<typeof sendWhatsAppMessage>>;
+      try {
+        result = await sendWhatsAppMessage({
+          leadId: row.lead.id,
+          phone: row.lead.telefone!,
+          message: row.message,
+          media: uploaded
+            ? { url: uploaded.signedUrl, type: uploaded.kind, fileName: uploaded.fileName }
+            : null,
+        });
+      } catch (e: any) {
+        result = { ok: false, error: String(e?.message ?? e) };
+      }
 
       if (result.ok) {
         sent++;
@@ -198,11 +242,18 @@ export default function WhatsappBulkModal({
         );
       }
 
-      if (i < initial.length - 1) await sleep(800);
+      if (i < eligibleLeads.length - 1) await sleep(delayMs);
     }
 
+    setCurrentIndex(null);
     setSending(false);
-    setDoneSummary({ sent, failed });
+    setDoneSummary({
+      total: leads.length,
+      sent,
+      failed,
+      skipped: invalidLeads.length,
+      elapsedMs: Date.now() - startedAt,
+    });
 
     if (deferredOnce && uploaded) {
       toast.message("Upload realizado, mas envio de anexo ainda depende do deploy da função de mídia.");
@@ -221,13 +272,13 @@ export default function WhatsappBulkModal({
   function handleClose(open: boolean) {
     if (sending) return;
     if (!open) {
-      // reset state
       if (attachmentPreview) URL.revokeObjectURL(attachmentPreview);
       setAttachment(null);
       setAttachmentPreview(null);
       setRows([]);
       setDoneSummary(null);
       setLinkError(null);
+      setShowAllPreviews(false);
     }
     onOpenChange(open);
   }
@@ -240,13 +291,20 @@ export default function WhatsappBulkModal({
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="rounded-xl bg-muted/40 border border-border/60 px-4 py-3 text-xs text-muted-foreground">
-            <span className="text-foreground font-medium">{eligibleLeads.length}</span> lead(s) com telefone válido.
-            {skippedCount > 0 && (
-              <span className="ml-1 text-yellow-400">
-                {skippedCount} ignorado(s) por telefone ausente/ inválido.
-              </span>
-            )}
+          {/* Contadores */}
+          <div className="grid grid-cols-3 gap-2">
+            <div className="rounded-xl bg-muted/40 border border-border/60 px-3 py-2">
+              <p className="text-[11px] text-muted-foreground">Selecionados</p>
+              <p className="text-lg font-semibold text-foreground">{leads.length}</p>
+            </div>
+            <div className="rounded-xl bg-emerald-500/5 border border-emerald-500/20 px-3 py-2">
+              <p className="text-[11px] text-muted-foreground">Telefone válido</p>
+              <p className="text-lg font-semibold text-emerald-400">{eligibleLeads.length}</p>
+            </div>
+            <div className="rounded-xl bg-yellow-500/5 border border-yellow-500/20 px-3 py-2">
+              <p className="text-[11px] text-muted-foreground">Sem telefone</p>
+              <p className="text-lg font-semibold text-yellow-400">{invalidLeads.length}</p>
+            </div>
           </div>
 
           {/* Saudação */}
@@ -302,6 +360,22 @@ export default function WhatsappBulkModal({
             {linkError && <p className="text-xs text-destructive">{linkError}</p>}
           </div>
 
+          {/* Intervalo entre envios */}
+          <div className="space-y-1.5">
+            <p className="text-xs text-muted-foreground">Intervalo entre envios (segundos)</p>
+            <input
+              type="number"
+              min={0}
+              value={intervalSeconds}
+              onChange={(e) => setIntervalSeconds(Math.max(0, Number(e.target.value) || 0))}
+              disabled={sending}
+              className="w-32 h-10 px-3 rounded-xl text-sm bg-background border border-input focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            />
+            <p className="text-[11px] text-muted-foreground/70">
+              Envio sequencial (1 por vez). Estimativa: ~{formatDuration(Math.max(0, eligibleLeads.length - 1) * intervalSeconds * 1000)} de espera.
+            </p>
+          </div>
+
           {/* Anexo */}
           <div className="space-y-1.5">
             <p className="text-xs text-muted-foreground">Anexo (opcional — JPG, PNG, WEBP ou PDF, máx 10 MB)</p>
@@ -345,17 +419,31 @@ export default function WhatsappBulkModal({
             />
           </div>
 
-          {/* Preview por lead */}
+          {/* Preview personalizado por lead */}
           {previewLeads.length > 0 && (
             <div className="space-y-2">
-              <p className="text-xs text-muted-foreground">
-                Pré-visualização ({previewLeads.length} de {eligibleLeads.length})
-              </p>
-              <div className="grid gap-2">
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-muted-foreground">
+                  Pré-visualização ({previewLeads.length} de {eligibleLeads.length})
+                </p>
+                {eligibleLeads.length > 3 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAllPreviews((v) => !v)}
+                    className="text-[11px] px-2 py-1 rounded-lg border border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showAllPreviews ? "Mostrar menos" : "Ver todos"}
+                  </button>
+                )}
+              </div>
+              <div className="grid gap-2 max-h-72 overflow-y-auto">
                 {previewLeads.map((l) => (
                   <div key={l.id} className="rounded-xl bg-emerald-500/5 border border-emerald-500/20 px-4 py-3">
-                    <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 mb-1">
-                      <Phone className="w-3 h-3" /> {l.nome || "(sem nome)"} · {l.telefone}
+                    <p className="text-xs text-foreground font-medium flex items-center gap-1.5">
+                      <Building2 className="w-3 h-3 text-muted-foreground" /> {l.empresa || "(sem instituição)"}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 mt-0.5 mb-1.5">
+                      <Phone className="w-3 h-3" /> Destinatário: {l.nome || "(sem contato)"} · {formatPhone(l.telefone)}
                     </p>
                     <p className="text-sm whitespace-pre-wrap text-foreground">{buildMessageFor(l)}</p>
                   </div>
@@ -364,32 +452,55 @@ export default function WhatsappBulkModal({
             </div>
           )}
 
+          {/* Ignorados */}
+          {invalidLeads.length > 0 && rows.length === 0 && (
+            <div className="rounded-xl border border-yellow-500/20 bg-yellow-500/5 px-4 py-3 space-y-1">
+              <p className="text-xs text-yellow-400">
+                {invalidLeads.length} lead(s) serão ignorados por telefone ausente/inválido:
+              </p>
+              {invalidLeads.slice(0, 5).map((l) => (
+                <p key={l.id} className="text-[11px] text-muted-foreground truncate">
+                  · {l.empresa || "(sem instituição)"} — {l.nome || "(sem contato)"}
+                </p>
+              ))}
+              {invalidLeads.length > 5 && (
+                <p className="text-[11px] text-muted-foreground/70">+ {invalidLeads.length - 5} outro(s)</p>
+              )}
+            </div>
+          )}
+
           {/* Progresso */}
           {rows.length > 0 && (
             <div className="space-y-1.5">
-              <p className="text-xs text-muted-foreground">Progresso</p>
-              <div className="rounded-xl border border-border/60 bg-muted/20 max-h-48 overflow-y-auto divide-y divide-border/40">
+              <p className="text-xs text-muted-foreground">
+                Progresso{currentIndex !== null ? ` — enviando ${currentIndex + 1} de ${eligibleLeads.length}` : ""}
+              </p>
+              <div className="rounded-xl border border-border/60 bg-muted/20 max-h-64 overflow-y-auto divide-y divide-border/40">
                 {rows.map((r) => (
                   <div key={r.lead.id} className="px-3 py-2 flex items-center gap-2 text-xs">
                     <div className="flex-1 min-w-0">
-                      <p className="text-foreground truncate">{r.lead.nome || "(sem nome)"}</p>
-                      <p className="text-muted-foreground/70 truncate">{r.lead.telefone}</p>
-                      {r.error && <p className="text-destructive truncate">{r.error}</p>}
+                      <p className="text-foreground truncate">{r.lead.empresa || "(sem instituição)"}</p>
+                      <p className="text-muted-foreground/70 truncate">
+                        {r.lead.nome || "(sem contato)"} · {formatPhone(r.lead.telefone)}
+                      </p>
+                      {r.error && <p className={r.status === "skipped" ? "text-yellow-400 truncate" : "text-destructive truncate"}>{r.error}</p>}
                     </div>
                     {r.status === "pending" && <span className="text-muted-foreground/60">Pendente</span>}
                     {r.status === "sending" && <Loader2 className="w-4 h-4 animate-spin text-primary" />}
                     {r.status === "sent" && <CheckCircle2 className="w-4 h-4 text-green-400" />}
                     {r.status === "error" && <XCircle className="w-4 h-4 text-destructive" />}
+                    {r.status === "skipped" && <MinusCircle className="w-4 h-4 text-yellow-400" />}
                   </div>
                 ))}
               </div>
               {doneSummary && (
-                <p className="text-xs text-muted-foreground">
-                  Concluído: <span className="text-green-400 font-medium">{doneSummary.sent} enviada(s)</span>
-                  {doneSummary.failed > 0 && (
-                    <span className="text-destructive font-medium ml-2">{doneSummary.failed} com erro</span>
-                  )}
-                </p>
+                <div className="rounded-xl border border-border/60 bg-muted/20 px-3 py-2 text-xs text-muted-foreground space-y-0.5">
+                  <p>Total selecionado: <span className="text-foreground font-medium">{doneSummary.total}</span></p>
+                  <p>Enviados: <span className="text-green-400 font-medium">{doneSummary.sent}</span></p>
+                  <p>Falhas: <span className="text-destructive font-medium">{doneSummary.failed}</span></p>
+                  <p>Ignorados: <span className="text-yellow-400 font-medium">{doneSummary.skipped}</span></p>
+                  <p>Tempo total: <span className="text-foreground font-medium">{formatDuration(doneSummary.elapsedMs)}</span></p>
+                </div>
               )}
             </div>
           )}
