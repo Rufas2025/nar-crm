@@ -9,7 +9,7 @@ import * as XLSX from "xlsx";
 import {
   Plus, Search, ChevronRight, X, Loader2,
   CheckCircle2, AlertTriangle, AlertCircle, Upload,
-  Copy, Phone, Mail, Trash2, Building2, User, Table2, MessageSquare,
+  Copy, Phone, Mail, Trash2, Building2, User, Table2, MessageSquare, Eye,
 } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
