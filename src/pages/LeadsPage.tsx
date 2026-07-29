@@ -1324,13 +1324,23 @@ export default function LeadsPage() {
         />
       )}
 
+      {/* Painel: leads selecionados */}
+      <SelectedLeadsPanel
+        leads={bulkLeads.filter((l) => selectedIds.has(l.id))}
+        open={showSelectedPanel}
+        onOpenChange={setShowSelectedPanel}
+        onRemove={(id) => toggleSelect(id)}
+        onClearAll={() => { clearSelection(); setShowSelectedPanel(false); }}
+      />
+
       {/* Modal Enviar WhatsApp em lote */}
       <WhatsappBulkModal
-        leads={getSelectedLeads()}
+        leads={bulkLeads.filter((l) => selectedIds.has(l.id))}
         open={showBulkWhatsApp}
         onOpenChange={setShowBulkWhatsApp}
         onDone={() => { fetchLeads(); }}
       />
+
     </div>
   );
 
