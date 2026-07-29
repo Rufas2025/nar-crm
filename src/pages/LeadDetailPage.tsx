@@ -646,10 +646,11 @@ export default function LeadDetailPage() {
     if (refreshed) setLead(refreshed);
     await fetchActivities();
     window.dispatchEvent(new CustomEvent("leads:refresh"));
-    if (result.attachmentDeferred) {
-      toast.message("Upload realizado, mas envio de anexo ainda depende do deploy da função de mídia.");
+    if (result.mediaRequested && !result.mediaSent) {
+      toast.warning(result.mediaError || "Texto enviado, mas o anexo falhou.");
+    } else {
+      toast.success("Mensagem enviada via WhatsApp e interação registrada com sucesso.");
     }
-    toast.success("Mensagem enviada via WhatsApp e interação registrada com sucesso.");
     setSendingWhatsApp(false);
   }
 
