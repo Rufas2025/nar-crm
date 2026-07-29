@@ -1164,7 +1164,7 @@ export default function LeadsPage() {
         <div className="grid grid-cols-[36px_minmax(180px,1.8fr)_minmax(140px,1.2fr)_100px_80px_60px_minmax(120px,1.5fr)_110px_36px] px-4 py-3 border-b border-border items-center">
           <div className="flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
             <Checkbox
-              checked={filtered.length > 0 && selectedIds.size === filtered.length}
+              checked={allFilteredSelected}
               onCheckedChange={toggleSelectAll}
               className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
             />
