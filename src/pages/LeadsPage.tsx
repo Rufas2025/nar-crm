@@ -763,19 +763,48 @@ export default function LeadsPage() {
     });
   }
 
+  const allFilteredSelected = filtered.length > 0 && filtered.every((l) => selectedIds.has(l.id));
+
   function toggleSelectAll() {
-    if (selectedIds.size === filtered.length) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(filtered.map((l) => l.id)));
-    }
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (allFilteredSelected) {
+        filtered.forEach((l) => next.delete(l.id));
+      } else {
+        filtered.forEach((l) => next.add(l.id));
+      }
+      return next;
+    });
   }
 
   function clearSelection() { setSelectedIds(new Set()); }
 
-  function getSelectedLeads() {
-    return filtered.filter((l) => selectedIds.has(l.id));
+  /**
+   * Fonte única da seleção: selectedIds. Resolve contra a lista completa `leads`,
+   * nunca apenas contra `filtered` (busca/filtros não devem perder selecionados).
+   */
+  function getSelectedLeads(): Lead[] {
+    const byId = new Map(leads.map((l) => [l.id, l]));
+    return Array.from(selectedIds)
+      .map((id) => byId.get(id) ?? resolvedSelectedRef.current.get(id))
+      .filter(Boolean) as Lead[];
   }
+
+  /** Busca no Supabase quaisquer IDs selecionados que não estejam carregados em memória. */
+  async function resolveSelectedLeads(): Promise<Lead[]> {
+    const byId = new Map<string, Lead>(leads.map((l) => [l.id, l]));
+    resolvedSelectedRef.current.forEach((l, id) => { if (!byId.has(id)) byId.set(id, l); });
+    const missing = Array.from(selectedIds).filter((id) => !byId.has(id));
+    if (missing.length > 0) {
+      const { data } = await supabase.from("leads").select("*").in("id", missing);
+      (data ?? []).forEach((l: Lead) => {
+        byId.set(l.id, l);
+        resolvedSelectedRef.current.set(l.id, l);
+      });
+    }
+    return Array.from(selectedIds).map((id) => byId.get(id)).filter(Boolean) as Lead[];
+  }
+
 
   function safeValue(val: string | null | undefined): string {
     if (!val) return "";
