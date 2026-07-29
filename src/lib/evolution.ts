@@ -117,7 +117,14 @@ export type SendWhatsAppResult = {
   error?: string | null;
   messageId?: string | null;
   interactionRegistered?: boolean;
-  attachmentDeferred?: boolean;
+  /** Texto entregue pela Evolution GO */
+  textSent?: boolean;
+  /** Havia anexo na requisição */
+  mediaRequested?: boolean;
+  /** Anexo entregue pela Evolution GO */
+  mediaSent?: boolean;
+  /** Motivo (seguro) da falha do anexo */
+  mediaError?: string | null;
 };
 
 export type WhatsAppMediaInput = {
@@ -136,6 +143,8 @@ export async function sendWhatsAppMessage(params: {
   phone: string;
   message?: string | null;
   media?: WhatsAppMediaInput | null;
+  /** Reenviar apenas o anexo, sem repetir o texto já entregue */
+  skipText?: boolean;
 }): Promise<SendWhatsAppResult> {
   const authToken = await getCrmToken();
   if (!authToken) return { ok: false, error: "Usuário não autenticado." };
@@ -150,6 +159,7 @@ export async function sendWhatsAppMessage(params: {
         mediaUrl: params.media?.url ?? null,
         mediaType: params.media?.type ?? null,
         fileName: params.media?.fileName ?? null,
+        skipText: params.skipText === true,
       },
     });
 
@@ -168,7 +178,10 @@ export async function sendWhatsAppMessage(params: {
       error: data?.error ?? null,
       messageId: data?.messageId ?? null,
       interactionRegistered: data?.interactionRegistered === true,
-      attachmentDeferred: data?.attachmentDeferred === true,
+      textSent: data?.textSent === true,
+      mediaRequested: data?.mediaRequested === true,
+      mediaSent: data?.mediaSent === true,
+      mediaError: data?.mediaError ?? null,
     };
   } catch (e: any) {
     return { ok: false, error: String(e?.message ?? e) };
