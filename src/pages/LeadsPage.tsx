@@ -1081,10 +1081,32 @@ export default function LeadsPage() {
               <Phone className="w-3.5 h-3.5" /> Copiar celulares
             </Button>
             <Button
+              variant="outline"
               size="sm"
+              className="h-8 rounded-lg text-xs gap-1.5"
+              onClick={async () => {
+                setResolvingSelection(true);
+                const resolved = await resolveSelectedLeads();
+                setBulkLeads(resolved);
+                setResolvingSelection(false);
+                setShowSelectedPanel(true);
+              }}
+            >
+              <Eye className="w-3.5 h-3.5" /> Ver selecionados
+            </Button>
+            <Button
+              size="sm"
+              disabled={resolvingSelection}
               className="h-8 rounded-lg text-xs gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-white shadow-[0_2px_8px_rgba(16,185,129,0.35)]"
-              onClick={() => {
-                const eligible = getSelectedLeads().filter((l) => {
+              onClick={async () => {
+                setResolvingSelection(true);
+                const resolved = await resolveSelectedLeads();
+                setResolvingSelection(false);
+                if (resolved.length === 0) {
+                  toast.error("Nenhum lead selecionado.");
+                  return;
+                }
+                const eligible = resolved.filter((l) => {
                   const d = (l.telefone ?? "").replace(/\D/g, "");
                   return d.length >= 10 && d.length <= 13;
                 });
@@ -1092,7 +1114,9 @@ export default function LeadsPage() {
                   toast.error("Nenhum lead selecionado tem telefone válido.");
                   return;
                 }
+                setBulkLeads(resolved);
                 setShowBulkWhatsApp(true);
+
               }}
             >
               <MessageSquare className="w-3.5 h-3.5" /> Enviar WhatsApp
