@@ -2,6 +2,8 @@ import { supabase } from "@/lib/supabase";
 
 export const ATTACHMENT_BUCKET = "whatsapp-attachments";
 export const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024; // 10 MB
+/** Acesso temporário apenas para a janela do disparo (30 min). */
+export const SIGNED_URL_TTL_SECONDS = 30 * 60;
 
 export const ALLOWED_IMAGE_MIMES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 export const ALLOWED_DOC_MIMES = ["application/pdf"];
@@ -40,7 +42,7 @@ export type UploadedAttachment = {
 
 /**
  * Faz upload do arquivo no bucket privado `whatsapp-attachments` sob `<userId>/<uuid>.<ext>`
- * e retorna uma URL assinada válida por 1h, pronta para ser consumida pela Edge Function.
+ * e retorna uma URL assinada válida por 30 minutos, pronta para ser consumida pela Edge Function.
  */
 export async function uploadWhatsAppAttachment(file: File): Promise<UploadedAttachment> {
   const validated = validateAttachment(file);
@@ -56,7 +58,15 @@ export async function uploadWhatsAppAttachment(file: File): Promise<UploadedAtta
   if (!userId) throw new Error("Usuário não autenticado.");
 
   const ext = (file.name.split(".").pop() || "bin").toLowerCase().replace(/[^a-z0-9]/g, "");
-  const path = `${userId}/${crypto.randomUUID()}.${ext}`;
+  const baseName = file.name
+    .replace(/\.[^.]+$/, "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9-_]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 48) || "arquivo";
+  const day = new Date().toISOString().slice(0, 10);
+  const path = `${userId}/${day}/${crypto.randomUUID()}-${baseName}.${ext}`;
 
   const { error: upErr } = await supabase.storage
     .from(ATTACHMENT_BUCKET)
@@ -65,7 +75,7 @@ export async function uploadWhatsAppAttachment(file: File): Promise<UploadedAtta
 
   const { data: signed, error: signErr } = await supabase.storage
     .from(ATTACHMENT_BUCKET)
-    .createSignedUrl(path, 60 * 60);
+    .createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
   if (signErr || !signed?.signedUrl) throw new Error("Falha ao gerar URL do anexo.");
 
   return {

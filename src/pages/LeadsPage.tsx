@@ -9,7 +9,7 @@ import * as XLSX from "xlsx";
 import {
   Plus, Search, ChevronRight, X, Loader2,
   CheckCircle2, AlertTriangle, AlertCircle, Upload,
-  Copy, Phone, Mail, Trash2, Building2, User, Table2, MessageSquare, Eye,
+  Copy, Phone, Mail, Trash2, Building2, User, Table2, MessageSquare, Eye, ChevronDown, ChevronUp,
 } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
-import WhatsappBulkModal from "@/components/WhatsappBulkModal";
+import WhatsappBulkModal, { formatPhone } from "@/components/WhatsappBulkModal";
 import SelectedLeadsPanel from "@/components/SelectedLeadsPanel";
 
 
@@ -598,6 +598,7 @@ export default function LeadsPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [showBulkWhatsApp, setShowBulkWhatsApp] = useState(false);
   const [showSelectedPanel, setShowSelectedPanel] = useState(false);
+  const [selectionExpanded, setSelectionExpanded] = useState(true);
   const [bulkLeads, setBulkLeads] = useState<Lead[]>([]);
   const [resolvingSelection, setResolvingSelection] = useState(false);
   // Cache de leads selecionados que não estão na lista atual (fora do filtro/paginação)
@@ -899,6 +900,28 @@ export default function LeadsPage() {
 
   const hasSelection = selectedIds.size > 0;
 
+  /**
+   * Mantém `bulkLeads` sempre sincronizado com `selectedIds` (fonte única),
+   * resolvendo contra a lista completa `leads` + cache — nunca contra `filtered`.
+   * É exatamente essa lista que alimenta o painel azul, o "Ver selecionados"
+   * e o WhatsappBulkModal.
+   */
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (selectedIds.size === 0) { setBulkLeads([]); return; }
+      const resolved = await resolveSelectedLeads();
+      if (!cancelled) setBulkLeads(resolved);
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedIds, leads]);
+
+  const selectedLeads = useMemo(
+    () => bulkLeads.filter((l) => selectedIds.has(l.id)),
+    [bulkLeads, selectedIds]
+  );
+
   return (
     <div className="flex-1 p-6 min-w-0">
       {/* Header */}
@@ -1062,7 +1085,8 @@ export default function LeadsPage() {
 
       {/* Bulk action bar */}
       {hasSelection && (<>
-        <div className="bg-primary/10 border border-primary/25 rounded-2xl px-4 py-3 mb-4 flex items-center gap-3 flex-wrap">
+        <div className="bg-primary/10 border border-primary/25 rounded-2xl px-4 py-3 mb-4">
+        <div className="flex items-center gap-3 flex-wrap">
           <span className="text-sm font-medium text-foreground">{selectedIds.size} lead{selectedIds.size !== 1 ? "s" : ""} selecionado{selectedIds.size !== 1 ? "s" : ""}</span>
           <div className="flex items-center gap-2">
             <Button variant="default" size="sm" className="h-8 rounded-lg text-xs gap-1.5" onClick={copyParaExcel}>
@@ -1134,6 +1158,54 @@ export default function LeadsPage() {
           <Button variant="ghost" size="sm" className="h-8 rounded-lg text-xs text-muted-foreground ml-auto" onClick={clearSelection}>
             Limpar seleção
           </Button>
+        </div>
+
+        {/* Lista permanente dos leads selecionados (independe de busca/filtros) */}
+        <div className="mt-3 pt-3 border-t border-primary/20">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-medium text-foreground">
+              Leads selecionados ({selectedIds.size})
+            </p>
+            <button
+              type="button"
+              onClick={() => setSelectionExpanded((v) => !v)}
+              className="text-[11px] px-2 py-1 rounded-lg text-muted-foreground hover:text-foreground flex items-center gap-1"
+            >
+              {selectionExpanded ? (<><ChevronUp className="w-3 h-3" /> Recolher</>) : (<><ChevronDown className="w-3 h-3" /> Expandir</>)}
+            </button>
+          </div>
+          {selectionExpanded && (
+            <div className={`mt-2 rounded-xl border border-border/50 bg-background/40 divide-y divide-border/40 ${selectedLeads.length > 6 ? "max-h-72 overflow-y-auto" : ""}`}>
+              {selectedLeads.length === 0 && (
+                <p className="px-3 py-3 text-xs text-muted-foreground">Carregando leads selecionados...</p>
+              )}
+              {selectedLeads.map((l) => {
+                const digits = (l.telefone ?? "").replace(/\D/g, "");
+                const phoneOk = digits.length >= 10 && digits.length <= 13;
+                return (
+                  <div key={l.id} className="px-3 py-2 flex items-center gap-3 text-xs">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-foreground font-medium truncate">{l.empresa || "(sem instituição)"}</p>
+                      <p className="text-muted-foreground truncate">Contato: {l.nome || "(sem contato)"}</p>
+                      <p className="text-muted-foreground truncate">Telefone: {formatPhone(l.telefone)}</p>
+                    </div>
+                    <span className={`shrink-0 text-[10px] px-2 py-0.5 rounded-full border ${phoneOk ? "text-emerald-400 border-emerald-500/30 bg-emerald-500/10" : "text-yellow-400 border-yellow-500/30 bg-yellow-500/10"}`}>
+                      {phoneOk ? "Telefone válido" : "Telefone inválido"}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => toggleSelect(l.id)}
+                      className="p-1 rounded-md hover:bg-secondary/60 text-muted-foreground hover:text-foreground shrink-0"
+                      aria-label={`Remover ${l.empresa || l.nome || "lead"} da seleção`}
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
         </div>
 
         <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
@@ -1326,7 +1398,7 @@ export default function LeadsPage() {
 
       {/* Painel: leads selecionados */}
       <SelectedLeadsPanel
-        leads={bulkLeads.filter((l) => selectedIds.has(l.id))}
+        leads={selectedLeads}
         open={showSelectedPanel}
         onOpenChange={setShowSelectedPanel}
         onRemove={(id) => toggleSelect(id)}
@@ -1335,7 +1407,7 @@ export default function LeadsPage() {
 
       {/* Modal Enviar WhatsApp em lote */}
       <WhatsappBulkModal
-        leads={bulkLeads.filter((l) => selectedIds.has(l.id))}
+        leads={selectedLeads}
         open={showBulkWhatsApp}
         onOpenChange={setShowBulkWhatsApp}
         onDone={() => { fetchLeads(); }}

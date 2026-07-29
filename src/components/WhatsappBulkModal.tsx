@@ -9,7 +9,22 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Send, Phone, Paperclip, X, Image as ImageIcon, FileText, CheckCircle2, XCircle, Link2, MinusCircle, Building2 } from "lucide-react";
+import {
+  Loader2,
+  Send,
+  Phone,
+  Paperclip,
+  X,
+  Image as ImageIcon,
+  FileText,
+  CheckCircle2,
+  XCircle,
+  Link2,
+  MinusCircle,
+  Building2,
+  AlertTriangle,
+  RefreshCw,
+} from "lucide-react";
 import type { Lead } from "@/lib/supabase";
 import { sendWhatsAppMessage } from "@/lib/evolution";
 import {
@@ -20,14 +35,25 @@ import {
   type UploadedAttachment,
 } from "@/lib/whatsappAttachment";
 
-type Status = "pending" | "sending" | "sent" | "error" | "skipped";
+type TextStatus = "pending" | "sending" | "sent" | "failed" | "skipped" | "not_sent";
+type MediaStatus =
+  | "not_requested"
+  | "uploading"
+  | "pending"
+  | "sending"
+  | "sent"
+  | "failed";
 
 type Row = {
   lead: Lead;
-  status: Status;
   message: string;
+  textStatus: TextStatus;
+  mediaStatus: MediaStatus;
   error?: string;
+  mediaError?: string;
 };
+
+type UploadState = "idle" | "uploading" | "ready" | "error";
 
 function firstName(nome: string | null | undefined): string {
   return (nome ?? "").trim().split(/\s+/)[0] || "";
@@ -40,11 +66,24 @@ function buildGreeting(template: string, nome: string): string {
   return template.split("{{nome}}").join(first);
 }
 
+/** Substituição única usada tanto no preview quanto no envio real. */
 function renderTemplate(template: string, vars: { nome: string; link: string }) {
   const first = firstName(vars.nome);
   return template
     .split("{{nome}}").join(first || "")
     .split("{{link}}").join(vars.link || "");
+}
+
+/** Detecta URLs indevidamente envolvidas por chaves, ex: {{https://exemplo.com}} */
+const WRAPPED_URL_RE = /\{\{\s*(https?:\/\/[^{}\s]+)\s*\}\}/gi;
+
+export function hasWrappedUrl(text: string): boolean {
+  WRAPPED_URL_RE.lastIndex = 0;
+  return WRAPPED_URL_RE.test(text);
+}
+
+export function unwrapUrls(text: string): string {
+  return text.replace(WRAPPED_URL_RE, "$1");
 }
 
 export function isValidPhone(phone: string | null | undefined): boolean {
@@ -77,6 +116,19 @@ function formatDuration(ms: number): string {
   return m > 0 ? `${m}min ${s}s` : `${s}s`;
 }
 
+function finalLabel(r: Row): { label: string; tone: string } {
+  if (r.textStatus === "skipped") return { label: "Ignorado", tone: "text-yellow-400" };
+  if (r.textStatus === "pending") return { label: "Pendente", tone: "text-muted-foreground/60" };
+  if (r.textStatus === "not_sent") return { label: "Não enviado", tone: "text-muted-foreground/60" };
+  if (r.textStatus === "sending" || r.mediaStatus === "sending" || r.mediaStatus === "uploading")
+    return { label: "Enviando", tone: "text-primary" };
+  const mediaOk = r.mediaStatus === "not_requested" || r.mediaStatus === "sent";
+  if (r.textStatus === "sent" && mediaOk) return { label: "Enviado", tone: "text-green-400" };
+  if (r.textStatus === "sent" && r.mediaStatus === "failed")
+    return { label: "Parcial", tone: "text-amber-400" };
+  return { label: "Falhou", tone: "text-destructive" };
+}
+
 export default function WhatsappBulkModal({
   leads,
   open,
@@ -99,13 +151,27 @@ export default function WhatsappBulkModal({
 
   const [attachment, setAttachment] = useState<File | null>(null);
   const [attachmentPreview, setAttachmentPreview] = useState<string | null>(null);
+  const [uploadState, setUploadState] = useState<UploadState>("idle");
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploaded, setUploaded] = useState<UploadedAttachment | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [rows, setRows] = useState<Row[]>([]);
   const [sending, setSending] = useState(false);
+  const [retryingId, setRetryingId] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
   const [doneSummary, setDoneSummary] = useState<
-    { total: number; sent: number; failed: number; skipped: number; elapsedMs: number } | null
+    {
+      total: number;
+      textsSent: number;
+      mediasSent: number;
+      complete: number;
+      partial: number;
+      failed: number;
+      skipped: number;
+      notSent: number;
+      elapsedMs: number;
+    } | null
   >(null);
   const [showAllPreviews, setShowAllPreviews] = useState(false);
 
@@ -116,6 +182,8 @@ export default function WhatsappBulkModal({
       setCurrentIndex(null);
     }
   }, [open]);
+
+  const wrappedUrlWarning = hasWrappedUrl(body) || hasWrappedUrl(greeting);
 
   function buildMessageFor(lead: Lead): string {
     const g = buildGreeting(greeting, lead.nome ?? "");
@@ -129,6 +197,20 @@ export default function WhatsappBulkModal({
 
   const previewLeads = showAllPreviews ? eligibleLeads : eligibleLeads.slice(0, 3);
 
+  async function startUpload(file: File) {
+    setUploadState("uploading");
+    setUploadError(null);
+    setUploaded(null);
+    try {
+      const result = await uploadWhatsAppAttachment(file);
+      setUploaded(result);
+      setUploadState("ready");
+    } catch (e: unknown) {
+      setUploadState("error");
+      setUploadError((e as Error)?.message || "Falha no upload do anexo.");
+    }
+  }
+
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
     e.target.value = "";
@@ -141,28 +223,43 @@ export default function WhatsappBulkModal({
     if (attachmentPreview) URL.revokeObjectURL(attachmentPreview);
     setAttachment(f);
     setAttachmentPreview(v.kind === "image" ? URL.createObjectURL(f) : null);
+    void startUpload(f);
   }
 
   function removeAttachment() {
     if (attachmentPreview) URL.revokeObjectURL(attachmentPreview);
     setAttachment(null);
     setAttachmentPreview(null);
+    setUploaded(null);
+    setUploadState("idle");
+    setUploadError(null);
   }
 
   function handleInsertLinkInBody() {
     const url = window.prompt("Cole o link (https://...)", link || "https://");
     if (!url) return;
-    const trimmed = url.trim();
+    const trimmed = unwrapUrls(url.trim());
     if (!/^https?:\/\/\S+/i.test(trimmed)) {
       toast.error("Link inválido. Use http:// ou https://");
       return;
     }
     setLink(trimmed);
     setLinkError(null);
+    // Insere sempre o placeholder literal {{link}} no corpo — nunca a URL crua.
     if (!body.includes("{{link}}")) {
       setBody((prev) => (prev ? `${prev.replace(/\s+$/, "")}\n{{link}}` : "{{link}}"));
     }
-    toast.success("Link adicionado");
+    toast.success("Link adicionado ao campo Link. O corpo usa {{link}}.");
+  }
+
+  function autoFixWrappedUrls() {
+    const foundInBody = body.match(WRAPPED_URL_RE);
+    WRAPPED_URL_RE.lastIndex = 0;
+    const firstUrl = foundInBody?.[0]?.replace(/^\{\{\s*|\s*\}\}$/g, "");
+    setBody((prev) => unwrapUrls(prev));
+    setGreeting((prev) => unwrapUrls(prev));
+    if (firstUrl && !link) setLink(firstUrl);
+    toast.success("Chaves removidas da URL.");
   }
 
   async function handleSendAll() {
@@ -170,8 +267,20 @@ export default function WhatsappBulkModal({
       toast.error("Nenhum lead com telefone válido.");
       return;
     }
+    if (wrappedUrlWarning) {
+      toast.error("Use {{link}} no texto e informe a URL no campo Link.");
+      return;
+    }
     if (link && !/^https?:\/\/\S+/i.test(link.trim())) {
       setLinkError("Link inválido. Use http:// ou https://");
+      return;
+    }
+    if (attachment && uploadState !== "ready") {
+      toast.error(
+        uploadState === "uploading"
+          ? "Aguarde o upload do anexo terminar."
+          : "O anexo não foi enviado ao storage. Tente novamente."
+      );
       return;
     }
     const firstMsg = buildMessageFor(eligibleLeads[0]);
@@ -184,38 +293,42 @@ export default function WhatsappBulkModal({
     setDoneSummary(null);
     const startedAt = Date.now();
 
-    let uploaded: UploadedAttachment | null = null;
-    if (attachment) {
-      try {
-        uploaded = await uploadWhatsAppAttachment(attachment);
-      } catch (e: any) {
-        toast.error(e?.message || "Falha no upload do anexo");
-        setSending(false);
-        return;
-      }
-    }
+    const media = uploaded;
 
-    // Ordem: elegíveis primeiro, ignorados marcados no fim
     const initial: Row[] = [
-      ...eligibleLeads.map((l) => ({ lead: l, status: "pending" as Status, message: buildMessageFor(l) })),
+      ...eligibleLeads.map((l) => ({
+        lead: l,
+        message: buildMessageFor(l),
+        textStatus: "pending" as TextStatus,
+        mediaStatus: (media ? "pending" : "not_requested") as MediaStatus,
+      })),
       ...invalidLeads.map((l) => ({
         lead: l,
-        status: "skipped" as Status,
         message: "",
+        textStatus: "skipped" as TextStatus,
+        mediaStatus: "not_requested" as MediaStatus,
         error: "Telefone ausente ou inválido",
       })),
     ];
     setRows(initial);
 
-    let sent = 0;
+    let textsSent = 0;
+    let mediasSent = 0;
+    let complete = 0;
+    let partial = 0;
     let failed = 0;
-    let deferredOnce = false;
     const delayMs = Math.max(0, Math.round(intervalSeconds * 1000));
 
     for (let i = 0; i < eligibleLeads.length; i++) {
       const row = initial[i];
       setCurrentIndex(i);
-      setRows((prev) => prev.map((r, idx) => (idx === i ? { ...r, status: "sending" } : r)));
+      setRows((prev) =>
+        prev.map((r, idx) =>
+          idx === i
+            ? { ...r, textStatus: "sending", mediaStatus: media ? "sending" : r.mediaStatus }
+            : r
+        )
+      );
 
       let result: Awaited<ReturnType<typeof sendWhatsAppMessage>>;
       try {
@@ -223,24 +336,37 @@ export default function WhatsappBulkModal({
           leadId: row.lead.id,
           phone: row.lead.telefone!,
           message: row.message,
-          media: uploaded
-            ? { url: uploaded.signedUrl, type: uploaded.kind, fileName: uploaded.fileName }
-            : null,
+          media: media ? { url: media.signedUrl, type: media.kind, fileName: media.fileName } : null,
         });
-      } catch (e: any) {
-        result = { ok: false, error: String(e?.message ?? e) };
+      } catch (e: unknown) {
+        result = { ok: false, error: String((e as Error)?.message ?? e) };
       }
 
-      if (result.ok) {
-        sent++;
-        if (result.attachmentDeferred) deferredOnce = true;
-        setRows((prev) => prev.map((r, idx) => (idx === i ? { ...r, status: "sent" } : r)));
-      } else {
-        failed++;
-        setRows((prev) =>
-          prev.map((r, idx) => (idx === i ? { ...r, status: "error", error: result.error || "Erro" } : r))
-        );
-      }
+      const textOk = result.textSent === true || (result.ok === true && result.textSent !== false);
+      const mediaOk = media ? result.mediaSent === true : false;
+
+      if (textOk) textsSent++;
+      if (mediaOk) mediasSent++;
+      if (textOk && (!media || mediaOk)) complete++;
+      else if (textOk && media && !mediaOk) partial++;
+      else failed++;
+
+      setRows((prev) =>
+        prev.map((r, idx) =>
+          idx === i
+            ? {
+                ...r,
+                textStatus: textOk ? "sent" : "failed",
+                mediaStatus: media ? (mediaOk ? "sent" : "failed") : "not_requested",
+                error: textOk ? undefined : result.error || "Erro no envio do texto",
+                mediaError:
+                  media && !mediaOk
+                    ? result.mediaError || "Texto enviado, mas o anexo falhou"
+                    : undefined,
+              }
+            : r
+        )
+      );
 
       if (i < eligibleLeads.length - 1) await sleep(delayMs);
     }
@@ -249,24 +375,68 @@ export default function WhatsappBulkModal({
     setSending(false);
     setDoneSummary({
       total: leads.length,
-      sent,
+      textsSent,
+      mediasSent,
+      complete,
+      partial,
       failed,
       skipped: invalidLeads.length,
+      notSent: 0,
       elapsedMs: Date.now() - startedAt,
     });
 
-    if (deferredOnce && uploaded) {
-      toast.message("Upload realizado, mas envio de anexo ainda depende do deploy da função de mídia.");
-    }
-    if (sent > 0 && failed === 0) {
-      toast.success(`${sent} mensagem(ns) enviada(s) com sucesso.`);
-    } else if (sent > 0 && failed > 0) {
-      toast.warning(`${sent} enviada(s), ${failed} com erro.`);
+    if (partial > 0) {
+      toast.warning(`${partial} envio(s) parcial(is): texto entregue, anexo falhou.`);
+    } else if (failed === 0) {
+      toast.success(`${complete} mensagem(ns) enviada(s) com sucesso.`);
+    } else if (complete > 0) {
+      toast.warning(`${complete} enviada(s), ${failed} com erro.`);
     } else {
       toast.error(`Nenhuma mensagem enviada (${failed} erro${failed !== 1 ? "s" : ""}).`);
     }
 
     onDone?.();
+  }
+
+  /** Reenvia SOMENTE o anexo para um destinatário cujo texto já foi entregue. */
+  async function retryMediaFor(leadId: string) {
+    if (!uploaded) return;
+    const row = rows.find((r) => r.lead.id === leadId);
+    if (!row) return;
+    setRetryingId(leadId);
+    setRows((prev) => prev.map((r) => (r.lead.id === leadId ? { ...r, mediaStatus: "sending" } : r)));
+    let result: Awaited<ReturnType<typeof sendWhatsAppMessage>>;
+    try {
+      result = await sendWhatsAppMessage({
+        leadId: row.lead.id,
+        phone: row.lead.telefone!,
+        message: row.message,
+        skipText: true,
+        media: { url: uploaded.signedUrl, type: uploaded.kind, fileName: uploaded.fileName },
+      });
+    } catch (e: unknown) {
+      result = { ok: false, error: String((e as Error)?.message ?? e) };
+    }
+    const ok = result.mediaSent === true;
+    setRows((prev) =>
+      prev.map((r) =>
+        r.lead.id === leadId
+          ? {
+              ...r,
+              mediaStatus: ok ? "sent" : "failed",
+              mediaError: ok ? undefined : result.mediaError || result.error || "Anexo falhou novamente",
+            }
+          : r
+      )
+    );
+    setDoneSummary((prev) =>
+      prev && ok
+        ? { ...prev, mediasSent: prev.mediasSent + 1, complete: prev.complete + 1, partial: Math.max(0, prev.partial - 1) }
+        : prev
+    );
+    setRetryingId(null);
+    if (ok) toast.success("Anexo reenviado.");
+    else toast.error("O anexo falhou novamente.");
   }
 
   function handleClose(open: boolean) {
@@ -275,6 +445,9 @@ export default function WhatsappBulkModal({
       if (attachmentPreview) URL.revokeObjectURL(attachmentPreview);
       setAttachment(null);
       setAttachmentPreview(null);
+      setUploaded(null);
+      setUploadState("idle");
+      setUploadError(null);
       setRows([]);
       setDoneSummary(null);
       setLinkError(null);
@@ -304,6 +477,28 @@ export default function WhatsappBulkModal({
             <div className="rounded-xl bg-yellow-500/5 border border-yellow-500/20 px-3 py-2">
               <p className="text-[11px] text-muted-foreground">Sem telefone</p>
               <p className="text-lg font-semibold text-yellow-400">{invalidLeads.length}</p>
+            </div>
+          </div>
+
+          {/* Destinatários */}
+          <div className="space-y-1.5">
+            <p className="text-xs text-muted-foreground">Destinatários ({leads.length})</p>
+            <div className="rounded-xl border border-border/60 bg-muted/20 divide-y divide-border/40 max-h-48 overflow-y-auto">
+              {leads.map((l) => (
+                <div key={l.id} className="px-3 py-2 flex items-center gap-2 text-xs">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-foreground truncate">{l.empresa || "(sem instituição)"}</p>
+                    <p className="text-muted-foreground/70 truncate">
+                      {l.nome || "(sem contato)"} · {formatPhone(l.telefone)}
+                    </p>
+                  </div>
+                  {isValidPhone(l.telefone) ? (
+                    <span className="text-[10px] text-emerald-400 shrink-0">válido</span>
+                  ) : (
+                    <span className="text-[10px] text-yellow-400 shrink-0">inválido</span>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
 
@@ -342,6 +537,23 @@ export default function WhatsappBulkModal({
               className="rounded-xl text-sm resize-none"
               placeholder="Quero compartilhar este link: {{link}}"
             />
+            {wrappedUrlWarning && (
+              <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 px-3 py-2 flex items-start gap-2">
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-400 mt-0.5 shrink-0" />
+                <div className="flex-1">
+                  <p className="text-[11px] text-amber-400">
+                    Use <code>{"{{link}}"}</code> no texto e informe a URL no campo Link.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={autoFixWrappedUrls}
+                    className="mt-1 text-[11px] px-2 py-1 rounded-lg border border-amber-500/30 text-amber-300 hover:bg-amber-500/10"
+                  >
+                    Corrigir automaticamente
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Link */}
@@ -399,10 +611,34 @@ export default function WhatsappBulkModal({
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-foreground truncate">{attachment.name}</p>
                   <p className="text-[11px] text-muted-foreground">{formatBytes(attachment.size)}</p>
+                  {uploadState === "uploading" && (
+                    <p className="text-[11px] text-primary flex items-center gap-1">
+                      <Loader2 className="w-3 h-3 animate-spin" /> Enviando arquivo...
+                    </p>
+                  )}
+                  {uploadState === "ready" && (
+                    <p className="text-[11px] text-emerald-400 flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3" /> Arquivo pronto
+                    </p>
+                  )}
+                  {uploadState === "error" && (
+                    <p className="text-[11px] text-destructive">Falha no upload{uploadError ? `: ${uploadError}` : ""}</p>
+                  )}
                 </div>
+                {uploadState === "error" && (
+                  <button
+                    type="button"
+                    onClick={() => attachment && startUpload(attachment)}
+                    className="p-1 rounded-md hover:bg-secondary/60 text-muted-foreground hover:text-foreground"
+                    aria-label="Tentar upload novamente"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={removeAttachment}
+                  disabled={sending}
                   className="p-1 rounded-md hover:bg-secondary/60 text-muted-foreground hover:text-foreground"
                   aria-label="Remover anexo"
                 >
@@ -476,29 +712,56 @@ export default function WhatsappBulkModal({
                 Progresso{currentIndex !== null ? ` — enviando ${currentIndex + 1} de ${eligibleLeads.length}` : ""}
               </p>
               <div className="rounded-xl border border-border/60 bg-muted/20 max-h-64 overflow-y-auto divide-y divide-border/40">
-                {rows.map((r) => (
-                  <div key={r.lead.id} className="px-3 py-2 flex items-center gap-2 text-xs">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-foreground truncate">{r.lead.empresa || "(sem instituição)"}</p>
-                      <p className="text-muted-foreground/70 truncate">
-                        {r.lead.nome || "(sem contato)"} · {formatPhone(r.lead.telefone)}
-                      </p>
-                      {r.error && <p className={r.status === "skipped" ? "text-yellow-400 truncate" : "text-destructive truncate"}>{r.error}</p>}
+                {rows.map((r) => {
+                  const fl = finalLabel(r);
+                  return (
+                    <div key={r.lead.id} className="px-3 py-2 flex items-center gap-2 text-xs">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-foreground truncate">{r.lead.empresa || "(sem instituição)"}</p>
+                        <p className="text-muted-foreground/70 truncate">
+                          {r.lead.nome || "(sem contato)"} · {formatPhone(r.lead.telefone)}
+                        </p>
+                        {r.error && (
+                          <p className={r.textStatus === "skipped" ? "text-yellow-400 truncate" : "text-destructive truncate"}>
+                            {r.error}
+                          </p>
+                        )}
+                        {r.mediaStatus === "failed" && (
+                          <div className="space-y-1">
+                            <p className="text-amber-400 truncate">
+                              Texto enviado, mas o anexo falhou{r.mediaError ? ` — ${r.mediaError}` : ""}
+                            </p>
+                            <button
+                              type="button"
+                              disabled={sending || retryingId === r.lead.id || !uploaded}
+                              onClick={() => retryMediaFor(r.lead.id)}
+                              className="text-[11px] px-2 py-1 rounded-lg border border-amber-500/30 text-amber-300 hover:bg-amber-500/10 disabled:opacity-50"
+                            >
+                              {retryingId === r.lead.id ? "Reenviando..." : "Reenviar somente o anexo"}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                      <span className={`shrink-0 ${fl.tone}`}>{fl.label}</span>
+                      {fl.label === "Enviando" && <Loader2 className="w-4 h-4 animate-spin text-primary" />}
+                      {fl.label === "Enviado" && <CheckCircle2 className="w-4 h-4 text-green-400" />}
+                      {fl.label === "Parcial" && <AlertTriangle className="w-4 h-4 text-amber-400" />}
+                      {fl.label === "Falhou" && <XCircle className="w-4 h-4 text-destructive" />}
+                      {fl.label === "Ignorado" && <MinusCircle className="w-4 h-4 text-yellow-400" />}
                     </div>
-                    {r.status === "pending" && <span className="text-muted-foreground/60">Pendente</span>}
-                    {r.status === "sending" && <Loader2 className="w-4 h-4 animate-spin text-primary" />}
-                    {r.status === "sent" && <CheckCircle2 className="w-4 h-4 text-green-400" />}
-                    {r.status === "error" && <XCircle className="w-4 h-4 text-destructive" />}
-                    {r.status === "skipped" && <MinusCircle className="w-4 h-4 text-yellow-400" />}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
               {doneSummary && (
                 <div className="rounded-xl border border-border/60 bg-muted/20 px-3 py-2 text-xs text-muted-foreground space-y-0.5">
                   <p>Total selecionado: <span className="text-foreground font-medium">{doneSummary.total}</span></p>
-                  <p>Enviados: <span className="text-green-400 font-medium">{doneSummary.sent}</span></p>
-                  <p>Falhas: <span className="text-destructive font-medium">{doneSummary.failed}</span></p>
+                  <p>Textos enviados: <span className="text-green-400 font-medium">{doneSummary.textsSent}</span></p>
+                  <p>Anexos enviados: <span className="text-green-400 font-medium">{doneSummary.mediasSent}</span></p>
+                  <p>Envios completos: <span className="text-green-400 font-medium">{doneSummary.complete}</span></p>
+                  <p>Envios parciais: <span className="text-amber-400 font-medium">{doneSummary.partial}</span></p>
+                  <p>Falhas totais: <span className="text-destructive font-medium">{doneSummary.failed}</span></p>
                   <p>Ignorados: <span className="text-yellow-400 font-medium">{doneSummary.skipped}</span></p>
+                  <p>Não enviados: <span className="text-foreground font-medium">{doneSummary.notSent}</span></p>
                   <p>Tempo total: <span className="text-foreground font-medium">{formatDuration(doneSummary.elapsedMs)}</span></p>
                 </div>
               )}
@@ -519,7 +782,13 @@ export default function WhatsappBulkModal({
           <Button
             type="button"
             onClick={handleSendAll}
-            disabled={sending || eligibleLeads.length === 0 || !!doneSummary}
+            disabled={
+              sending ||
+              eligibleLeads.length === 0 ||
+              !!doneSummary ||
+              wrappedUrlWarning ||
+              (!!attachment && uploadState !== "ready")
+            }
             className="h-10 px-5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white text-sm font-medium shadow-[0_4px_14px_rgba(16,185,129,0.35)]"
           >
             {sending ? (
