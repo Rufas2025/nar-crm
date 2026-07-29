@@ -598,6 +598,7 @@ export default function LeadsPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [showBulkWhatsApp, setShowBulkWhatsApp] = useState(false);
   const [showSelectedPanel, setShowSelectedPanel] = useState(false);
+  const [selectionExpanded, setSelectionExpanded] = useState(true);
   const [bulkLeads, setBulkLeads] = useState<Lead[]>([]);
   const [resolvingSelection, setResolvingSelection] = useState(false);
   // Cache de leads selecionados que não estão na lista atual (fora do filtro/paginação)
