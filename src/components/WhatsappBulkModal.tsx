@@ -889,6 +889,7 @@ export default function WhatsappBulkModal({
                   <p>Envios parciais: <span className="text-amber-400 font-medium">{doneSummary.partial}</span></p>
                   <p>Falhas totais: <span className="text-destructive font-medium">{doneSummary.failed}</span></p>
                   <p>Ignorados: <span className="text-yellow-400 font-medium">{doneSummary.skipped}</span></p>
+                  <p>Duplicados ignorados: <span className="text-yellow-400 font-medium">{doneSummary.duplicatesIgnored}</span></p>
                   <p>Não enviados: <span className="text-foreground font-medium">{doneSummary.notSent}</span></p>
                   <p>Tempo total: <span className="text-foreground font-medium">{formatDuration(doneSummary.elapsedMs)}</span></p>
                 </div>
