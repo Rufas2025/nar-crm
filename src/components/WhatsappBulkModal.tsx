@@ -55,24 +55,56 @@ type Row = {
 
 type UploadState = "idle" | "uploading" | "ready" | "error";
 
-function firstName(nome: string | null | undefined): string {
-  return (nome ?? "").trim().split(/\s+/)[0] || "";
+function clean(v: string | null | undefined): string {
+  return (v ?? "").replace(/\s+/g, " ").trim();
 }
 
-function buildGreeting(template: string, nome: string): string {
-  const first = firstName(nome);
-  if (!template.includes("{{nome}}")) return template;
-  if (!first) return "Olá, tudo bem?";
-  return template.split("{{nome}}").join(first);
+function firstName(nome: string | null | undefined): string {
+  return clean(nome).split(" ")[0] || "";
+}
+
+/** Variáveis suportadas. `nome` = Decisor/Contato (lead.nome); `instituicao` = lead.empresa. */
+export const TEMPLATE_VARS = ["nome", "primeiro_nome", "instituicao", "link"] as const;
+
+export function leadVars(lead: Lead, link: string): Record<string, string> {
+  const nome = clean(lead.nome);
+  return {
+    nome,
+    primeiro_nome: firstName(nome),
+    instituicao: clean(lead.empresa),
+    link: clean(link),
+  };
 }
 
 /** Substituição única usada tanto no preview quanto no envio real. */
-function renderTemplate(template: string, vars: { nome: string; link: string }) {
-  const first = firstName(vars.nome);
-  return template
-    .split("{{nome}}").join(first || "")
-    .split("{{link}}").join(vars.link || "");
+export function renderTemplate(template: string, vars: Record<string, string>): string {
+  return template.replace(/\{\{\s*([a-z_]+)\s*\}\}/gi, (match, key: string) => {
+    const value = vars[key.toLowerCase()];
+    return value !== undefined && value !== null ? value : match;
+  });
 }
+
+/** Retorna os placeholders que continuariam sem valor após a renderização. */
+export function unresolvedPlaceholders(template: string, vars: Record<string, string>): string[] {
+  const found = new Set<string>();
+  const re = /\{\{\s*([^{}]*?)\s*\}\}/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(template))) {
+    const key = m[1].trim();
+    const value = vars[key.toLowerCase()];
+    if (!value) found.add(`{{${key}}}`);
+  }
+  return [...found];
+}
+
+function buildGreeting(template: string, vars: Record<string, string>): string {
+  const hasName = Boolean(vars.nome);
+  if (!hasName && /\{\{\s*(nome|primeiro_nome)\s*\}\}/i.test(template)) {
+    return "Olá, tudo bem?";
+  }
+  return renderTemplate(template, vars);
+}
+
 
 /** Detecta URLs indevidamente envolvidas por chaves, ex: {{https://exemplo.com}} */
 const WRAPPED_URL_RE = /\{\{\s*(https?:\/\/[^{}\s]+)\s*\}\}/gi;
@@ -143,7 +175,7 @@ export default function WhatsappBulkModal({
   const eligibleLeads = useMemo(() => leads.filter((l) => isValidPhone(l.telefone)), [leads]);
   const invalidLeads = useMemo(() => leads.filter((l) => !isValidPhone(l.telefone)), [leads]);
 
-  const [greeting, setGreeting] = useState("Olá, {{nome}}, tudo bem?");
+  const [greeting, setGreeting] = useState("Olá, {{primeiro_nome}}, tudo bem?");
   const [body, setBody] = useState("Quero compartilhar este link:\n{{link}}");
   const [link, setLink] = useState("");
   const [linkError, setLinkError] = useState<string | null>(null);
@@ -186,8 +218,9 @@ export default function WhatsappBulkModal({
   const wrappedUrlWarning = hasWrappedUrl(body) || hasWrappedUrl(greeting);
 
   function buildMessageFor(lead: Lead): string {
-    const g = buildGreeting(greeting, lead.nome ?? "");
-    const b = renderTemplate(body, { nome: lead.nome ?? "", link });
+    const vars = leadVars(lead, link);
+    const g = buildGreeting(greeting, vars);
+    const b = renderTemplate(body, vars);
     const trimmedG = g.trim();
     const trimmedB = b.trim();
     if (!trimmedG) return trimmedB;
@@ -195,7 +228,29 @@ export default function WhatsappBulkModal({
     return `${trimmedG}\n\n${trimmedB}`;
   }
 
+  /** Destinatários com placeholders sem valor (bloqueiam o envio). */
+  const unresolvedByLead = useMemo(() => {
+    return eligibleLeads
+      .map((lead) => {
+        const vars = leadVars(lead, link);
+        const nameless =
+          !vars.nome && /\{\{\s*(nome|primeiro_nome)\s*\}\}/i.test(greeting) && !body.match(/\{\{\s*(nome|primeiro_nome)\s*\}\}/i);
+        const missing = new Set<string>([
+          ...(nameless ? [] : unresolvedPlaceholders(greeting, vars)),
+          ...unresolvedPlaceholders(body, vars),
+        ]);
+        return { lead, missing: [...missing] };
+      })
+      .filter((r) => r.missing.length > 0);
+  }, [eligibleLeads, greeting, body, link]);
+
+  const unresolvedNames = useMemo(
+    () => [...new Set(unresolvedByLead.flatMap((r) => r.missing))],
+    [unresolvedByLead]
+  );
+
   const previewLeads = showAllPreviews ? eligibleLeads : eligibleLeads.slice(0, 3);
+
 
   async function startUpload(file: File) {
     setUploadState("uploading");
@@ -271,6 +326,11 @@ export default function WhatsappBulkModal({
       toast.error("Use {{link}} no texto e informe a URL no campo Link.");
       return;
     }
+    if (unresolvedByLead.length > 0) {
+      toast.error(`Existem campos de personalização não resolvidos: ${unresolvedNames.join(", ")}`);
+      return;
+    }
+
     if (link && !/^https?:\/\/\S+/i.test(link.trim())) {
       setLinkError("Link inválido. Use http:// ou https://");
       return;
@@ -502,11 +562,21 @@ export default function WhatsappBulkModal({
             </div>
           </div>
 
+          {/* Legenda de variáveis */}
+          <div className="rounded-xl border border-border/60 bg-muted/20 px-3 py-2 space-y-0.5">
+            <p className="text-[11px] text-muted-foreground/80">Variáveis disponíveis:</p>
+            <p className="text-[11px] text-muted-foreground"><code className="text-primary">{"{{nome}}"}</code> — nome completo do contato</p>
+            <p className="text-[11px] text-muted-foreground"><code className="text-primary">{"{{primeiro_nome}}"}</code> — primeiro nome do contato</p>
+            <p className="text-[11px] text-muted-foreground"><code className="text-primary">{"{{instituicao}}"}</code> — nome da escola</p>
+            <p className="text-[11px] text-muted-foreground"><code className="text-primary">{"{{link}}"}</code> — link informado</p>
+          </div>
+
           {/* Saudação */}
           <div className="space-y-1.5">
             <p className="text-xs text-muted-foreground">
-              Saudação (use <code className="text-primary">{"{{nome}}"}</code>)
+              Saudação (use <code className="text-primary">{"{{primeiro_nome}}"}</code>)
             </p>
+
             <input
               type="text"
               value={greeting}
@@ -537,7 +607,25 @@ export default function WhatsappBulkModal({
               className="rounded-xl text-sm resize-none"
               placeholder="Quero compartilhar este link: {{link}}"
             />
+            {unresolvedByLead.length > 0 && (
+              <div className="rounded-xl border border-destructive/40 bg-destructive/5 px-3 py-2 space-y-1">
+                <p className="text-[11px] text-destructive">
+                  Existem campos de personalização não resolvidos: {unresolvedNames.join(", ")}
+                </p>
+                <ul className="text-[11px] text-muted-foreground space-y-0.5 max-h-28 overflow-y-auto">
+                  {unresolvedByLead.map(({ lead, missing }) => (
+                    <li key={lead.id}>
+                      {lead.empresa || lead.nome || "(lead sem dados)"} — falta {missing.join(", ")}
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-[11px] text-muted-foreground/70">
+                  Corrija o texto ou remova o placeholder para liberar o envio.
+                </p>
+              </div>
+            )}
             {wrappedUrlWarning && (
+
               <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 px-3 py-2 flex items-start gap-2">
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-400 mt-0.5 shrink-0" />
                 <div className="flex-1">
@@ -787,6 +875,8 @@ export default function WhatsappBulkModal({
               eligibleLeads.length === 0 ||
               !!doneSummary ||
               wrappedUrlWarning ||
+              unresolvedByLead.length > 0 ||
+
               (!!attachment && uploadState !== "ready")
             }
             className="h-10 px-5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white text-sm font-medium shadow-[0_4px_14px_rgba(16,185,129,0.35)]"
