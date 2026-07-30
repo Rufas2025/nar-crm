@@ -607,7 +607,25 @@ export default function WhatsappBulkModal({
               className="rounded-xl text-sm resize-none"
               placeholder="Quero compartilhar este link: {{link}}"
             />
+            {unresolvedByLead.length > 0 && (
+              <div className="rounded-xl border border-destructive/40 bg-destructive/5 px-3 py-2 space-y-1">
+                <p className="text-[11px] text-destructive">
+                  Existem campos de personalização não resolvidos: {unresolvedNames.join(", ")}
+                </p>
+                <ul className="text-[11px] text-muted-foreground space-y-0.5 max-h-28 overflow-y-auto">
+                  {unresolvedByLead.map(({ lead, missing }) => (
+                    <li key={lead.id}>
+                      {lead.empresa || lead.nome || "(lead sem dados)"} — falta {missing.join(", ")}
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-[11px] text-muted-foreground/70">
+                  Corrija o texto ou remova o placeholder para liberar o envio.
+                </p>
+              </div>
+            )}
             {wrappedUrlWarning && (
+
               <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 px-3 py-2 flex items-start gap-2">
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-400 mt-0.5 shrink-0" />
                 <div className="flex-1">
