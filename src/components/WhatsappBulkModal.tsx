@@ -233,6 +233,7 @@ export default function WhatsappBulkModal({
       failed: number;
       skipped: number;
       notSent: number;
+      duplicatesIgnored: number;
       elapsedMs: number;
     } | null
   >(null);
