@@ -479,8 +479,9 @@ export default function WhatsappBulkModal({
       complete,
       partial,
       failed,
-      skipped: invalidLeads.length,
+      skipped: invalidLeads.length + duplicateLeads.length,
       notSent: 0,
+      duplicatesIgnored: duplicateLeads.length,
       elapsedMs: Date.now() - startedAt,
     });
 
