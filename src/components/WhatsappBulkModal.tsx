@@ -55,24 +55,56 @@ type Row = {
 
 type UploadState = "idle" | "uploading" | "ready" | "error";
 
-function firstName(nome: string | null | undefined): string {
-  return (nome ?? "").trim().split(/\s+/)[0] || "";
+function clean(v: string | null | undefined): string {
+  return (v ?? "").replace(/\s+/g, " ").trim();
 }
 
-function buildGreeting(template: string, nome: string): string {
-  const first = firstName(nome);
-  if (!template.includes("{{nome}}")) return template;
-  if (!first) return "Olá, tudo bem?";
-  return template.split("{{nome}}").join(first);
+function firstName(nome: string | null | undefined): string {
+  return clean(nome).split(" ")[0] || "";
+}
+
+/** Variáveis suportadas. `nome` = Decisor/Contato (lead.nome); `instituicao` = lead.empresa. */
+export const TEMPLATE_VARS = ["nome", "primeiro_nome", "instituicao", "link"] as const;
+
+export function leadVars(lead: Lead, link: string): Record<string, string> {
+  const nome = clean(lead.nome);
+  return {
+    nome,
+    primeiro_nome: firstName(nome),
+    instituicao: clean(lead.empresa),
+    link: clean(link),
+  };
 }
 
 /** Substituição única usada tanto no preview quanto no envio real. */
-function renderTemplate(template: string, vars: { nome: string; link: string }) {
-  const first = firstName(vars.nome);
-  return template
-    .split("{{nome}}").join(first || "")
-    .split("{{link}}").join(vars.link || "");
+export function renderTemplate(template: string, vars: Record<string, string>): string {
+  return template.replace(/\{\{\s*([a-z_]+)\s*\}\}/gi, (match, key: string) => {
+    const value = vars[key.toLowerCase()];
+    return value !== undefined && value !== null ? value : match;
+  });
 }
+
+/** Retorna os placeholders que continuariam sem valor após a renderização. */
+export function unresolvedPlaceholders(template: string, vars: Record<string, string>): string[] {
+  const found = new Set<string>();
+  const re = /\{\{\s*([^{}]*?)\s*\}\}/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(template))) {
+    const key = m[1].trim();
+    const value = vars[key.toLowerCase()];
+    if (!value) found.add(`{{${key}}}`);
+  }
+  return [...found];
+}
+
+function buildGreeting(template: string, vars: Record<string, string>): string {
+  const hasName = Boolean(vars.nome);
+  if (!hasName && /\{\{\s*(nome|primeiro_nome)\s*\}\}/i.test(template)) {
+    return "Olá, tudo bem?";
+  }
+  return renderTemplate(template, vars);
+}
+
 
 /** Detecta URLs indevidamente envolvidas por chaves, ex: {{https://exemplo.com}} */
 const WRAPPED_URL_RE = /\{\{\s*(https?:\/\/[^{}\s]+)\s*\}\}/gi;
