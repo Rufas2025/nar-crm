@@ -204,6 +204,8 @@ export default function WhatsappBulkModal({
     }
     return { eligibleLeads: kept, duplicateGroups: groups, duplicateLeads: dupes };
   }, [validPhoneLeads]);
+  const duplicateIds = useMemo(() => new Set(duplicateLeads.map((l) => l.id)), [duplicateLeads]);
+
 
 
   const [greeting, setGreeting] = useState("Olá, {{primeiro_nome}}, tudo bem?");
