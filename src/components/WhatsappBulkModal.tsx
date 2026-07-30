@@ -175,7 +175,7 @@ export default function WhatsappBulkModal({
   const eligibleLeads = useMemo(() => leads.filter((l) => isValidPhone(l.telefone)), [leads]);
   const invalidLeads = useMemo(() => leads.filter((l) => !isValidPhone(l.telefone)), [leads]);
 
-  const [greeting, setGreeting] = useState("Olá, {{nome}}, tudo bem?");
+  const [greeting, setGreeting] = useState("Olá, {{primeiro_nome}}, tudo bem?");
   const [body, setBody] = useState("Quero compartilhar este link:\n{{link}}");
   const [link, setLink] = useState("");
   const [linkError, setLinkError] = useState<string | null>(null);
