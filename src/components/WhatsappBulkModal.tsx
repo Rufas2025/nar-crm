@@ -326,6 +326,11 @@ export default function WhatsappBulkModal({
       toast.error("Use {{link}} no texto e informe a URL no campo Link.");
       return;
     }
+    if (unresolvedByLead.length > 0) {
+      toast.error(`Existem campos de personalização não resolvidos: ${unresolvedNames.join(", ")}`);
+      return;
+    }
+
     if (link && !/^https?:\/\/\S+/i.test(link.trim())) {
       setLinkError("Link inválido. Use http:// ou https://");
       return;
