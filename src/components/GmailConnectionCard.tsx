@@ -34,9 +34,11 @@ export default function GmailConnectionCard() {
     } else if (gmail === "wrong_account") {
       toast.error(`Conta errada: ${params.get("email") ?? "desconhecida"}. Use ${GMAIL_EXPECTED_ACCOUNT}.`);
     } else if (gmail === "error") {
-      toast.error(`Falha na conexão Gmail: ${params.get("reason") ?? "erro"}`);
+      const httpStatus = params.get("status");
+      const reason = params.get("reason") ?? "erro";
+      toast.error(`Falha na conexão Gmail: ${reason}${httpStatus ? ` (HTTP ${httpStatus})` : ""}`);
     }
-    params.delete("gmail"); params.delete("email"); params.delete("reason");
+    params.delete("gmail"); params.delete("email"); params.delete("reason"); params.delete("status");
     setParams(params, { replace: true });
   }, [params, setParams]);
 

@@ -81,7 +81,9 @@ Deno.serve(async (req) => {
       access_type: "offline",
       prompt: "consent",
       include_granted_scopes: "true",
-      scope: "https://www.googleapis.com/auth/gmail.compose openid email",
+      // openid/email/profile são necessários para ler o e-mail via
+      // openidconnect.googleapis.com/v1/userinfo no callback.
+      scope: "https://www.googleapis.com/auth/gmail.compose openid email profile",
       state,
     });
     const url = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;

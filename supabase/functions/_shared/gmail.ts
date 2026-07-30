@@ -1,5 +1,6 @@
 // Shared helpers for Gmail draft edge functions.
 import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { getConnection, updateAccessToken } from "./gmail-connection.ts";
 
 export const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -49,11 +50,11 @@ export function validateGmailSafe(html: string): { ok: boolean; reason?: string 
 }
 
 export async function getValidAccessToken(admin: SupabaseClient, userId: string): Promise<{ accessToken: string; email: string } | { error: string }> {
-  const { data: conn, error } = await admin.from("gmail_connections").select("*").eq("user_id", userId).maybeSingle();
-  if (error || !conn) return { error: "Gmail não conectado" };
-  const expiresAt = new Date(conn.expires_at).getTime();
+  const conn = await getConnection(admin, userId);
+  if (!conn) return { error: "Gmail não conectado" };
+  const expiresAt = conn.expiresAt ? new Date(conn.expiresAt).getTime() : 0;
   if (Date.now() < expiresAt - 30_000) {
-    return { accessToken: conn.access_token, email: conn.email };
+    return { accessToken: conn.accessToken, email: conn.email };
   }
   const resp = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
@@ -61,21 +62,19 @@ export async function getValidAccessToken(admin: SupabaseClient, userId: string)
     body: new URLSearchParams({
       client_id: Deno.env.get("GOOGLE_CLIENT_ID")!,
       client_secret: Deno.env.get("GOOGLE_CLIENT_SECRET")!,
-      refresh_token: conn.refresh_token,
+      refresh_token: conn.refreshToken,
       grant_type: "refresh_token",
     }),
   });
-  const json = await resp.json();
   if (!resp.ok) {
-    console.error("refresh token failed", json);
+    // Corpo cru pode ecoar o refresh_token enviado: logar apenas o status.
+    console.error("[gmail] refresh token failed", { status: resp.status });
     return { error: "Falha ao renovar token Gmail. Reconecte." };
   }
+  const json = await resp.json();
   const newExpires = new Date(Date.now() + ((json.expires_in ?? 3600) - 60) * 1000).toISOString();
-  await admin.from("gmail_connections").update({
-    access_token: json.access_token,
-    expires_at: newExpires,
-    updated_at: new Date().toISOString(),
-  }).eq("user_id", userId);
+  const { error: updErr } = await updateAccessToken(admin, userId, json.access_token, newExpires);
+  if (updErr) console.error("[gmail] update access token", { message: updErr });
   return { accessToken: json.access_token, email: conn.email };
 }
 
