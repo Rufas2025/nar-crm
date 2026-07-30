@@ -875,6 +875,8 @@ export default function WhatsappBulkModal({
               eligibleLeads.length === 0 ||
               !!doneSummary ||
               wrappedUrlWarning ||
+              unresolvedByLead.length > 0 ||
+
               (!!attachment && uploadState !== "ready")
             }
             className="h-10 px-5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white text-sm font-medium shadow-[0_4px_14px_rgba(16,185,129,0.35)]"
