@@ -118,6 +118,14 @@ export function unwrapUrls(text: string): string {
   return text.replace(WRAPPED_URL_RE, "$1");
 }
 
+/** Normaliza o telefone apenas para comparação — nunca altera o valor salvo no banco. */
+export function normalizePhone(phone: string | null | undefined): string {
+  const d = (phone ?? "").replace(/\D/g, "");
+  if (!d) return "";
+  const withCc = d.length <= 11 ? `55${d}` : d;
+  return withCc.replace(/^55(\d{2})9(\d{8})$/, "55$19$2");
+}
+
 export function isValidPhone(phone: string | null | undefined): boolean {
   if (!phone) return false;
   const d = phone.replace(/\D/g, "");
@@ -172,8 +180,33 @@ export default function WhatsappBulkModal({
   onOpenChange: (open: boolean) => void;
   onDone?: () => void;
 }) {
-  const eligibleLeads = useMemo(() => leads.filter((l) => isValidPhone(l.telefone)), [leads]);
+  const validPhoneLeads = useMemo(() => leads.filter((l) => isValidPhone(l.telefone)), [leads]);
   const invalidLeads = useMemo(() => leads.filter((l) => !isValidPhone(l.telefone)), [leads]);
+
+  /** Deduplicação por telefone normalizado: mantém apenas o primeiro lead de cada número. */
+  const { eligibleLeads, duplicateGroups, duplicateLeads } = useMemo(() => {
+    const byPhone = new Map<string, Lead[]>();
+    for (const l of validPhoneLeads) {
+      const key = normalizePhone(l.telefone);
+      const arr = byPhone.get(key);
+      if (arr) arr.push(l);
+      else byPhone.set(key, [l]);
+    }
+    const kept: Lead[] = [];
+    const dupes: Lead[] = [];
+    const groups: { phone: string; leads: Lead[] }[] = [];
+    for (const [phone, group] of byPhone) {
+      kept.push(group[0]);
+      if (group.length > 1) {
+        dupes.push(...group.slice(1));
+        groups.push({ phone, leads: group });
+      }
+    }
+    return { eligibleLeads: kept, duplicateGroups: groups, duplicateLeads: dupes };
+  }, [validPhoneLeads]);
+  const duplicateIds = useMemo(() => new Set(duplicateLeads.map((l) => l.id)), [duplicateLeads]);
+
+
 
   const [greeting, setGreeting] = useState("Olá, {{primeiro_nome}}, tudo bem?");
   const [body, setBody] = useState("Quero compartilhar este link:\n{{link}}");
@@ -202,6 +235,7 @@ export default function WhatsappBulkModal({
       failed: number;
       skipped: number;
       notSent: number;
+      duplicatesIgnored: number;
       elapsedMs: number;
     } | null
   >(null);
@@ -362,6 +396,13 @@ export default function WhatsappBulkModal({
         textStatus: "pending" as TextStatus,
         mediaStatus: (media ? "pending" : "not_requested") as MediaStatus,
       })),
+      ...duplicateLeads.map((l) => ({
+        lead: l,
+        message: "",
+        textStatus: "skipped" as TextStatus,
+        mediaStatus: "not_requested" as MediaStatus,
+        error: "Ignorado por telefone duplicado",
+      })),
       ...invalidLeads.map((l) => ({
         lead: l,
         message: "",
@@ -440,8 +481,9 @@ export default function WhatsappBulkModal({
       complete,
       partial,
       failed,
-      skipped: invalidLeads.length,
+      skipped: invalidLeads.length + duplicateLeads.length,
       notSent: 0,
+      duplicatesIgnored: duplicateLeads.length,
       elapsedMs: Date.now() - startedAt,
     });
 
@@ -531,14 +573,44 @@ export default function WhatsappBulkModal({
               <p className="text-lg font-semibold text-foreground">{leads.length}</p>
             </div>
             <div className="rounded-xl bg-emerald-500/5 border border-emerald-500/20 px-3 py-2">
-              <p className="text-[11px] text-muted-foreground">Telefone válido</p>
+              <p className="text-[11px] text-muted-foreground">Destinatários efetivos</p>
               <p className="text-lg font-semibold text-emerald-400">{eligibleLeads.length}</p>
             </div>
             <div className="rounded-xl bg-yellow-500/5 border border-yellow-500/20 px-3 py-2">
-              <p className="text-[11px] text-muted-foreground">Sem telefone</p>
-              <p className="text-lg font-semibold text-yellow-400">{invalidLeads.length}</p>
+              <p className="text-[11px] text-muted-foreground">Ignorados</p>
+              <p className="text-lg font-semibold text-yellow-400">{invalidLeads.length + duplicateLeads.length}</p>
             </div>
           </div>
+
+          {/* Aviso de telefones duplicados */}
+          {duplicateGroups.length > 0 && (
+            <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 px-3 py-2 space-y-1">
+              <p className="text-[11px] text-amber-400 flex items-center gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                Foram encontrados {duplicateGroups.reduce((n, g) => n + g.leads.length, 0)} leads compartilhando o mesmo telefone.
+              </p>
+              <div className="space-y-1 max-h-40 overflow-y-auto">
+                {duplicateGroups.map((g) => (
+                  <div key={g.phone} className="text-[11px] text-muted-foreground">
+                    <p className="text-muted-foreground/80">{formatPhone(g.phone)}</p>
+                    {g.leads.map((l, i) => (
+                      <p key={l.id} className="truncate pl-2">
+                        · {l.empresa || "(sem instituição)"} — {l.nome || "(sem contato)"}{" "}
+                        {i === 0 ? (
+                          <span className="text-emerald-400">será enviado</span>
+                        ) : (
+                          <span className="text-yellow-400">ignorado por telefone duplicado</span>
+                        )}
+                      </p>
+                    ))}
+                  </div>
+                ))}
+              </div>
+              <p className="text-[11px] text-muted-foreground/70">
+                Cada telefone recebe apenas uma mensagem (e um anexo, se houver) por lote. Revise antes de enviar.
+              </p>
+            </div>
+          )}
 
           {/* Destinatários */}
           <div className="space-y-1.5">
@@ -552,7 +624,9 @@ export default function WhatsappBulkModal({
                       {l.nome || "(sem contato)"} · {formatPhone(l.telefone)}
                     </p>
                   </div>
-                  {isValidPhone(l.telefone) ? (
+                  {duplicateIds.has(l.id) ? (
+                    <span className="text-[10px] text-yellow-400 shrink-0">duplicado</span>
+                  ) : isValidPhone(l.telefone) ? (
                     <span className="text-[10px] text-emerald-400 shrink-0">válido</span>
                   ) : (
                     <span className="text-[10px] text-yellow-400 shrink-0">inválido</span>
@@ -561,6 +635,7 @@ export default function WhatsappBulkModal({
               ))}
             </div>
           </div>
+
 
           {/* Legenda de variáveis */}
           <div className="rounded-xl border border-border/60 bg-muted/20 px-3 py-2 space-y-0.5">
@@ -849,6 +924,7 @@ export default function WhatsappBulkModal({
                   <p>Envios parciais: <span className="text-amber-400 font-medium">{doneSummary.partial}</span></p>
                   <p>Falhas totais: <span className="text-destructive font-medium">{doneSummary.failed}</span></p>
                   <p>Ignorados: <span className="text-yellow-400 font-medium">{doneSummary.skipped}</span></p>
+                  <p>Duplicados ignorados: <span className="text-yellow-400 font-medium">{doneSummary.duplicatesIgnored}</span></p>
                   <p>Não enviados: <span className="text-foreground font-medium">{doneSummary.notSent}</span></p>
                   <p>Tempo total: <span className="text-foreground font-medium">{formatDuration(doneSummary.elapsedMs)}</span></p>
                 </div>
