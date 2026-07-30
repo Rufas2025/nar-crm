@@ -562,11 +562,21 @@ export default function WhatsappBulkModal({
             </div>
           </div>
 
+          {/* Legenda de variáveis */}
+          <div className="rounded-xl border border-border/60 bg-muted/20 px-3 py-2 space-y-0.5">
+            <p className="text-[11px] text-muted-foreground/80">Variáveis disponíveis:</p>
+            <p className="text-[11px] text-muted-foreground"><code className="text-primary">{"{{nome}}"}</code> — nome completo do contato</p>
+            <p className="text-[11px] text-muted-foreground"><code className="text-primary">{"{{primeiro_nome}}"}</code> — primeiro nome do contato</p>
+            <p className="text-[11px] text-muted-foreground"><code className="text-primary">{"{{instituicao}}"}</code> — nome da escola</p>
+            <p className="text-[11px] text-muted-foreground"><code className="text-primary">{"{{link}}"}</code> — link informado</p>
+          </div>
+
           {/* Saudação */}
           <div className="space-y-1.5">
             <p className="text-xs text-muted-foreground">
-              Saudação (use <code className="text-primary">{"{{nome}}"}</code>)
+              Saudação (use <code className="text-primary">{"{{primeiro_nome}}"}</code>)
             </p>
+
             <input
               type="text"
               value={greeting}
