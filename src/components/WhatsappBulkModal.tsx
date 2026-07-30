@@ -172,8 +172,31 @@ export default function WhatsappBulkModal({
   onOpenChange: (open: boolean) => void;
   onDone?: () => void;
 }) {
-  const eligibleLeads = useMemo(() => leads.filter((l) => isValidPhone(l.telefone)), [leads]);
+  const validPhoneLeads = useMemo(() => leads.filter((l) => isValidPhone(l.telefone)), [leads]);
   const invalidLeads = useMemo(() => leads.filter((l) => !isValidPhone(l.telefone)), [leads]);
+
+  /** Deduplicação por telefone normalizado: mantém apenas o primeiro lead de cada número. */
+  const { eligibleLeads, duplicateGroups, duplicateLeads } = useMemo(() => {
+    const byPhone = new Map<string, Lead[]>();
+    for (const l of validPhoneLeads) {
+      const key = normalizePhone(l.telefone);
+      const arr = byPhone.get(key);
+      if (arr) arr.push(l);
+      else byPhone.set(key, [l]);
+    }
+    const kept: Lead[] = [];
+    const dupes: Lead[] = [];
+    const groups: { phone: string; leads: Lead[] }[] = [];
+    for (const [phone, group] of byPhone) {
+      kept.push(group[0]);
+      if (group.length > 1) {
+        dupes.push(...group.slice(1));
+        groups.push({ phone, leads: group });
+      }
+    }
+    return { eligibleLeads: kept, duplicateGroups: groups, duplicateLeads: dupes };
+  }, [validPhoneLeads]);
+
 
   const [greeting, setGreeting] = useState("Olá, {{primeiro_nome}}, tudo bem?");
   const [body, setBody] = useState("Quero compartilhar este link:\n{{link}}");
