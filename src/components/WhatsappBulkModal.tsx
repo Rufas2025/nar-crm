@@ -393,6 +393,13 @@ export default function WhatsappBulkModal({
         textStatus: "pending" as TextStatus,
         mediaStatus: (media ? "pending" : "not_requested") as MediaStatus,
       })),
+      ...duplicateLeads.map((l) => ({
+        lead: l,
+        message: "",
+        textStatus: "skipped" as TextStatus,
+        mediaStatus: "not_requested" as MediaStatus,
+        error: "Ignorado por telefone duplicado",
+      })),
       ...invalidLeads.map((l) => ({
         lead: l,
         message: "",
