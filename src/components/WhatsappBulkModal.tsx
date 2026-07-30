@@ -118,6 +118,14 @@ export function unwrapUrls(text: string): string {
   return text.replace(WRAPPED_URL_RE, "$1");
 }
 
+/** Normaliza o telefone apenas para comparação — nunca altera o valor salvo no banco. */
+export function normalizePhone(phone: string | null | undefined): string {
+  const d = (phone ?? "").replace(/\D/g, "");
+  if (!d) return "";
+  const withCc = d.length <= 11 ? `55${d}` : d;
+  return withCc.replace(/^55(\d{2})9(\d{8})$/, "55$19$2");
+}
+
 export function isValidPhone(phone: string | null | undefined): boolean {
   if (!phone) return false;
   const d = phone.replace(/\D/g, "");
