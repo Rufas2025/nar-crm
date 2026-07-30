@@ -218,8 +218,9 @@ export default function WhatsappBulkModal({
   const wrappedUrlWarning = hasWrappedUrl(body) || hasWrappedUrl(greeting);
 
   function buildMessageFor(lead: Lead): string {
-    const g = buildGreeting(greeting, lead.nome ?? "");
-    const b = renderTemplate(body, { nome: lead.nome ?? "", link });
+    const vars = leadVars(lead, link);
+    const g = buildGreeting(greeting, vars);
+    const b = renderTemplate(body, vars);
     const trimmedG = g.trim();
     const trimmedB = b.trim();
     if (!trimmedG) return trimmedB;
@@ -227,7 +228,29 @@ export default function WhatsappBulkModal({
     return `${trimmedG}\n\n${trimmedB}`;
   }
 
+  /** Destinatários com placeholders sem valor (bloqueiam o envio). */
+  const unresolvedByLead = useMemo(() => {
+    return eligibleLeads
+      .map((lead) => {
+        const vars = leadVars(lead, link);
+        const nameless =
+          !vars.nome && /\{\{\s*(nome|primeiro_nome)\s*\}\}/i.test(greeting) && !body.match(/\{\{\s*(nome|primeiro_nome)\s*\}\}/i);
+        const missing = new Set<string>([
+          ...(nameless ? [] : unresolvedPlaceholders(greeting, vars)),
+          ...unresolvedPlaceholders(body, vars),
+        ]);
+        return { lead, missing: [...missing] };
+      })
+      .filter((r) => r.missing.length > 0);
+  }, [eligibleLeads, greeting, body, link]);
+
+  const unresolvedNames = useMemo(
+    () => [...new Set(unresolvedByLead.flatMap((r) => r.missing))],
+    [unresolvedByLead]
+  );
+
   const previewLeads = showAllPreviews ? eligibleLeads : eligibleLeads.slice(0, 3);
+
 
   async function startUpload(file: File) {
     setUploadState("uploading");
