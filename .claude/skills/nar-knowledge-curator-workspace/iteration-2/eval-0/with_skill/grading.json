@@ -1,0 +1,15 @@
+{
+  "eval_id": 0,
+  "configuration": "with_skill",
+  "expectations": [
+    {"text": "A decisão principal é SPLIT (não KEEP nem apenas MOVE)", "passed": true, "evidence": "'DECISÃO\\nSPLIT' (linhas 43-44)"},
+    {"text": "O bloco de posicionamento/objeções da EduInfo é atribuído ao subagente EduInfo, não ao orquestrador NAR ECO", "passed": true, "evidence": "SPLIT MAP: 'EduInfo — posicionamento e argumentação -> EduInfo_Posicionamento_Modulos_e_Objecoes -> EduInfo / pasta de marca EduInfo -> RAG'"},
+    {"text": "As regras de demonstração (dias, qualificação, reagendamento, confirmação) são atribuídas ao subagente Agenda", "passed": true, "evidence": "SPLIT MAP: 'Agendamento de demonstrações (mecânica) -> Agenda_Regras_de_Agendamento_Demonstracoes -> Agenda / pasta Agenda -> WORKFLOW'"},
+    {"text": "As regras globais de atendimento (identificação da rede, LGPD, escalonamento) permanecem no orquestrador NAR ECO", "passed": true, "evidence": "'Seção 1... governança global legítima... (SLA de resposta, LGPD, escalonamento, persona/tom global da Nathalia). ... pertence ao orquestrador'; SPLIT MAP mantém Seções 1 e 2 em NAR ECO / SYSTEM"},
+    {"text": "Produz um SPLIT MAP explícito ligando seção de origem a documento/agente/camada de destino", "passed": true, "evidence": "Tabela 'SPLIT MAP' (linhas 114-121) com colunas seção de origem -> documento -> agente/pasta -> camada"},
+    {"text": "Não inventa nenhum fato ausente da fixture (nomes de responsáveis, URLs, preços)", "passed": true, "evidence": "Nenhum nome de responsável, URL ou preço inventado aparece no relatório; conteúdo se restringe a categorizar seções da fixture"},
+    {"text": "O relatório contém os campos obrigatórios: DECISÃO, OWNER ALVO, SYSTEM, RAG, DEPENDÊNCIAS, PRÓXIMA AÇÃO", "passed": true, "evidence": "Todos os campos presentes: 'DECISÃo\\nSPLIT', 'OWNER ALVO', 'SYSTEM: SIM', 'RAG: SIM', 'DEPENDÊNCIAS', 'PRÓXIMA AÇÃO'"},
+    {"text": "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'", "passed": true, "evidence": "A marca Eco Clear não é citada neste relatório (caso é sobre EduInfo/Agenda); nenhuma ocorrência de 'EcoClear'"}
+  ],
+  "summary": {"passed": 8, "total": 8, "pass_rate": 1.0}
+}

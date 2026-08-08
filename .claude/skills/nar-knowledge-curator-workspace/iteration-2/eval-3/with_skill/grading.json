@@ -1,0 +1,15 @@
+{
+  "eval_id": 3,
+  "configuration": "with_skill",
+  "expectations": [
+    {"text": "A decisão é KEEP", "passed": true, "evidence": "'DECISÃO\\nKEEP, com uma recomendação pontual de nomenclatura (não uma reestruturação).'"},
+    {"text": "Não recomenda SPLIT nem REWRITE do documento", "passed": true, "evidence": "'Não há problema arquitetural que justifique MOVE, SPLIT, MERGE ou REWRITE.'"},
+    {"text": "Não propõe renomear o documento", "passed": true, "evidence": "'NOME PROPOSTO\\nMantido: 00_Indice_Mestre_da_Base_de_Conhecimento.'"},
+    {"text": "SYSTEM: NÃO", "passed": true, "evidence": "'SYSTEM: NÃO\\nNão é necessário para o orquestrador decidir roteamento em tempo real...'"},
+    {"text": "RAG: NÃO", "passed": true, "evidence": "'RAG: NÃO\\nNão é conteúdo recuperável para responder perguntas de cliente...'"},
+    {"text": "Classifica a camada como REFERENCE", "passed": true, "evidence": "'TIPO DE CONHECIMENTO\\nREFERENCE (documentação de arquitetura para humanos e para orientação de curadoria).'"},
+    {"text": "Não inventa problemas nem gera trabalho de reestruturação sem ganho arquitetural nomeado", "passed": true, "evidence": "Único ponto levantado (numeração sem espaçamento) é explicitamente marcado como 'Ponto de atenção (não bloqueante)' e 'prioridade BAIXA', com justificativa concreta (crescimento futuro do ecossistema quebraria referências)"},
+    {"text": "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'", "passed": true, "evidence": "'Eco Clear' grafado corretamente em duas palavras' e '30_Eco_Clear' na lista de renumeração sugerida — nenhuma ocorrência de 'EcoClear'"}
+  ],
+  "summary": {"passed": 8, "total": 8, "pass_rate": 1.0}
+}

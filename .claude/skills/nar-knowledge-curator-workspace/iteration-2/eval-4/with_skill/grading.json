@@ -1,0 +1,15 @@
+{
+  "eval_id": 4,
+  "configuration": "with_skill",
+  "expectations": [
+    {"text": "O posicionamento da EduInfo é atribuído ao subagente EduInfo", "passed": true, "evidence": "SPLIT MAP: 'Sobre a EduInfo -> EduInfo_Identidade_e_Posicionamento -> EduInfo (marca) -> RAG'"},
+    {"text": "O link de apresentação da Gennera é atribuído ao subagente Gennera", "passed": true, "evidence": "SPLIT MAP: 'Link Gennera -> Gennera_Apresentacao_Institucional... -> Gennera (marca) -> ASSET (link) + RAG'"},
+    {"text": "O case da Rede Semear é atribuído ao subagente Eco Clear", "passed": true, "evidence": "SPLIT MAP: 'Case Eco Clear -> Eco_Clear_Cases_e_Provas -> Eco Clear (marca) -> RAG'"},
+    {"text": "A regra comercial de aprovação de proposta é atribuída ao orquestrador NAR ECO como regra global", "passed": true, "evidence": "SPLIT MAP: 'Regra comercial NAR ECO -> NAR_ECO_Regras_Comerciais_Globais -> NAR ECO (orquestrador) -> SYSTEM'; nota: 'foi tratada como global porque o próprio texto declara explicitamente que vale para EduInfo, Gennera, Eco Clear, Educbank e Vibe Flow Educacional'"},
+    {"text": "As regras de reunião de diagnóstico/proposta e cancelamento são atribuídas ao subagente Agenda", "passed": true, "evidence": "SPLIT MAP: 'Agendamento -> Agenda_Regras_de_Reuniao_e_Cancelamento -> Agenda (transversal) -> WORKFLOW'"},
+    {"text": "Nenhuma informação de uma marca é atribuída a outra marca (zero contaminação cruzada)", "passed": true, "evidence": "Cada seção do SPLIT MAP tem destino de marca único e correto (EduInfo->EduInfo, Gennera->Gennera, Eco Clear->Eco Clear); texto adverte explicitamente contra a 'armadilha 4 de RAG (documento de marca recuperável por outro subagente)'"},
+    {"text": "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'", "passed": true, "evidence": "'Case Eco Clear', 'Eco_Clear_Cases_e_Provas', 'Eco Clear (marca)' — sempre em duas palavras, nenhuma ocorrência de 'EcoClear'"},
+    {"text": "Não inventa fatos ausentes da fixture", "passed": true, "evidence": "Relatório marca explicitamente o que não pode verificar como INFERIDO/DESCONHECIDO (validade do link da Gennera, conflito com outros documentos) em vez de inventar; não introduz nomes, preços ou URLs novos"}
+  ],
+  "summary": {"passed": 8, "total": 8, "pass_rate": 1.0}
+}

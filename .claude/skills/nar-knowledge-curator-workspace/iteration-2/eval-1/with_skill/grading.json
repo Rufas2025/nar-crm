@@ -1,0 +1,14 @@
+{
+  "eval_id": 1,
+  "configuration": "with_skill",
+  "expectations": [
+    {"text": "Identifica ao menos 4 divergências factuais concretas entre os dois documentos (preços por faixa, taxa de implantação, desconto anual, regra de cancelamento, prazo de implantação, suporte telefônico)", "passed": true, "evidence": "Tabela comparativa lista divergências em: até 500 alunos, 501-1500, acima de 1500, taxa de implantação, desconto pagamento anual, cancelamento, prazo de implantação, suporte (8+ itens)"},
+    {"text": "Marca as divergências como CONFLITO/CONFLITANTE de forma explícita", "passed": true, "evidence": "'Status de cada fato acima: CONFLITANTE.'; 'Isso não é duplicação — é CONFLITO'"},
+    {"text": "NÃO escolhe sozinho qual versão é a verdadeira — encaminha a decisão para validação humana", "passed": true, "evidence": "'Não usar nenhum dos dois documentos... até a validação humana.'; 'Levar às duas versões para o dono comercial da conta Gennera'"},
+    {"text": "Indica qual documento deveria ser a fonte canônica única das condições comerciais Gennera", "passed": true, "evidence": "'Depois da validação humana: uma única fonte canônica passa a existir; a outra vira ARCHIVE'; ambos os documentos são recomendados para migrar/consolidar em 03_Gennera com nomenclatura de marca alinhada"},
+    {"text": "Aponta que documento comercial da Gennera não pertence à pasta 00_Governanca_e_Arquitetura", "passed": true, "evidence": "'este documento é conteúdo comercial específico da marca Gennera... mas está guardado em 00_Governanca_e_Arquitetura. Isso é vazamento de conhecimento de marca'"},
+    {"text": "Recomenda ARCHIVE em vez de exclusão destrutiva do documento substituído", "passed": true, "evidence": "'a outra vira ARCHIVE (nunca deletar) com uma nota indicando qual documento a substituiu'"},
+    {"text": "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'", "passed": true, "evidence": "Marca Eco Clear não é citada neste relatório (caso é sobre Gennera); nenhuma ocorrência de 'EcoClear'"}
+  ],
+  "summary": {"passed": 7, "total": 7, "pass_rate": 1.0}
+}

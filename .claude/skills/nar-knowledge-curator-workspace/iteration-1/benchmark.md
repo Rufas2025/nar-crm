@@ -1,7 +1,7 @@
 # Skill Benchmark: nar-knowledge-curator
 
 **Model**: <model-name>
-**Date**: 2026-08-08T19:32:45Z
+**Date**: 2026-08-08T20:06:53Z
 **Evals**: 0, 1, 2, 3, 4 (3 runs each per configuration)
 
 ## Summary

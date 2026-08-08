@@ -1,0 +1,15 @@
+{
+  "eval_id": 2,
+  "configuration": "with_skill",
+  "expectations": [
+    {"text": "Mantém em SYSTEM apenas identidade, tom de voz global, classificação de intenção, roteamento e governança/LGPD", "passed": true, "evidence": "'CONTEÚDO A MANTER (no SYSTEM do orquestrador, após split)' lista IDENTIDADE, TOM DE VOZ, COMO CLASSIFICAR A INTENÇÃO, escalonamento, GOVERNANÇA E LGPD, mais duas exceções justificadas (FAQ institucional 'empresa só' e regra comercial global de alçada) — não inclui catálogo/objeções/agendamento"},
+    {"text": "Move os catálogos por marca (EduInfo, Gennera, Eco Clear, Educbank, Vibe Flow Educacional) para RAG ou para os respectivos subagentes, fora do SYSTEM", "passed": true, "evidence": "SPLIT MAP move catálogo/objeções de todas as 5 marcas para documentos RAG específicos de cada subagente (ex.: 'EduInfo (catálogo, objeções) -> EduInfo_Produtos_Objecoes -> EduInfo -> RAG')"},
+    {"text": "Move FAQ geral, objeções e canais/redes sociais para RAG, fora do SYSTEM", "passed": true, "evidence": "SPLIT MAP: FAQs não-institucionais e canais de cada marca movidos para RAG (ex.: 'FAQ Atendem qual região? -> NAR_ECO_Institucional_FAQ -> RAG'; canais de cada marca -> RAG)"},
+    {"text": "Move as regras de agendamento para o subagente Agenda", "passed": true, "evidence": "SPLIT MAP: 'REGRAS DE AGENDAMENTO (íntegra) -> Agenda_Regras_de_Agendamento -> Agenda -> WORKFLOW'"},
+    {"text": "Classifica a seção de integração Evolution GO/n8n/payload como WORKFLOW, não como RAG nem SYSTEM", "passed": true, "evidence": "SPLIT MAP: 'INTEGRAÇÃO OPERACIONAL (webhook, payload, retry) -> NAR_ECO_Integracao_Evolution_n8n -> NAR ECO / infra -> WORKFLOW'"},
+    {"text": "Não recomenda indexar o system prompt em si como conhecimento factual no RAG", "passed": true, "evidence": "Nenhuma recomendação no relatório sugere indexar o próprio system prompt como RAG; o documento original é destinado a ARCHIVE, não a RAG"},
+    {"text": "A recomendação resulta em redução substancial do system prompt (a maior parte dos blocos sai de SYSTEM)", "passed": true, "evidence": "SPLIT MAP mostra apenas 6 das ~20 seções/linhas de origem permanecendo em SYSTEM; texto qualitativo: 'a maior parte do conteúdo do documento não sobrevive à pergunta 1' — sem percentual numérico de redução, apenas descrição qualitativa e a proporção visível na tabela"},
+    {"text": "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'", "passed": true, "evidence": "'Eco Clear (programa, case Rede Semear)' e 'Eco Clear' na SPLIT MAP — sempre em duas palavras, nenhuma ocorrência de 'EcoClear'"}
+  ],
+  "summary": {"passed": 8, "total": 8, "pass_rate": 1.0}
+}
