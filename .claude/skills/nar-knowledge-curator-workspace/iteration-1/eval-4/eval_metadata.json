@@ -1,0 +1,15 @@
+{
+  "eval_id": 4,
+  "eval_name": "contaminacao-entre-marcas",
+  "prompt": "Esse material de apoio comercial foi montado a partir de anotações de reunião e virou uma bagunça. Quero saber para onde vai cada pedaço dele. Arquivo: FIXTURES/caso5_material_apoio_comercial.md",
+  "assertions": [
+    "O posicionamento da EduInfo é atribuído ao subagente EduInfo",
+    "O link de apresentação da Gennera é atribuído ao subagente Gennera",
+    "O case da Rede Semear é atribuído ao subagente Eco Clear",
+    "A regra comercial de aprovação de proposta é atribuída ao orquestrador NAR ECO como regra global",
+    "As regras de reunião de diagnóstico/proposta e cancelamento são atribuídas ao subagente Agenda",
+    "Nenhuma informação de uma marca é atribuída a outra marca (zero contaminação cruzada)",
+    "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'",
+    "Não inventa fatos ausentes da fixture"
+  ]
+}

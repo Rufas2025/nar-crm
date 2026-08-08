@@ -1,0 +1,15 @@
+{
+  "eval_id": 0,
+  "eval_name": "escopo-misturado-split",
+  "prompt": "Dá uma olhada nesse documento da pasta 00_Governanca_e_Arquitetura, é o playbook omnichannel do NAR ECO. Quero saber se ele está no lugar certo ou se tem conteúdo ali que deveria estar com outro agente do ecossistema. Arquivo: FIXTURES/caso1_playbook_omnichannel.md",
+  "assertions": [
+    "A decisão principal é SPLIT (não KEEP nem apenas MOVE)",
+    "O bloco de posicionamento/objeções da EduInfo é atribuído ao subagente EduInfo, não ao orquestrador NAR ECO",
+    "As regras de demonstração (dias, qualificação, reagendamento, confirmação) são atribuídas ao subagente Agenda",
+    "As regras globais de atendimento (identificação da rede, LGPD, escalonamento) permanecem no orquestrador NAR ECO",
+    "Produz um SPLIT MAP explícito ligando seção de origem a documento/agente/camada de destino",
+    "Não inventa nenhum fato ausente da fixture (nomes de responsáveis, URLs, preços)",
+    "O relatório contém os campos obrigatórios: DECISÃO, OWNER ALVO, SYSTEM, RAG, DEPENDÊNCIAS, PRÓXIMA AÇÃO",
+    "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'"
+  ]
+}

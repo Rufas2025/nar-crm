@@ -1,0 +1,14 @@
+{
+  "eval_id": 1,
+  "eval_name": "conflito-comercial-gennera",
+  "prompt": "Encontrei esses dois documentos com informação comercial da Gennera e os números não batem entre eles. Me ajuda a entender o que fazer com isso. Arquivos: FIXTURES/caso2a_gennera_condicoes_comerciais.md e FIXTURES/caso2b_gennera_tabela_comercial_2025.md",
+  "assertions": [
+    "Identifica ao menos 4 divergências factuais concretas entre os dois documentos (preços por faixa, taxa de implantação, desconto anual, regra de cancelamento, prazo de implantação, suporte telefônico)",
+    "Marca as divergências como CONFLITO/CONFLITANTE de forma explícita",
+    "NÃO escolhe sozinho qual versão é a verdadeira — encaminha a decisão para validação humana",
+    "Indica qual documento deveria ser a fonte canônica única das condições comerciais Gennera",
+    "Aponta que documento comercial da Gennera não pertence à pasta 00_Governanca_e_Arquitetura",
+    "Recomenda ARCHIVE em vez de exclusão destrutiva do documento substituído",
+    "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'"
+  ]
+}

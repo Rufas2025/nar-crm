@@ -1,0 +1,15 @@
+{
+  "eval_id": 2,
+  "eval_name": "master-prompt-inchado",
+  "prompt": "Esse é o prompt que a Nathalia usa hoje como system prompt. Ele está gigante e o agente ficou lento e confuso, misturando marcas nas respostas. Me ajuda a entender o que realmente precisa continuar no system prompt e o que deveria sair. Arquivo: FIXTURES/caso3_base_de_prompt_do_agente.md",
+  "assertions": [
+    "Mantém em SYSTEM apenas identidade, tom de voz global, classificação de intenção, roteamento e governança/LGPD",
+    "Move os catálogos por marca (EduInfo, Gennera, Eco Clear, Educbank, Vibe Flow Educacional) para RAG ou para os respectivos subagentes, fora do SYSTEM",
+    "Move FAQ geral, objeções e canais/redes sociais para RAG, fora do SYSTEM",
+    "Move as regras de agendamento para o subagente Agenda",
+    "Classifica a seção de integração Evolution GO/n8n/payload como WORKFLOW, não como RAG nem SYSTEM",
+    "Não recomenda indexar o system prompt em si como conhecimento factual no RAG",
+    "A recomendação resulta em redução substancial do system prompt (a maior parte dos blocos sai de SYSTEM)",
+    "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'"
+  ]
+}

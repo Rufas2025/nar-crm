@@ -1,0 +1,15 @@
+{
+  "eval_id": 3,
+  "eval_name": "governanca-limpa-keep",
+  "prompt": "Revisa esse índice mestre da base de conhecimento pra mim e me diz se precisa de algum ajuste. Arquivo: FIXTURES/caso4_indice_mestre.md",
+  "assertions": [
+    "A decisão é KEEP",
+    "Não recomenda SPLIT nem REWRITE do documento",
+    "Não propõe renomear o documento",
+    "SYSTEM: NÃO",
+    "RAG: NÃO",
+    "Classifica a camada como REFERENCE",
+    "Não inventa problemas nem gera trabalho de reestruturação sem ganho arquitetural nomeado",
+    "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'"
+  ]
+}
