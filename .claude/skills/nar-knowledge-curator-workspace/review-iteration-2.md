@@ -203,7 +203,7 @@ Commits subsequentes de evidência de teste (execuções de regressão e grading
 
 ## 14. Caminho do pacote `.skill`
 
-`.claude/skills/nar-knowledge-curator-workspace/dist/nar-knowledge-curator.skill`
+`.claude/skills/nar-knowledge-curator-workspace/package/nar-knowledge-curator.skill`
 
 Empacotado a partir de `.claude/skills/nar-knowledge-curator/` (SKILL.md + references/ + assets/;
 evals/ e fixtures/ excluídos do pacote por design do empacotador). **Não instalado** — aguardando
