@@ -1,0 +1,100 @@
+{
+  "skill_name": "nar-knowledge-curator",
+  "evals": [
+    {
+      "id": 0,
+      "name": "escopo-misturado-split",
+      "prompt": "Dá uma olhada nesse documento da pasta 00_Governanca_e_Arquitetura, é o playbook omnichannel do NAR ECO. Quero saber se ele está no lugar certo ou se tem conteúdo ali que deveria estar com outro agente do ecossistema. Arquivo: FIXTURES/caso1_playbook_omnichannel.md",
+      "expected_output": "Relatório de curadoria com decisão SPLIT: regras globais ficam no orquestrador NAR ECO, bloco EduInfo vai para o subagente EduInfo, regras de demonstração vão para o subagente Agenda. Deve incluir SPLIT MAP.",
+      "files": [
+        "caso1_playbook_omnichannel.md"
+      ],
+      "assertions": [
+        "A decisão principal é SPLIT (não KEEP nem apenas MOVE)",
+        "O bloco de posicionamento/objeções da EduInfo é atribuído ao subagente EduInfo, não ao orquestrador NAR ECO",
+        "As regras de demonstração (dias, qualificação, reagendamento, confirmação) são atribuídas ao subagente Agenda",
+        "As regras globais de atendimento (identificação da rede, LGPD, escalonamento) permanecem no orquestrador NAR ECO",
+        "Produz um SPLIT MAP explícito ligando seção de origem a documento/agente/camada de destino",
+        "Não inventa nenhum fato ausente da fixture (nomes de responsáveis, URLs, preços)",
+        "O relatório contém os campos obrigatórios: DECISÃO, OWNER ALVO, SYSTEM, RAG, DEPENDÊNCIAS, PRÓXIMA AÇÃO",
+        "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "conflito-comercial-gennera",
+      "prompt": "Encontrei esses dois documentos com informação comercial da Gennera e os números não batem entre eles. Me ajuda a entender o que fazer com isso. Arquivos: FIXTURES/caso2a_gennera_condicoes_comerciais.md e FIXTURES/caso2b_gennera_tabela_comercial_2025.md",
+      "expected_output": "Deve identificar os conflitos factuais (preços, taxa de implantação, desconto, multa de cancelamento, prazo de implantação, suporte), marcar como CONFLITANTE e encaminhar para validação humana SEM escolher sozinho qual versão vale. Deve indicar fonte canônica única e que o documento da Gennera não deveria estar na pasta de governança.",
+      "files": [
+        "caso2a_gennera_condicoes_comerciais.md",
+        "caso2b_gennera_tabela_comercial_2025.md"
+      ],
+      "assertions": [
+        "Identifica ao menos 4 divergências factuais concretas entre os dois documentos (preços por faixa, taxa de implantação, desconto anual, regra de cancelamento, prazo de implantação, suporte telefônico)",
+        "Marca as divergências como CONFLITO/CONFLITANTE de forma explícita",
+        "NÃO escolhe sozinho qual versão é a verdadeira — encaminha a decisão para validação humana",
+        "Indica qual documento deveria ser a fonte canônica única das condições comerciais Gennera",
+        "Aponta que documento comercial da Gennera não pertence à pasta 00_Governanca_e_Arquitetura",
+        "Recomenda ARCHIVE em vez de exclusão destrutiva do documento substituído",
+        "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "master-prompt-inchado",
+      "prompt": "Esse é o prompt que a Nathalia usa hoje como system prompt. Ele está gigante e o agente ficou lento e confuso, misturando marcas nas respostas. Me ajuda a entender o que realmente precisa continuar no system prompt e o que deveria sair. Arquivo: FIXTURES/caso3_base_de_prompt_do_agente.md",
+      "expected_output": "Deve manter em SYSTEM apenas identidade, tom global, classificação de intenção, roteamento e governança. Catálogos por marca, FAQ, objeções, canais e cases vão para RAG/subagentes de marca; regras de agendamento vão para Agenda; integração Evolution GO/n8n vai para WORKFLOW.",
+      "files": [
+        "caso3_base_de_prompt_do_agente.md"
+      ],
+      "assertions": [
+        "Mantém em SYSTEM apenas identidade, tom de voz global, classificação de intenção, roteamento e governança/LGPD",
+        "Move os catálogos por marca (EduInfo, Gennera, Eco Clear, Educbank, Vibe Flow Educacional) para RAG ou para os respectivos subagentes, fora do SYSTEM",
+        "Move FAQ geral, objeções e canais/redes sociais para RAG, fora do SYSTEM",
+        "Move as regras de agendamento para o subagente Agenda",
+        "Classifica a seção de integração Evolution GO/n8n/payload como WORKFLOW, não como RAG nem SYSTEM",
+        "Não recomenda indexar o system prompt em si como conhecimento factual no RAG",
+        "A recomendação resulta em redução substancial do system prompt (a maior parte dos blocos sai de SYSTEM)",
+        "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "governanca-limpa-keep",
+      "prompt": "Revisa esse índice mestre da base de conhecimento pra mim e me diz se precisa de algum ajuste. Arquivo: FIXTURES/caso4_indice_mestre.md",
+      "expected_output": "Controle negativo. Documento bem escopado, no dono e camada corretos. Decisão deve ser KEEP, sem SPLIT/REWRITE/renomeação. SYSTEM: NÃO, RAG: NÃO, camada REFERENCE.",
+      "files": [
+        "caso4_indice_mestre.md"
+      ],
+      "assertions": [
+        "A decisão é KEEP",
+        "Não recomenda SPLIT nem REWRITE do documento",
+        "Não propõe renomear o documento",
+        "SYSTEM: NÃO",
+        "RAG: NÃO",
+        "Classifica a camada como REFERENCE",
+        "Não inventa problemas nem gera trabalho de reestruturação sem ganho arquitetural nomeado",
+        "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "contaminacao-entre-marcas",
+      "prompt": "Esse material de apoio comercial foi montado a partir de anotações de reunião e virou uma bagunça. Quero saber para onde vai cada pedaço dele. Arquivo: FIXTURES/caso5_material_apoio_comercial.md",
+      "expected_output": "SPLIT sem contaminação cruzada: posicionamento EduInfo -> EduInfo; link Gennera -> Gennera; case -> Eco Clear (grafia em duas palavras); regra comercial global -> NAR ECO/Nathalia; agendamento -> Agenda.",
+      "files": [
+        "caso5_material_apoio_comercial.md"
+      ],
+      "assertions": [
+        "O posicionamento da EduInfo é atribuído ao subagente EduInfo",
+        "O link de apresentação da Gennera é atribuído ao subagente Gennera",
+        "O case da Rede Semear é atribuído ao subagente Eco Clear",
+        "A regra comercial de aprovação de proposta é atribuída ao orquestrador NAR ECO como regra global",
+        "As regras de reunião de diagnóstico/proposta e cancelamento são atribuídas ao subagente Agenda",
+        "Nenhuma informação de uma marca é atribuída a outra marca (zero contaminação cruzada)",
+        "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'",
+        "Não inventa fatos ausentes da fixture"
+      ]
+    }
+  ]
+}
