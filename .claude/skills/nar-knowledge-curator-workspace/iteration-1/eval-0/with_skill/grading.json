@@ -1,0 +1,49 @@
+{
+  "eval_id": 0,
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "A decisão principal é SPLIT (não KEEP nem apenas MOVE)",
+      "passed": true,
+      "evidence": "Campo explícito: 'DECISÃO / SPLIT'. Abertura: 'A decisão é **SPLIT**, não MOVE — parte do documento fica onde está.'"
+    },
+    {
+      "text": "O bloco de posicionamento/objeções da EduInfo é atribuído ao subagente EduInfo, não ao orquestrador NAR ECO",
+      "passed": true,
+      "evidence": "'Seção 3 integral -> subagente EduInfo' e no SPLIT MAP: 'Posicionamento, valor e módulos EduInfo (3) -> EduInfo_Identidade_e_Posicionamento -> EduInfo -> RAG'; 'Diferenciais e objeções EduInfo (3) -> EduInfo_FAQ_e_Objecoes -> EduInfo -> RAG'"
+    },
+    {
+      "text": "As regras de demonstração (dias, qualificação, reagendamento, confirmação) são atribuídas ao subagente Agenda",
+      "passed": true,
+      "evidence": "SPLIT MAP: 'Janelas, blocos e link de agendamento (4) -> Agenda_Regras_de_Demonstracao -> Agenda -> WORKFLOW'; 'Reagendamento, cancelamento e no-show (4) -> Agenda -> WORKFLOW'; 'Confirmação automática 24h/1h e liberação (4) -> Agenda -> WORKFLOW'"
+    },
+    {
+      "text": "As regras globais de atendimento (identificação da rede, LGPD, escalonamento) permanecem no orquestrador NAR ECO",
+      "passed": true,
+      "evidence": "'CONTEÚDO A MANTER — Seção 1 — princípios de atendimento omnichannel (identificação do interlocutor, SLA de 15 min, ... LGPD em pré-venda, escalonamento para humano...)' e SPLIT MAP aponta seções 1, 2 e 5 para 'NAR ECO (orquestrador) -> SYSTEM'"
+    },
+    {
+      "text": "Produz um SPLIT MAP explícito ligando seção de origem a documento/agente/camada de destino",
+      "passed": true,
+      "evidence": "Bloco 'SPLIT MAP' com 12 linhas no formato 'seção de origem -> documento destino -> agente -> camada (SYSTEM/RAG/WORKFLOW)', encerrado por 'Nenhuma seção do documento de origem ficou sem destino.'"
+    },
+    {
+      "text": "Não inventa nenhum fato ausente da fixture (nomes de responsáveis, URLs, preços)",
+      "passed": true,
+      "evidence": "Só cita dados literais da fixture ('eduinfo.com.br' e '@eduinfo.oficial'), e declara: 'Não inventei preços, URLs ou responsáveis além dos que o documento traz literalmente'. Lacunas ficam marcadas como DESCONHECIDO/INFERIDO."
+    },
+    {
+      "text": "O relatório contém os campos obrigatórios: DECISÃO, OWNER ALVO, SYSTEM, RAG, DEPENDÊNCIAS, PRÓXIMA AÇÃO",
+      "passed": true,
+      "evidence": "Todos presentes no bloco de relatório: 'DECISÃO', 'OWNER ALVO', 'SYSTEM: SIM — ...', 'RAG: SIM — ...', 'DEPENDÊNCIAS', 'PRÓXIMA AÇÃO'"
+    },
+    {
+      "text": "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'",
+      "passed": true,
+      "evidence": "Nenhuma ocorrência da grafia 'EcoClear' no relatório (a marca não é citada nominalmente neste caso)."
+    }
+  ],
+  "passed_count": 8,
+  "total_count": 8,
+  "pass_rate": 1.0
+}
