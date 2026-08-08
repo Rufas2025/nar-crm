@@ -1,0 +1,2775 @@
+{
+  "name": "RAG NAR - LAB V4",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# RAG NAR - LAB V4\n\nWorkflow de ingestao da Base de Conhecimento NAR ECO.\n\nPastas indexadas:\n01 Base de Conhecimento\n  01_01 Quem e a NAR ECO (institucional)\n  01_02 Canais Oficiais NAR ECO (institucional)\n02 Institucional e Posicionamento\n03 Diagnostico e Roteamento\n04 FAQ e Objecoes\n04 Tom de Voz e Cultura\n05 Agenda e Regras Comerciais\n06 Materiais para Envio\n07 Produtos e Solucoes\n\nPastas NAO indexadas:\n00 Governanca e Arquitetura (removida)\n08 Testes e Validacao (removida)\n\nTabela: nar_rag | Query: match_documents\nactive: false. Nao publicar sem revisao.",
+        "height": 616,
+        "width": 972,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "88f43432-6349-491d-8016-30f280609fcb",
+      "name": "NOTA - RAG NAR LAB"
+    },
+    {
+      "parameters": {
+        "content": "## Gatilhos de Monitoramento - Base NAR ECO\n\n10 pastas, 2 gatilhos cada (criado/atualizado), cada par marca a categoria da subpasta antes de seguir para o processamento compartilhado.",
+        "height": 2400,
+        "width": 848,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1056,
+        720
+      ],
+      "id": "420049e2-4aab-4392-98bf-9d902d47df79",
+      "name": "NOTA - Gatilhos por Subpasta"
+    },
+    {
+      "parameters": {
+        "content": "## Extracao, limpeza, categorizacao e indexacao\n\nLe o arquivo, extrai o texto (PDF/XLSX/Google Docs/DOCX), limpa o conteudo, usa IA para gerar metadados (categoria_principal, publico_alvo, palavras_chave) e insere no Supabase Vector Store (tabela nar_rag), preservando categoria_pasta e pasta_origem.",
+        "height": 1620,
+        "width": 1640,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1984,
+        704
+      ],
+      "id": "92de48fc-4e70-4d8c-a3a2-435f79878064",
+      "name": "NOTA - Processamento Compartilhado"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "00000027-aaaa-4aaa-8aaa-000000000027",
+              "name": "file_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "00000028-aaaa-4aaa-8aaa-000000000028",
+              "name": "file_type",
+              "value": "={{ $json.mimeType }}",
+              "type": "string"
+            },
+            {
+              "id": "00000029-aaaa-4aaa-8aaa-000000000029",
+              "name": "originalFilename",
+              "value": "={{ $json.originalFilename }}",
+              "type": "string"
+            },
+            {
+              "id": "0000002a-aaaa-4aaa-8aaa-00000000002a",
+              "name": "sha1Checksum",
+              "value": "={{ $json.sha1Checksum }}",
+              "type": "string"
+            },
+            {
+              "id": "0000002b-aaaa-4aaa-8aaa-00000000002b",
+              "name": "categoria_pasta",
+              "value": "={{ $json.categoria_pasta }}",
+              "type": "string"
+            },
+            {
+              "id": "0000002c-aaaa-4aaa-8aaa-00000000002c",
+              "name": "pasta_origem",
+              "value": "={{ $json.pasta_origem }}",
+              "type": "string"
+            },
+            {
+              "id": "0000002d-aaaa-4aaa-8aaa-00000000002d",
+              "name": "brand",
+              "value": "={{ $json.brand || 'nar_eco' }}",
+              "type": "string"
+            },
+            {
+              "id": "0000002e-aaaa-4aaa-8aaa-00000000002e",
+              "name": "status",
+              "value": "={{ $json.status || 'approved' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2032,
+        1424
+      ],
+      "id": "05c618cc-80ac-4d12-b785-b44e7a364416",
+      "name": "Set File ID"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "tableId": "nar_rag",
+        "filterType": "string",
+        "filterString": "=metadata->>file_id=like.*{{ $json.file_id }}*"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2224,
+        1424
+      ],
+      "id": "c460f3e1-162a-401e-9211-fe7c1100c09a",
+      "name": "Deleta linhas antigas do documento",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "y3t9gxWewz3ggKTf",
+          "name": "Supabase NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return $items(\"Set File ID\").map(item => {\n  return {\n    json: {\n      file_id: item.json.file_id,\n      file_type: item.json.file_type,\n      categoria_pasta: item.json.categoria_pasta,\n      pasta_origem: item.json.pasta_origem,\n      brand: item.json.brand,\n      status: item.json.status\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2432,
+        1424
+      ],
+      "id": "bfa7e19b-bc42-4f53-a7f0-ee9d0798dd06",
+      "name": "Retorna ID do arquivo"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2624,
+        1424
+      ],
+      "id": "485f6de8-ff1b-49a7-b050-0b63033cbb6c",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.file_id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "text/plain"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2832,
+        1440
+      ],
+      "id": "cfcb13a7-2fed-4956-887c-ca2ed2003c1f",
+      "name": "Download File",
+      "executeOnce": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.file_type }}",
+                    "rightValue": "application/pdf",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "00000032-aaaa-4aaa-8aaa-000000000032"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "00000033-aaaa-4aaa-8aaa-000000000033",
+                    "leftValue": "={{ $json.file_type }}",
+                    "rightValue": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "00000034-aaaa-4aaa-8aaa-000000000034",
+                    "leftValue": "={{ $json.file_type }}",
+                    "rightValue": "application/vnd.google-apps.document",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "00000035-aaaa-4aaa-8aaa-000000000035",
+                    "leftValue": "={{ $json.file_type }}",
+                    "rightValue": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": 2
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        3024,
+        1408
+      ],
+      "id": "6c713fd8-8325-4075-8870-3776038f060b",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        3392,
+        1296
+      ],
+      "id": "57b01841-d143-4e8a-a880-3da9078c7f20",
+      "name": "Extract PDF Text"
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        3232,
+        1440
+      ],
+      "id": "0451c130-3dd4-4cb5-9aa0-fa1d86cc7313",
+      "name": "Extract from Excel"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        3392,
+        1440
+      ],
+      "id": "2241f370-4ffa-4cc1-a383-50ffdadac981",
+      "name": "Aggregate2"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "concatenate",
+              "field": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1,
+      "position": [
+        3552,
+        1440
+      ],
+      "id": "ecb8c849-821b-4f6c-bdcd-092593b4b846",
+      "name": "Summarize1"
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        3392,
+        1616
+      ],
+      "id": "3c0b9888-54fc-4d4b-ac65-e3b46bfa1e15",
+      "name": "Extract Document Text",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        3344,
+        1776
+      ],
+      "id": "20b63dbc-417b-4ff4-bbf9-a5aca68d722e",
+      "name": "Extract from File2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst processedItems = [];\n\nfor (const item of items) {\n  let text = item.json.text || item.json.data;\n\n  if (typeof text === 'string' && text.length > 0) {\n    text = text.replace(/_{5,}/g, '');\n    text = text.replace(/^[ \\t]+/gm, '');\n    text = text.replace(/(\\r\\n|\\n){3,}/g, '\\n\\n');\n    text = text.replace(/\\u0000/g, '');\n    // Remove sintaxe de marcador [ASSET:ID] do texto ANTES de indexar no\n    // Supabase. Se um documento fonte contiver esse padrao literal (ex.: um\n    // catalogo de materiais com os marcadores escritos por engano), o chunk\n    // indexado ensina o Agent a reproduzir a sintaxe do marcador quando esse\n    // trecho e recuperado como contexto - causa raiz confirmada de respostas\n    // com mais de um [ASSET:...] na mesma mensagem.\n    text = text.replace(/\\[\\s*ASSET\\s*:\\s*[A-Za-z0-9_.-]+\\s*\\]/g, '');\n    text = text.trim();\n\n    item.json.data = text;\n  }\n\n  processedItems.push(item);\n}\n\nreturn processedItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3744,
+        1440
+      ],
+      "id": "bbe74992-a5ce-48c3-ab3e-6021aebd2ff6",
+      "name": "Contexto LIMPO"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.data || $json.text}}",
+        "options": {
+          "systemMessage": "Voce e um assistente de IA especialista em processar e catalogar a Base de Conhecimento da NAR ECO Solucoes, um hub de solucoes para instituicoes de ensino (EduInfo, Gennera, Eco Clear, Educbank, Vibe Flow Educacional e Programas de Desenvolvimento).\n\nSua funcao e analisar um trecho de texto extraido de um documento dessa base e retornar metadados em um formato JSON estruturado.\n\nO texto pode abordar diversos topicos como: governanca e arquitetura da base de conhecimento, descricao institucional e posicionamento, diagnostico e roteamento de leads, descricao de produtos e solucoes, tom de voz e cultura da marca, perguntas frequentes e objecoes comerciais, regras de agenda e regras comerciais, materiais para envio a leads/escolas, base de conhecimento geral ou conteudo de testes e validacao.\n\nAnalise o texto fornecido pelo usuario e retorne um unico objeto JSON com a seguinte estrutura:\n{\n  \"categoria_principal\": \"string (ex: Governanca e Arquitetura, Base de Conhecimento, Institucional e Posicionamento, Diagnostico e Roteamento, FAQ e Objecoes, Tom de Voz e Cultura, Agenda e Regras Comerciais, Materiais para Envio, Produtos e Solucoes, Testes e Validacao)\",\n  \"publico_alvo\": \"string (ex: Escolas e Leads, Equipe Comercial NAR ECO, Equipe Interna, Parceiros)\",\n  \"palavras_chave\": \"array de strings (ex: ['EduInfo', 'Gennera', 'mensalidade', 'agenda comercial'])\"\n}\n\nAnalise o texto a seguir e retorne APENAS o objeto JSON."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        3904,
+        1440
+      ],
+      "id": "32b4b26d-1db0-4b0e-9d67-70f5329c3a1c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        3904,
+        1664
+      ],
+      "id": "132117dd-e030-4b10-8758-5c75ae6d5534",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "KtLk64shL8kcDYkL",
+          "name": "OpenAI NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pega o item vindo do nÃ³ da OpenAI\nconst item = $input.first();\n\n// Pega a string de saÃ­da que contÃ©m o JSON\nlet jsonString = item.json.output;\n\n// 1. Remove o \"envelope\" do Markdown (```json e ```)\n// A expressÃ£o regular procura por ```json no inÃ­cio ou ``` no final e substitui por nada.\njsonString = jsonString.replace(/```json\\n?|\\n?```/g, '');\n\n// 2. Converte a string de texto limpa em um objeto JSON real\nconst jsonObject = JSON.parse(jsonString);\n\n// Retorna o objeto JSON limpo para o prÃ³ximo nÃ³\nreturn [ { json: jsonObject } ];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4272,
+        1440
+      ],
+      "id": "6b039dbb-82b2-47de-b19f-3d929303c2f8",
+      "name": "Transforma em JSON"
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $('Contexto LIMPO').first().json.data || $('Contexto LIMPO').item.json.text}}",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "=file_id",
+                "value": "={{ $('Set File ID').first().json.file_id }}"
+              },
+              {
+                "name": "=categoria_principal",
+                "value": "={{ $json.categoria_principal }}"
+              },
+              {
+                "name": "=publico_alvo",
+                "value": "={{ $json.publico_alvo }}"
+              },
+              {
+                "name": "=palavras_chave",
+                "value": "={{ $json.palavras_chave }}"
+              },
+              {
+                "name": "=categoria_pasta",
+                "value": "={{ $('Set File ID').first().json.categoria_pasta }}"
+              },
+              {
+                "name": "=pasta_origem",
+                "value": "={{ $('Set File ID').first().json.pasta_origem }}"
+              },
+              {
+                "name": "=brand",
+                "value": "={{ $('Set File ID').first().json.brand }}"
+              },
+              {
+                "name": "=status",
+                "value": "={{ $('Set File ID').first().json.status }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        4880,
+        1792
+      ],
+      "id": "ba56173c-2562-4f66-879e-5d2aedc895e5",
+      "name": "Default Data Loader2"
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-small",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1,
+      "position": [
+        4736,
+        1792
+      ],
+      "id": "c02d4f8f-5885-4705-9887-5aa426984ba6",
+      "name": "Embeddings OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "KtLk64shL8kcDYkL",
+          "name": "OpenAI NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.textSplitterCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        4880,
+        2032
+      ],
+      "id": "5ea21cf0-9771-4f22-9218-0c6df637efb9",
+      "name": "Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "nar_rag",
+          "mode": "list",
+          "cachedResultName": "nar_rag"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        4912,
+        1424
+      ],
+      "id": "e833e239-3baa-4470-9b47-97fa0be959d2",
+      "name": "Insert into Consultar Base Oficial NAR ECO",
+      "credentials": {
+        "supabaseApi": {
+          "id": "y3t9gxWewz3ggKTf",
+          "name": "Supabase NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1U_QZ-UVZufmI578jrGwwO8pqa_tNcOVs",
+          "mode": "list",
+          "cachedResultName": "01_Base_de_Conhecimento"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        944
+      ],
+      "id": "73b51047-2fd2-47fb-b8e8-f6557341c77a",
+      "name": "File Created - 01 Base de Conhecimento",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1U_QZ-UVZufmI578jrGwwO8pqa_tNcOVs",
+          "mode": "list",
+          "cachedResultName": "01_Base_de_Conhecimento"
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        1072
+      ],
+      "id": "3bc12d1d-a647-4bc4-a46d-d89353f74330",
+      "name": "File Updated - 01 Base de Conhecimento",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "96535291-79f0-4985-8fdb-dc48cae48d44",
+              "name": "categoria_pasta",
+              "value": "Base de Conhecimento",
+              "type": "string"
+            },
+            {
+              "id": "4f0ef88e-e5fe-44a2-a682-f634655856a0",
+              "name": "pasta_origem",
+              "value": "01_Base_de_Conhecimento",
+              "type": "string"
+            },
+            {
+              "id": "41dbfb82-0ede-4e9a-9ac1-d07e622a8512",
+              "name": "originalFilename",
+              "value": "={{ $json.originalFilename || $json.name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1712,
+        1024
+      ],
+      "id": "9560ccb2-ff6d-4da1-b201-b0b99a757307",
+      "name": "Categoria - 01 Base de Conhecimento"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        3200
+      ],
+      "id": "4a16dee5-0f27-4a66-9ef7-dc3f25ea162e",
+      "name": "Manual Trigger - 01 Base de Conhecimento"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "'1U_QZ-UVZufmI578jrGwwO8pqa_tNcOVs' in parents and trashed = false and mimeType != 'application/vnd.google-apps.folder'",
+        "returnAll": true,
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1488,
+        3200
+      ],
+      "id": "ed4400c6-6f0c-41ef-8282-489f5deafa4c",
+      "name": "List Files - 01 Base de Conhecimento",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1hkatahj55td6pSV09l9yxDQYwCotIV2I",
+          "mode": "list",
+          "cachedResultName": "02_Institucional_e_Posicionamento"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        1168
+      ],
+      "id": "2d1275d6-ea59-45b9-aa0f-037b23614051",
+      "name": "File Created - 02 Institucional e Posicionamento",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1hkatahj55td6pSV09l9yxDQYwCotIV2I",
+          "mode": "list",
+          "cachedResultName": "02_Institucional_e_Posicionamento"
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        1280
+      ],
+      "id": "303b04c3-66af-4a41-945f-487dcfa96606",
+      "name": "File Updated - 02 Institucional e Posicionamento",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b8e03319-9a75-4594-9621-feacbb4edb43",
+              "name": "categoria_pasta",
+              "value": "Institucional e Posicionamento",
+              "type": "string"
+            },
+            {
+              "id": "6306d960-fd62-41e5-b256-93fd9acac1ba",
+              "name": "pasta_origem",
+              "value": "02_Institucional_e_Posicionamento",
+              "type": "string"
+            },
+            {
+              "id": "9e3fa9b7-aaa7-458f-8d74-2b1a063a48fc",
+              "name": "originalFilename",
+              "value": "={{ $json.originalFilename || $json.name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1712,
+        1232
+      ],
+      "id": "938d03a6-f6fb-4cad-9817-60a3a118ef61",
+      "name": "Categoria - 02 Institucional e Posicionamento"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "searchMethod": "query",
+        "queryString": "'1hkatahj55td6pSV09l9yxDQYwCotIV2I' in parents and trashed = false and mimeType != 'application/vnd.google-apps.folder'",
+        "returnAll": true,
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1488,
+        3408
+      ],
+      "id": "e3e43139-2918-44e8-9c6e-4b67365388ff",
+      "name": "List Files - 02 Institucional e Posicionamento",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1VRZz0-jF5JBfy0gjTwRcEW6WlTiJrujJ",
+          "mode": "list",
+          "cachedResultName": "03_Diagnostico_e_Roteamento"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        1376
+      ],
+      "id": "63e51b63-4550-4dda-b23c-d1bad5e37a68",
+      "name": "File Created - 03 Diagnostico e Roteamento",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1VRZz0-jF5JBfy0gjTwRcEW6WlTiJrujJ",
+          "mode": "list",
+          "cachedResultName": "03_Diagnostico_e_Roteamento"
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        1472
+      ],
+      "id": "5a58780b-3a65-4525-abe3-1e03084062cc",
+      "name": "File Updated - 03 Diagnostico e Roteamento",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "351799fe-4b8b-4942-9faa-6f63149a0f18",
+              "name": "categoria_pasta",
+              "value": "Diagnostico e Roteamento",
+              "type": "string"
+            },
+            {
+              "id": "196d39d4-83cc-46e7-b95c-ce7836f1e83f",
+              "name": "pasta_origem",
+              "value": "03_Diagnostico_e_Roteamento",
+              "type": "string"
+            },
+            {
+              "id": "dc29b3f0-4856-4ba8-81c7-09531cfd5110",
+              "name": "originalFilename",
+              "value": "={{ $json.originalFilename || $json.name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1712,
+        1424
+      ],
+      "id": "1b0cb8cf-2cb8-42fc-ad74-d6cc0f6e5dc0",
+      "name": "Categoria - 03 Diagnostico e Roteamento"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "searchMethod": "query",
+        "queryString": "'1VRZz0-jF5JBfy0gjTwRcEW6WlTiJrujJ' in parents and trashed = false and mimeType != 'application/vnd.google-apps.folder'",
+        "returnAll": true,
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1488,
+        3632
+      ],
+      "id": "c0236bea-e6fa-4615-9f43-5fd9316db6a0",
+      "name": "List Files - 03 Diagnostico e Roteamento",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1biWKdeTvI66OuaP393oT7TsZvXjMPkrv",
+          "mode": "list",
+          "cachedResultName": "04_FAQ_e_Objecoes"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        1568
+      ],
+      "id": "74f7ec10-45b5-4e6b-8ec7-940ab81dfc9f",
+      "name": "File Created - 04a FAQ e Objecoes",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1biWKdeTvI66OuaP393oT7TsZvXjMPkrv",
+          "mode": "list",
+          "cachedResultName": "04_FAQ_e_Objecoes"
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        1680
+      ],
+      "id": "223c601c-d4f6-4745-a4f3-a625165ab444",
+      "name": "File Updated - 04a FAQ e Objecoes",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f6227e02-85bb-4418-8459-21794885eb74",
+              "name": "categoria_pasta",
+              "value": "FAQ e Objecoes",
+              "type": "string"
+            },
+            {
+              "id": "b3ed95e6-46e7-4d9d-b5bd-a833738be2aa",
+              "name": "pasta_origem",
+              "value": "04_FAQ_e_Objecoes",
+              "type": "string"
+            },
+            {
+              "id": "3d814827-d47d-4081-bf13-e73647f7bb1a",
+              "name": "originalFilename",
+              "value": "={{ $json.originalFilename || $json.name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1712,
+        1632
+      ],
+      "id": "e7729c64-559c-4994-8b71-2f38b1478907",
+      "name": "Categoria - 04a FAQ e Objecoes"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "searchMethod": "query",
+        "queryString": "'1biWKdeTvI66OuaP393oT7TsZvXjMPkrv' in parents and trashed = false and mimeType != 'application/vnd.google-apps.folder'",
+        "returnAll": true,
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1488,
+        3856
+      ],
+      "id": "b05ed058-1e3a-4060-8b01-87192b28b98c",
+      "name": "List Files - 04a FAQ e Objecoes",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1xKqk2OMvFrS4F9puhVTmyLgZUttINWIg",
+          "mode": "list",
+          "cachedResultName": "04_Tom_de_Voz_e_Cultura"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        896,
+        1712
+      ],
+      "id": "c9a6f22f-b595-4c00-ac9f-15250b8541af",
+      "name": "File Created - 04b Tom de Voz e Cultura",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1xKqk2OMvFrS4F9puhVTmyLgZUttINWIg",
+          "mode": "list",
+          "cachedResultName": "04_Tom_de_Voz_e_Cultura"
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        896,
+        1920
+      ],
+      "id": "8f8ec969-3a40-4aca-b086-8ab9fde97d4d",
+      "name": "File Updated - 04b Tom de Voz e Cultura",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "03575bb2-55d6-4d57-ad1c-a7ad2ed3f45b",
+              "name": "categoria_pasta",
+              "value": "Tom de Voz e Cultura",
+              "type": "string"
+            },
+            {
+              "id": "69ddc890-db04-4656-971a-473f76d79753",
+              "name": "pasta_origem",
+              "value": "04_Tom_de_Voz_e_Cultura",
+              "type": "string"
+            },
+            {
+              "id": "327273af-adb0-4efb-8f30-635517f859e2",
+              "name": "originalFilename",
+              "value": "={{ $json.originalFilename || $json.name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1712,
+        1824
+      ],
+      "id": "08a5f330-6e14-4987-9bc8-42d4b7779952",
+      "name": "Categoria - 04b Tom de Voz e Cultura"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "searchMethod": "query",
+        "queryString": "'1xKqk2OMvFrS4F9puhVTmyLgZUttINWIg' in parents and trashed = false and mimeType != 'application/vnd.google-apps.folder'",
+        "returnAll": true,
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1488,
+        4080
+      ],
+      "id": "b5a2fd80-577a-45fb-82ba-58a653178082",
+      "name": "List Files - 04b Tom de Voz e Cultura",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1eqS4_3DwlQHEuKKgp3D-Y_kc-iZejmgf",
+          "mode": "list",
+          "cachedResultName": "05_Agenda_e_Regras_Comerciais"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        1968
+      ],
+      "id": "0d02ca48-aecc-46c6-93aa-6dcba0b1553b",
+      "name": "File Created - 05 Agenda e Regras Comerciais",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1eqS4_3DwlQHEuKKgp3D-Y_kc-iZejmgf",
+          "mode": "list",
+          "cachedResultName": "05_Agenda_e_Regras_Comerciais"
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        2080
+      ],
+      "id": "3b2d8315-eb2b-4368-a94f-7ae5416e5e31",
+      "name": "File Updated - 05 Agenda e Regras Comerciais",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9e173bed-14d9-43b6-9f02-f22eb65e6152",
+              "name": "categoria_pasta",
+              "value": "Agenda e Regras Comerciais",
+              "type": "string"
+            },
+            {
+              "id": "98c44983-eb23-42c6-abcc-2e8bf65429bc",
+              "name": "pasta_origem",
+              "value": "05_Agenda_e_Regras_Comerciais",
+              "type": "string"
+            },
+            {
+              "id": "897e7503-63f7-4bba-bd4c-205b0e239b66",
+              "name": "originalFilename",
+              "value": "={{ $json.originalFilename || $json.name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1712,
+        2032
+      ],
+      "id": "8c97d03e-8c3f-4afd-a768-daa1de8112fc",
+      "name": "Categoria - 05 Agenda e Regras Comerciais"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "searchMethod": "query",
+        "queryString": "'1eqS4_3DwlQHEuKKgp3D-Y_kc-iZejmgf' in parents and trashed = false and mimeType != 'application/vnd.google-apps.folder'",
+        "returnAll": true,
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1488,
+        4288
+      ],
+      "id": "09144563-d161-427c-ac61-33927366f278",
+      "name": "List Files - 05 Agenda e Regras Comerciais",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1xB0SFUF9kJT2TJ9uJnss4treie9xB5mF",
+          "mode": "list",
+          "cachedResultName": "06_Materiais_para_Envio"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        2208
+      ],
+      "id": "ad38123d-b4fd-4cba-83e5-4b2af06ebfd4",
+      "name": "File Created - 06 Materiais para Envio",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1xB0SFUF9kJT2TJ9uJnss4treie9xB5mF",
+          "mode": "list",
+          "cachedResultName": "06_Materiais_para_Envio"
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        1312,
+        2272
+      ],
+      "id": "eefa237b-9f69-4763-aadd-e2cce1aa392f",
+      "name": "File Updated - 06 Materiais para Envio",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cefc9a98-0923-422c-92ff-ff5fda46b665",
+              "name": "categoria_pasta",
+              "value": "Materiais para Envio",
+              "type": "string"
+            },
+            {
+              "id": "f8407a98-0223-4b31-a52b-fdcbbf777497",
+              "name": "pasta_origem",
+              "value": "06_Materiais_para_Envio",
+              "type": "string"
+            },
+            {
+              "id": "0761830a-833c-4ee9-9c4e-2b2c54e104fb",
+              "name": "originalFilename",
+              "value": "={{ $json.originalFilename || $json.name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1712,
+        2224
+      ],
+      "id": "7c995889-6cd2-4f93-b4f9-13961c692499",
+      "name": "Categoria - 06 Materiais para Envio"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "searchMethod": "query",
+        "queryString": "'1xB0SFUF9kJT2TJ9uJnss4treie9xB5mF' in parents and trashed = false and mimeType != 'application/vnd.google-apps.folder'",
+        "returnAll": true,
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1488,
+        4512
+      ],
+      "id": "5f8636ae-2dcd-4850-98b3-1aec4566974e",
+      "name": "List Files - 06 Materiais para Envio",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1EgbpF_9hcPAl-LE-yZbzS7_OkKlUqFrB",
+          "mode": "list",
+          "cachedResultName": "07_Produtos_e_Solucoes"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        1152,
+        2384
+      ],
+      "id": "c1f0378d-d3a7-4f81-9c29-38a1b83fc9aa",
+      "name": "File Created - 07 Produtos e Solucoes",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1EgbpF_9hcPAl-LE-yZbzS7_OkKlUqFrB",
+          "mode": "list",
+          "cachedResultName": "07_Produtos_e_Solucoes"
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        1152,
+        2560
+      ],
+      "id": "631ae981-5d6f-4714-9924-25129c9717ca",
+      "name": "File Updated - 07 Produtos e Solucoes",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "58231fdb-656e-40a4-96aa-fd1e8c621de1",
+              "name": "categoria_pasta",
+              "value": "Produtos e Solucoes",
+              "type": "string"
+            },
+            {
+              "id": "d71e4ae3-abf4-4d47-b339-4c819e77d8a7",
+              "name": "pasta_origem",
+              "value": "07_Produtos_e_Solucoes",
+              "type": "string"
+            },
+            {
+              "id": "91a3b0dd-dc5b-4e71-add9-45dca7e2a8c0",
+              "name": "originalFilename",
+              "value": "={{ $json.originalFilename || $json.name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1712,
+        2432
+      ],
+      "id": "f5437b9e-07ac-4c8d-ab16-a385b1847ca5",
+      "name": "Categoria - 07 Produtos e Solucoes"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "searchMethod": "query",
+        "queryString": "'1EgbpF_9hcPAl-LE-yZbzS7_OkKlUqFrB' in parents and trashed = false and mimeType != 'application/vnd.google-apps.folder'",
+        "returnAll": true,
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1488,
+        4736
+      ],
+      "id": "4213bfa2-b7c3-4e25-a50e-109b76bd11ae",
+      "name": "List Files - 07 Produtos e Solucoes",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Indexacao Manual em Lote (Backfill)\n\nNova branch manual, independente dos gatilhos File Created/File Updated.\n\nPara reindexar os arquivos ja existentes em uma subpasta: abra esta area e clique em \"Execute step\" no Manual Trigger da pasta desejada.\n\nNao altera os gatilhos automaticos, a tabela nar_rag, a query match_documents nem as credenciais.",
+        "height": 2400,
+        "width": 824,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        2720
+      ],
+      "id": "ad6a586e-8286-4fb6-ae38-c916cecd8240",
+      "name": "NOTA - Indexacao Manual em Lote"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1bEfDLrYTfkCzWKcQKUjHhf73A0cQwPLH",
+          "mode": "list",
+          "cachedResultName": "01_01_Quem_e_a_NAR_ECO",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1bEfDLrYTfkCzWKcQKUjHhf73A0cQwPLH"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        528
+      ],
+      "id": "348c3b69-1a95-458d-a0da-2043d94a8483",
+      "name": "File Created - 01_01 Quem e a NAR ECO",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1bEfDLrYTfkCzWKcQKUjHhf73A0cQwPLH",
+          "mode": "list",
+          "cachedResultName": "01_01_Quem_e_a_NAR_ECO",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1bEfDLrYTfkCzWKcQKUjHhf73A0cQwPLH"
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        784
+      ],
+      "id": "0ad57a9a-befe-4060-828b-c07a512a9f6f",
+      "name": "File Updated - 01_01 Quem e a NAR ECO",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e7c3be26-10e4-4e63-89a8-f81eb9770a8b",
+              "name": "categoria_pasta",
+              "value": "NAR ECO Institucional",
+              "type": "string"
+            },
+            {
+              "id": "5ce353fd-3dcb-44ff-b6c3-9aeb7b2fc47a",
+              "name": "pasta_origem",
+              "value": "01_01_Quem_e_a_NAR_ECO",
+              "type": "string"
+            },
+            {
+              "id": "b97bf992-d315-4e53-afaa-5e69d08f23c4",
+              "name": "originalFilename",
+              "value": "={{ $json.originalFilename || $json.name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        784,
+        800
+      ],
+      "id": "013574c8-5aeb-47af-9100-d817d0eaa8c8",
+      "name": "Categoria - 01_01 Quem e a NAR ECO"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "searchMethod": "query",
+        "queryString": "'1bEfDLrYTfkCzWKcQKUjHhf73A0cQwPLH' in parents and trashed = false and mimeType != 'application/vnd.google-apps.folder'",
+        "returnAll": true,
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1488,
+        2976
+      ],
+      "id": "3c9e3426-f4bf-47b2-956b-901f763bad49",
+      "name": "List Files - 01_01 Quem e a NAR ECO",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1mjsPD5V6wrZsWoyZqGECI0M2xYkie7VJ",
+          "mode": "list",
+          "cachedResultName": "01_02_Canais_Oficiais_NAR_ECO",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1mjsPD5V6wrZsWoyZqGECI0M2xYkie7VJ"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        1056
+      ],
+      "id": "0bfc761e-136e-44f7-855b-c67f9e3e12a0",
+      "name": "File Created - 01_02 Canais Oficiais NAR ECO",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1mjsPD5V6wrZsWoyZqGECI0M2xYkie7VJ",
+          "mode": "list",
+          "cachedResultName": "01_02_Canais_Oficiais_NAR_ECO",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1mjsPD5V6wrZsWoyZqGECI0M2xYkie7VJ"
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        1248
+      ],
+      "id": "1c302be0-af0f-4465-8674-5259c4614c5e",
+      "name": "File Updated - 01_02 Canais Oficiais NAR ECO",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e9bcbb64-bc85-4753-bfa3-43da5dc85aaf",
+              "name": "categoria_pasta",
+              "value": "NAR ECO Institucional",
+              "type": "string"
+            },
+            {
+              "id": "4af1e986-e53d-439f-8915-94239a09116c",
+              "name": "pasta_origem",
+              "value": "01_02_Canais_Oficiais_NAR_ECO",
+              "type": "string"
+            },
+            {
+              "id": "2a00d493-57d6-456f-b00f-77992cc597c5",
+              "name": "originalFilename",
+              "value": "={{ $json.originalFilename || $json.name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        784,
+        1008
+      ],
+      "id": "39d1f5e5-9e42-433f-9cc2-0110861b3126",
+      "name": "Categoria - 01_02 Canais Oficiais NAR ECO"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "searchMethod": "query",
+        "queryString": "'1mjsPD5V6wrZsWoyZqGECI0M2xYkie7VJ' in parents and trashed = false and mimeType != 'application/vnd.google-apps.folder'",
+        "returnAll": true,
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1488,
+        3200
+      ],
+      "id": "fb314905-5f26-4218-adc1-95ed9fce9827",
+      "name": "List Files - 01_02 Canais Oficiais NAR ECO",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1sVZK4qAPh9MRXxzZOmv1jYrv3YOUrKTn",
+          "mode": "list",
+          "cachedResultName": "RAG",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1sVZK4qAPh9MRXxzZOmv1jYrv3YOUrKTn"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        1152,
+        2704
+      ],
+      "id": "a1e0d001-1111-4111-8111-000000000001",
+      "name": "File Created - 09 Marcas EduInfo RAG",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1sVZK4qAPh9MRXxzZOmv1jYrv3YOUrKTn",
+          "mode": "list",
+          "cachedResultName": "RAG",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1sVZK4qAPh9MRXxzZOmv1jYrv3YOUrKTn"
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        1152,
+        2864
+      ],
+      "id": "a1e0d002-1111-4111-8111-000000000002",
+      "name": "File Updated - 09 Marcas EduInfo RAG",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1e0d101-1111-4111-8111-000000000101",
+              "name": "categoria_pasta",
+              "value": "Marcas - EduInfo",
+              "type": "string"
+            },
+            {
+              "id": "a1e0d102-1111-4111-8111-000000000102",
+              "name": "pasta_origem",
+              "value": "09_Marcas/Eduinfo/RAG",
+              "type": "string"
+            },
+            {
+              "id": "a1e0d103-1111-4111-8111-000000000103",
+              "name": "originalFilename",
+              "value": "={{ $json.originalFilename || $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "a1e0d104-1111-4111-8111-000000000104",
+              "name": "brand",
+              "value": "eduinfo",
+              "type": "string"
+            },
+            {
+              "id": "a1e0d105-1111-4111-8111-000000000105",
+              "name": "status",
+              "value": "approved",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1712,
+        2784
+      ],
+      "id": "a1e0d003-1111-4111-8111-000000000003",
+      "name": "Categoria - 09 Marcas EduInfo RAG"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "searchMethod": "query",
+        "queryString": "'1sVZK4qAPh9MRXxzZOmv1jYrv3YOUrKTn' in parents and trashed = false and mimeType != 'application/vnd.google-apps.folder'",
+        "returnAll": true,
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1488,
+        4960
+      ],
+      "id": "a1e0d004-1111-4111-8111-000000000004",
+      "name": "List Files - 09 Marcas EduInfo RAG",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ch54C5Fg1ElIedk9",
+          "name": "Google Drive NAR ECO"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Set File ID": {
+      "main": [
+        [
+          {
+            "node": "Deleta linhas antigas do documento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deleta linhas antigas do documento": {
+      "main": [
+        [
+          {
+            "node": "Retorna ID do arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retorna ID do arquivo": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Extract PDF Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract from Excel",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract Document Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract from File2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract PDF Text": {
+      "main": [
+        [
+          {
+            "node": "Contexto LIMPO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from Excel": {
+      "main": [
+        [
+          {
+            "node": "Aggregate2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate2": {
+      "main": [
+        [
+          {
+            "node": "Summarize1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize1": {
+      "main": [
+        [
+          {
+            "node": "Contexto LIMPO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Document Text": {
+      "main": [
+        [
+          {
+            "node": "Contexto LIMPO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contexto LIMPO": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Transforma em JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transforma em JSON": {
+      "main": [
+        [
+          {
+            "node": "Insert into Consultar Base Oficial NAR ECO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader2": {
+      "ai_document": [
+        [
+          {
+            "node": "Insert into Consultar Base Oficial NAR ECO",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Insert into Consultar Base Oficial NAR ECO",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader2",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Created - 01 Base de Conhecimento": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 01 Base de Conhecimento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Updated - 01 Base de Conhecimento": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 01 Base de Conhecimento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categoria - 01 Base de Conhecimento": {
+      "main": [
+        [
+          {
+            "node": "Set File ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger - 01 Base de Conhecimento": {
+      "main": [
+        [
+          {
+            "node": "List Files - 01 Base de Conhecimento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Files - 01 Base de Conhecimento": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 01 Base de Conhecimento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Created - 02 Institucional e Posicionamento": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 02 Institucional e Posicionamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Updated - 02 Institucional e Posicionamento": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 02 Institucional e Posicionamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categoria - 02 Institucional e Posicionamento": {
+      "main": [
+        [
+          {
+            "node": "Set File ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Files - 02 Institucional e Posicionamento": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 02 Institucional e Posicionamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Created - 03 Diagnostico e Roteamento": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 03 Diagnostico e Roteamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Updated - 03 Diagnostico e Roteamento": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 03 Diagnostico e Roteamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categoria - 03 Diagnostico e Roteamento": {
+      "main": [
+        [
+          {
+            "node": "Set File ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Files - 03 Diagnostico e Roteamento": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 03 Diagnostico e Roteamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Created - 04a FAQ e Objecoes": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 04a FAQ e Objecoes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Updated - 04a FAQ e Objecoes": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 04a FAQ e Objecoes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categoria - 04a FAQ e Objecoes": {
+      "main": [
+        [
+          {
+            "node": "Set File ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Files - 04a FAQ e Objecoes": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 04a FAQ e Objecoes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Created - 04b Tom de Voz e Cultura": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 04b Tom de Voz e Cultura",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Updated - 04b Tom de Voz e Cultura": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 04b Tom de Voz e Cultura",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categoria - 04b Tom de Voz e Cultura": {
+      "main": [
+        [
+          {
+            "node": "Set File ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Files - 04b Tom de Voz e Cultura": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 04b Tom de Voz e Cultura",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Created - 05 Agenda e Regras Comerciais": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 05 Agenda e Regras Comerciais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Updated - 05 Agenda e Regras Comerciais": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 05 Agenda e Regras Comerciais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categoria - 05 Agenda e Regras Comerciais": {
+      "main": [
+        [
+          {
+            "node": "Set File ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Files - 05 Agenda e Regras Comerciais": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 05 Agenda e Regras Comerciais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Created - 06 Materiais para Envio": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 06 Materiais para Envio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Updated - 06 Materiais para Envio": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 06 Materiais para Envio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categoria - 06 Materiais para Envio": {
+      "main": [
+        [
+          {
+            "node": "Set File ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Files - 06 Materiais para Envio": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 06 Materiais para Envio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Created - 07 Produtos e Solucoes": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 07 Produtos e Solucoes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Updated - 07 Produtos e Solucoes": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 07 Produtos e Solucoes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categoria - 07 Produtos e Solucoes": {
+      "main": [
+        [
+          {
+            "node": "Set File ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Files - 07 Produtos e Solucoes": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 07 Produtos e Solucoes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert into Consultar Base Oficial NAR ECO": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Created - 01_01 Quem e a NAR ECO": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 01_01 Quem e a NAR ECO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Updated - 01_01 Quem e a NAR ECO": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 01_01 Quem e a NAR ECO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categoria - 01_01 Quem e a NAR ECO": {
+      "main": [
+        [
+          {
+            "node": "Set File ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Files - 01_01 Quem e a NAR ECO": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 01_01 Quem e a NAR ECO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Created - 01_02 Canais Oficiais NAR ECO": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 01_02 Canais Oficiais NAR ECO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Updated - 01_02 Canais Oficiais NAR ECO": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 01_02 Canais Oficiais NAR ECO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categoria - 01_02 Canais Oficiais NAR ECO": {
+      "main": [
+        [
+          {
+            "node": "Set File ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Files - 01_02 Canais Oficiais NAR ECO": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 01_02 Canais Oficiais NAR ECO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Created - 09 Marcas EduInfo RAG": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 09 Marcas EduInfo RAG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Updated - 09 Marcas EduInfo RAG": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 09 Marcas EduInfo RAG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Files - 09 Marcas EduInfo RAG": {
+      "main": [
+        [
+          {
+            "node": "Categoria - 09 Marcas EduInfo RAG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categoria - 09 Marcas EduInfo RAG": {
+      "main": [
+        [
+          {
+            "node": "Set File ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "24c413e8-cdf7-4b2d-b0e0-7edaa7b7c00b",
+  "meta": {
+    "instanceId": "240744e4f5f839792b85e0a02480b9898a4d4ed03f4d9e51419fe7c59941774d"
+  },
+  "nodeGroups": [],
+  "id": "q0CMLnX6F5KSrSyA",
+  "tags": []
+}
