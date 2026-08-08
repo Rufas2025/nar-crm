@@ -1,0 +1,54 @@
+{
+  "eval_id": 0,
+  "configuration": "without_skill",
+  "expectations": [
+    {
+      "text": "A decisão principal é SPLIT (não KEEP nem apenas MOVE)",
+      "passed": true,
+      "evidence": "'Recomendação: **manter o arquivo na pasta, mas fatiá-lo (split)**' e seção 'Plano de split recomendado' com três destinos."
+    },
+    {
+      "text": "O bloco de posicionamento/objeções da EduInfo é atribuído ao subagente EduInfo, não ao orquestrador NAR ECO",
+      "passed": true,
+      "evidence": "Tabela: 'Seção 3 ... Dono correto: **Agente especialista EduInfo** — Ação: Mover'; item B do plano: 'Vai para o agente especialista EduInfo — Toda a seção 3'"
+    },
+    {
+      "text": "As regras de demonstração (dias, qualificação, reagendamento, confirmação) são atribuídas ao subagente Agenda",
+      "passed": true,
+      "evidence": "Item C: 'Vai para o agente comercial / de agendamento — Seção 4 ... Janelas e duração; Checklist de qualificação; Política de reagendamento, cancelamento e no-show; Cadência de confirmação (D-1 e H-1)'. Terminologia diferente ('agente comercial/de agendamento') mas equivalente ao subagente Agenda em substância — ressalvado o fallback 'se não existir ... vai integralmente para o agente EduInfo'."
+    },
+    {
+      "text": "As regras globais de atendimento (identificação da rede, LGPD, escalonamento) permanecem no orquestrador NAR ECO",
+      "passed": true,
+      "evidence": "'A) Permanece em 00_Governanca_e_Arquitetura — dono: orquestrador (Nathalia Serrano): Seção 1 — Princípios de atendimento omnichannel (integral)' incluindo SLA, LGPD e escalada."
+    },
+    {
+      "text": "Produz um SPLIT MAP explícito ligando seção de origem a documento/agente/camada de destino",
+      "passed": true,
+      "evidence": "Tabela 'Seção | Conteúdo | Natureza | Dono correto | Ação' cobrindo as 5 seções, mais o plano A/B/C com destino por bloco. Não usa rótulos de camada (SYSTEM/RAG/WORKFLOW), mas cada seção de origem está ligada a dono e destino explícitos."
+    },
+    {
+      "text": "Não inventa nenhum fato ausente da fixture (nomes de responsáveis, URLs, preços)",
+      "passed": true,
+      "evidence": "Todos os dados citados ('até 300 alunos', '@eduinfo.oficial', 'implantação em 30 dias', confirmações D-1/H-1 = 24h/1h) estão na fixture; lacunas viram perguntas na seção 'Perguntas a resolver'."
+    },
+    {
+      "text": "O relatório contém os campos obrigatórios: DECISÃO, OWNER ALVO, SYSTEM, RAG, DEPENDÊNCIAS, PRÓXIMA AÇÃO",
+      "passed": false,
+      "evidence": "Nenhum desses campos existe no relatório. A estrutura é livre ('Veredito resumido', 'Análise seção a seção', 'Problemas identificados', 'Plano de split', 'Perguntas a resolver'), sem classificação SYSTEM/RAG nem campos DECISÃO/OWNER ALVO/DEPENDÊNCIAS/PRÓXIMA AÇÃO."
+    },
+    {
+      "text": "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'",
+      "passed": true,
+      "evidence": "'a seção 2 cita cinco marcas (EduInfo, Gennera, Eco Clear, Educbank, Vibe Flow Educacional)' — grafia correta; nenhuma ocorrência de 'EcoClear'."
+    }
+  ],
+  "passed_count": 7,
+  "total_count": 8,
+  "pass_rate": 0.88,
+  "summary": {
+    "passed": 7,
+    "total": 8,
+    "pass_rate": 0.875
+  }
+}

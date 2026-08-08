@@ -1,0 +1,54 @@
+{
+  "eval_id": 3,
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "A decisão é KEEP",
+      "passed": true,
+      "evidence": "'DECISÃO / KEEP' e abertura: 'não precisa de ajuste. O documento está no dono certo, na pasta certa, na camada certa e com escopo único.'"
+    },
+    {
+      "text": "Não recomenda SPLIT nem REWRITE do documento",
+      "passed": true,
+      "evidence": "'CONTEÚDO A MANTER: Todo. CONTEÚDO A MOVER: Nenhum. CONTEÚDO A REMOVER/ARQUIVAR: Nenhum.'; 'Propor renomeação, divisão ou reescrita aqui geraria trabalho humano sem nenhum ganho arquitetural.'"
+    },
+    {
+      "text": "Não propõe renomear o documento",
+      "passed": true,
+      "evidence": "'NOME PROPOSTO: 00_Indice_Mestre_da_Base_de_Conhecimento (inalterado)'."
+    },
+    {
+      "text": "SYSTEM: NÃO",
+      "passed": true,
+      "evidence": "'SYSTEM: NÃO — o orquestrador não precisa do índice para decidir como agir nem para rotear.'"
+    },
+    {
+      "text": "RAG: NÃO",
+      "passed": true,
+      "evidence": "'RAG: NÃO — documentação de arquitetura em RAG polui a recuperação e pode acabar sendo respondida ao cliente final.'"
+    },
+    {
+      "text": "Classifica a camada como REFERENCE",
+      "passed": true,
+      "evidence": "'TIPO DE CONHECIMENTO / REFERENCE'."
+    },
+    {
+      "text": "Não inventa problemas nem gera trabalho de reestruturação sem ganho arquitetural nomeado",
+      "passed": true,
+      "evidence": "'Nada a corrigir'; 'PRÓXIMA AÇÃO: Nenhuma ação de curadoria.' A única observação (numeração sem folga) vem com ganho nomeado — 'a renumeração quebra referências' — e é explicitamente não-recomendação: 'Fica registrado para você decidir, não como recomendação de mudança.'"
+    },
+    {
+      "text": "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'",
+      "passed": true,
+      "evidence": "'`03_Eco_Clear` — grafia em duas palavras preservada. Correto.' Nenhuma ocorrência de 'EcoClear'."
+    }
+  ],
+  "passed_count": 8,
+  "total_count": 8,
+  "pass_rate": 1.0,
+  "summary": {
+    "passed": 8,
+    "total": 8,
+    "pass_rate": 1.0
+  }
+}

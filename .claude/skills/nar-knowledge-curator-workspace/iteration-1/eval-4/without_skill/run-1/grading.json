@@ -1,0 +1,54 @@
+{
+  "eval_id": 4,
+  "configuration": "without_skill",
+  "expectations": [
+    {
+      "text": "O posicionamento da EduInfo é atribuído ao subagente EduInfo",
+      "passed": true,
+      "evidence": "'Bloco 1 — Sobre a EduInfo → base EduInfo ... Dono: Subagente EduInfo'."
+    },
+    {
+      "text": "O link de apresentação da Gennera é atribuído ao subagente Gennera",
+      "passed": true,
+      "evidence": "'Bloco 2 — Link Gennera → base Gennera ... Dono: Subagente Gennera'; sugere `Gennera/ativos-comerciais.md` com link e regra juntos."
+    },
+    {
+      "text": "O case da Rede Semear é atribuído ao subagente Eco Clear",
+      "passed": true,
+      "evidence": "'Bloco 3 — Case Eco Clear → base Eco Clear ... Dono: Subagente Eco Clear'; destino `Eco_Clear/cases/rede-semear.md`."
+    },
+    {
+      "text": "A regra comercial de aprovação de proposta é atribuída ao orquestrador NAR ECO como regra global",
+      "passed": true,
+      "evidence": "'Bloco 4 — Regra comercial NAR ECO → PERMANECE em `00_Governanca_e_Arquitetura` ... é a única parte do documento que é genuinamente transversal ao ecossistema ... pertence à camada do orquestrador'."
+    },
+    {
+      "text": "As regras de reunião de diagnóstico/proposta e cancelamento são atribuídas ao subagente Agenda",
+      "passed": false,
+      "evidence": "Atribui esses blocos ao orquestrador, não a um subagente Agenda: 'Blocos 5 e 6 — Agendamento e cancelamento → governança (processo comercial) ... Dono: Orquestrador (Nathalia)', com destino '00_Governanca_e_Arquitetura/processo-comercial-agendamento.md'. Nenhuma menção a um agente/subagente Agenda em todo o relatório."
+    },
+    {
+      "text": "Nenhuma informação de uma marca é atribuída a outra marca (zero contaminação cruzada)",
+      "passed": true,
+      "evidence": "O mapa bloco a bloco mantém cada conteúdo com sua marca de origem (EduInfo, Gennera, Eco Clear); não há troca de atribuição entre marcas."
+    },
+    {
+      "text": "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'",
+      "passed": true,
+      "evidence": "Em prosa: 'Case Eco Clear', 'base Eco Clear', 'Subagente Eco Clear'. A forma `ecoclear` aparece apenas como identificador citado de `brands.ts`, não como grafia própria da marca."
+    },
+    {
+      "text": "Não inventa fatos ausentes da fixture",
+      "passed": true,
+      "evidence": "Números e frases citados conferem com a fixture (4 unidades, 2.300 alunos, 38%, autorização de uso). A referência externa a `/home/user/nar-crm/src/lib/brands.ts` foi verificada e é real (`BrandId = \"eduinfo\" | \"gennera\" | \"ecoclear\" | \"educbank\" | \"nareco\"`), e as lacunas são registradas como pendências em vez de preenchidas."
+    }
+  ],
+  "passed_count": 7,
+  "total_count": 8,
+  "pass_rate": 0.88,
+  "summary": {
+    "passed": 7,
+    "total": 8,
+    "pass_rate": 0.875
+  }
+}

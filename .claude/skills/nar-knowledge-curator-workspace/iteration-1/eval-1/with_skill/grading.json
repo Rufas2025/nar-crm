@@ -1,0 +1,49 @@
+{
+  "eval_id": 1,
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "Identifica ao menos 4 divergências factuais concretas entre os dois documentos (preços por faixa, taxa de implantação, desconto anual, regra de cancelamento, prazo de implantação, suporte telefônico)",
+      "passed": true,
+      "evidence": "Tabela de conflitos com 9 itens: três faixas de preço, taxa de implantação (R$ 3.500 x isenta), desconto (10% x 15%), cancelamento (multa 30% x aviso 60 dias sem multa), prazo (45 x 60 dias), suporte telefônico e contrato semestral."
+    },
+    {
+      "text": "Marca as divergências como CONFLITO/CONFLITANTE de forma explícita",
+      "passed": true,
+      "evidence": "'Isto **não é duplicação** — é **CONFLITO**'; 'Todos os itens abaixo estão com status `CONFLITANTE`. Nenhum foi resolvido.'; campos CONFLITOS nos dois relatórios."
+    },
+    {
+      "text": "NÃO escolhe sozinho qual versão é a verdadeira — encaminha a decisão para validação humana",
+      "passed": true,
+      "evidence": "'Eu **não vou escolher** qual está certa'; 'Não escolhi qual tabela está certa'; PRÓXIMA AÇÃO: 'Perguntar ao responsável comercial da Gennera qual tabela está em vigor'."
+    },
+    {
+      "text": "Indica qual documento deveria ser a fonte canônica única das condições comerciais Gennera",
+      "passed": true,
+      "evidence": "Define a fonte canônica única como um só documento em 03_Gennera — 'renomear o vigente para `Gennera_Precos_e_Condicoes_Comerciais`' — e exige que os demais materiais passem a 'referenciar o documento canônico' em vez de repetir os números."
+    },
+    {
+      "text": "Aponta que documento comercial da Gennera não pertence à pasta 00_Governanca_e_Arquitetura",
+      "passed": true,
+      "evidence": "'Tabela de preço de marca não é governança... vazamento de escopo clássico'; DECISÃO do doc B: 'MOVE ... de 00_Governanca_e_Arquitetura para 03_Gennera'."
+    },
+    {
+      "text": "Recomenda ARCHIVE em vez de exclusão destrutiva do documento substituído",
+      "passed": true,
+      "evidence": "'O outro vai para `03_Gennera/ARCHIVE/`, registrando dentro dele o que o substituiu e quando. **Nenhum dos dois é deletado**'."
+    },
+    {
+      "text": "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'",
+      "passed": true,
+      "evidence": "Nenhuma ocorrência de 'EcoClear' no relatório (a marca não é citada neste caso)."
+    }
+  ],
+  "passed_count": 7,
+  "total_count": 7,
+  "pass_rate": 1.0,
+  "summary": {
+    "passed": 7,
+    "total": 7,
+    "pass_rate": 1.0
+  }
+}

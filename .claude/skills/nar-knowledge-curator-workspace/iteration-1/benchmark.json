@@ -1,0 +1,637 @@
+{
+  "metadata": {
+    "skill_name": "nar-knowledge-curator",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-08-08T19:32:45Z",
+    "evals_run": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 100.6,
+        "tokens": 58197,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A decis\u00e3o principal \u00e9 SPLIT (n\u00e3o KEEP nem apenas MOVE)",
+          "passed": true,
+          "evidence": "Campo expl\u00edcito: 'DECIS\u00c3O / SPLIT'. Abertura: 'A decis\u00e3o \u00e9 **SPLIT**, n\u00e3o MOVE \u2014 parte do documento fica onde est\u00e1.'"
+        },
+        {
+          "text": "O bloco de posicionamento/obje\u00e7\u00f5es da EduInfo \u00e9 atribu\u00eddo ao subagente EduInfo, n\u00e3o ao orquestrador NAR ECO",
+          "passed": true,
+          "evidence": "'Se\u00e7\u00e3o 3 integral -> subagente EduInfo' e no SPLIT MAP: 'Posicionamento, valor e m\u00f3dulos EduInfo (3) -> EduInfo_Identidade_e_Posicionamento -> EduInfo -> RAG'; 'Diferenciais e obje\u00e7\u00f5es EduInfo (3) -> EduInfo_FAQ_e_Objecoes -> EduInfo -> RAG'"
+        },
+        {
+          "text": "As regras de demonstra\u00e7\u00e3o (dias, qualifica\u00e7\u00e3o, reagendamento, confirma\u00e7\u00e3o) s\u00e3o atribu\u00eddas ao subagente Agenda",
+          "passed": true,
+          "evidence": "SPLIT MAP: 'Janelas, blocos e link de agendamento (4) -> Agenda_Regras_de_Demonstracao -> Agenda -> WORKFLOW'; 'Reagendamento, cancelamento e no-show (4) -> Agenda -> WORKFLOW'; 'Confirma\u00e7\u00e3o autom\u00e1tica 24h/1h e libera\u00e7\u00e3o (4) -> Agenda -> WORKFLOW'"
+        },
+        {
+          "text": "As regras globais de atendimento (identifica\u00e7\u00e3o da rede, LGPD, escalonamento) permanecem no orquestrador NAR ECO",
+          "passed": true,
+          "evidence": "'CONTE\u00daDO A MANTER \u2014 Se\u00e7\u00e3o 1 \u2014 princ\u00edpios de atendimento omnichannel (identifica\u00e7\u00e3o do interlocutor, SLA de 15 min, ... LGPD em pr\u00e9-venda, escalonamento para humano...)' e SPLIT MAP aponta se\u00e7\u00f5es 1, 2 e 5 para 'NAR ECO (orquestrador) -> SYSTEM'"
+        },
+        {
+          "text": "Produz um SPLIT MAP expl\u00edcito ligando se\u00e7\u00e3o de origem a documento/agente/camada de destino",
+          "passed": true,
+          "evidence": "Bloco 'SPLIT MAP' com 12 linhas no formato 'se\u00e7\u00e3o de origem -> documento destino -> agente -> camada (SYSTEM/RAG/WORKFLOW)', encerrado por 'Nenhuma se\u00e7\u00e3o do documento de origem ficou sem destino.'"
+        },
+        {
+          "text": "N\u00e3o inventa nenhum fato ausente da fixture (nomes de respons\u00e1veis, URLs, pre\u00e7os)",
+          "passed": true,
+          "evidence": "S\u00f3 cita dados literais da fixture ('eduinfo.com.br' e '@eduinfo.oficial'), e declara: 'N\u00e3o inventei pre\u00e7os, URLs ou respons\u00e1veis al\u00e9m dos que o documento traz literalmente'. Lacunas ficam marcadas como DESCONHECIDO/INFERIDO."
+        },
+        {
+          "text": "O relat\u00f3rio cont\u00e9m os campos obrigat\u00f3rios: DECIS\u00c3O, OWNER ALVO, SYSTEM, RAG, DEPEND\u00caNCIAS, PR\u00d3XIMA A\u00c7\u00c3O",
+          "passed": true,
+          "evidence": "Todos presentes no bloco de relat\u00f3rio: 'DECIS\u00c3O', 'OWNER ALVO', 'SYSTEM: SIM \u2014 ...', 'RAG: SIM \u2014 ...', 'DEPEND\u00caNCIAS', 'PR\u00d3XIMA A\u00c7\u00c3O'"
+        },
+        {
+          "text": "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'",
+          "passed": true,
+          "evidence": "Nenhuma ocorr\u00eancia da grafia 'EcoClear' no relat\u00f3rio (a marca n\u00e3o \u00e9 citada nominalmente neste caso)."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 121.8,
+        "tokens": 57645,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Identifica ao menos 4 diverg\u00eancias factuais concretas entre os dois documentos (pre\u00e7os por faixa, taxa de implanta\u00e7\u00e3o, desconto anual, regra de cancelamento, prazo de implanta\u00e7\u00e3o, suporte telef\u00f4nico)",
+          "passed": true,
+          "evidence": "Tabela de conflitos com 9 itens: tr\u00eas faixas de pre\u00e7o, taxa de implanta\u00e7\u00e3o (R$ 3.500 x isenta), desconto (10% x 15%), cancelamento (multa 30% x aviso 60 dias sem multa), prazo (45 x 60 dias), suporte telef\u00f4nico e contrato semestral."
+        },
+        {
+          "text": "Marca as diverg\u00eancias como CONFLITO/CONFLITANTE de forma expl\u00edcita",
+          "passed": true,
+          "evidence": "'Isto **n\u00e3o \u00e9 duplica\u00e7\u00e3o** \u2014 \u00e9 **CONFLITO**'; 'Todos os itens abaixo est\u00e3o com status `CONFLITANTE`. Nenhum foi resolvido.'; campos CONFLITOS nos dois relat\u00f3rios."
+        },
+        {
+          "text": "N\u00c3O escolhe sozinho qual vers\u00e3o \u00e9 a verdadeira \u2014 encaminha a decis\u00e3o para valida\u00e7\u00e3o humana",
+          "passed": true,
+          "evidence": "'Eu **n\u00e3o vou escolher** qual est\u00e1 certa'; 'N\u00e3o escolhi qual tabela est\u00e1 certa'; PR\u00d3XIMA A\u00c7\u00c3O: 'Perguntar ao respons\u00e1vel comercial da Gennera qual tabela est\u00e1 em vigor'."
+        },
+        {
+          "text": "Indica qual documento deveria ser a fonte can\u00f4nica \u00fanica das condi\u00e7\u00f5es comerciais Gennera",
+          "passed": true,
+          "evidence": "Define a fonte can\u00f4nica \u00fanica como um s\u00f3 documento em 03_Gennera \u2014 'renomear o vigente para `Gennera_Precos_e_Condicoes_Comerciais`' \u2014 e exige que os demais materiais passem a 'referenciar o documento can\u00f4nico' em vez de repetir os n\u00fameros."
+        },
+        {
+          "text": "Aponta que documento comercial da Gennera n\u00e3o pertence \u00e0 pasta 00_Governanca_e_Arquitetura",
+          "passed": true,
+          "evidence": "'Tabela de pre\u00e7o de marca n\u00e3o \u00e9 governan\u00e7a... vazamento de escopo cl\u00e1ssico'; DECIS\u00c3O do doc B: 'MOVE ... de 00_Governanca_e_Arquitetura para 03_Gennera'."
+        },
+        {
+          "text": "Recomenda ARCHIVE em vez de exclus\u00e3o destrutiva do documento substitu\u00eddo",
+          "passed": true,
+          "evidence": "'O outro vai para `03_Gennera/ARCHIVE/`, registrando dentro dele o que o substituiu e quando. **Nenhum dos dois \u00e9 deletado**'."
+        },
+        {
+          "text": "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'",
+          "passed": true,
+          "evidence": "Nenhuma ocorr\u00eancia de 'EcoClear' no relat\u00f3rio (a marca n\u00e3o \u00e9 citada neste caso)."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 123.1,
+        "tokens": 60037,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Mant\u00e9m em SYSTEM apenas identidade, tom de voz global, classifica\u00e7\u00e3o de inten\u00e7\u00e3o, roteamento e governan\u00e7a/LGPD",
+          "passed": true,
+          "evidence": "'SYSTEM: SIM \u2014 apenas identidade, tom global, classifica\u00e7\u00e3o de inten\u00e7\u00e3o, tabela de roteamento (uma linha por marca), regras comerciais globais e governan\u00e7a/LGPD.' O \u00fanico item al\u00e9m da lista da assertion s\u00e3o as REGRAS COMERCIAIS, tratadas como regra global de governan\u00e7a que vale para todas as marcas \u2014 nenhum cat\u00e1logo de marca, FAQ, canal, agenda ou integra\u00e7\u00e3o permanece em SYSTEM."
+        },
+        {
+          "text": "Move os cat\u00e1logos por marca (EduInfo, Gennera, Eco Clear, Educbank, Vibe Flow Educacional) para RAG ou para os respectivos subagentes, fora do SYSTEM",
+          "passed": true,
+          "evidence": "SPLIT MAP mapeia as cinco marcas para documentos pr\u00f3prios em camada RAG (ex.: 'Gennera: ERP, contrata\u00e7\u00e3o, prazo, IPCA, suporte, implanta\u00e7\u00e3o -> Gennera_Produtos_e_Condicoes_Comerciais -> Gennera -> RAG')."
+        },
+        {
+          "text": "Move FAQ geral, obje\u00e7\u00f5es e canais/redes sociais para RAG, fora do SYSTEM",
+          "passed": true,
+          "evidence": "'FAQ GERAL (institucional, 4 perguntas) -> NAR_ECO_FAQ_Institucional -> NAR ECO -> RAG'; 'Canais NAR ECO (site + LinkedIn) -> NAR_ECO_Canais_Oficiais -> RAG'; obje\u00e7\u00f5es por marca -> '*_FAQ_e_Objecoes -> RAG'."
+        },
+        {
+          "text": "Move as regras de agendamento para o subagente Agenda",
+          "passed": true,
+          "evidence": "Seis linhas do SPLIT MAP com destino Agenda (demonstra\u00e7\u00f5es, qualifica\u00e7\u00e3o, reagendamento/no-show, confirma\u00e7\u00f5es 24h/1h, tipos de reuni\u00e3o) e 'REGRAS DE AGENDAMENTO -> Agenda' em CONTE\u00daDO A MOVER."
+        },
+        {
+          "text": "Classifica a se\u00e7\u00e3o de integra\u00e7\u00e3o Evolution GO/n8n/payload como WORKFLOW, n\u00e3o como RAG nem SYSTEM",
+          "passed": true,
+          "evidence": "'INTEGRA\u00c7\u00c3O OPERACIONAL (Evolution GO, n8n, payload, retry) -> NAR_ECO_Workflow_Encerramento_CRM -> opera\u00e7\u00e3o -> WORKFLOW'."
+        },
+        {
+          "text": "N\u00e3o recomenda indexar o system prompt em si como conhecimento factual no RAG",
+          "passed": true,
+          "evidence": "'RAG: SIM \u2014 blocos de marca, FAQ institucional e canais, cada um em \u00edndice isolado por dono. O documento inteiro nunca deve ser indexado como est\u00e1.' O original vai para ARCHIVE, n\u00e3o para o \u00edndice."
+        },
+        {
+          "text": "A recomenda\u00e7\u00e3o resulta em redu\u00e7\u00e3o substancial do system prompt (a maior parte dos blocos sai de SYSTEM)",
+          "passed": true,
+          "evidence": "'cerca de tr\u00eas quartos do documento deve sair do system prompt'; o prompt final tem 5 blocos e 'nenhuma resposta de cliente dentro dele'."
+        },
+        {
+          "text": "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'",
+          "passed": true,
+          "evidence": "'Eco Clear: programa e certifica\u00e7\u00e3o', 'Eco Clear: case Rede Semear' \u2014 sempre duas palavras; nenhuma ocorr\u00eancia de 'EcoClear' (nomes de arquivo usam underscore: 'Eco_Clear_Cases_e_Provas')."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 64.4,
+        "tokens": 53032,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A decis\u00e3o \u00e9 KEEP",
+          "passed": true,
+          "evidence": "'DECIS\u00c3O / KEEP' e abertura: 'n\u00e3o precisa de ajuste. O documento est\u00e1 no dono certo, na pasta certa, na camada certa e com escopo \u00fanico.'"
+        },
+        {
+          "text": "N\u00e3o recomenda SPLIT nem REWRITE do documento",
+          "passed": true,
+          "evidence": "'CONTE\u00daDO A MANTER: Todo. CONTE\u00daDO A MOVER: Nenhum. CONTE\u00daDO A REMOVER/ARQUIVAR: Nenhum.'; 'Propor renomea\u00e7\u00e3o, divis\u00e3o ou reescrita aqui geraria trabalho humano sem nenhum ganho arquitetural.'"
+        },
+        {
+          "text": "N\u00e3o prop\u00f5e renomear o documento",
+          "passed": true,
+          "evidence": "'NOME PROPOSTO: 00_Indice_Mestre_da_Base_de_Conhecimento (inalterado)'."
+        },
+        {
+          "text": "SYSTEM: N\u00c3O",
+          "passed": true,
+          "evidence": "'SYSTEM: N\u00c3O \u2014 o orquestrador n\u00e3o precisa do \u00edndice para decidir como agir nem para rotear.'"
+        },
+        {
+          "text": "RAG: N\u00c3O",
+          "passed": true,
+          "evidence": "'RAG: N\u00c3O \u2014 documenta\u00e7\u00e3o de arquitetura em RAG polui a recupera\u00e7\u00e3o e pode acabar sendo respondida ao cliente final.'"
+        },
+        {
+          "text": "Classifica a camada como REFERENCE",
+          "passed": true,
+          "evidence": "'TIPO DE CONHECIMENTO / REFERENCE'."
+        },
+        {
+          "text": "N\u00e3o inventa problemas nem gera trabalho de reestrutura\u00e7\u00e3o sem ganho arquitetural nomeado",
+          "passed": true,
+          "evidence": "'Nada a corrigir'; 'PR\u00d3XIMA A\u00c7\u00c3O: Nenhuma a\u00e7\u00e3o de curadoria.' A \u00fanica observa\u00e7\u00e3o (numera\u00e7\u00e3o sem folga) vem com ganho nomeado \u2014 'a renumera\u00e7\u00e3o quebra refer\u00eancias' \u2014 e \u00e9 explicitamente n\u00e3o-recomenda\u00e7\u00e3o: 'Fica registrado para voc\u00ea decidir, n\u00e3o como recomenda\u00e7\u00e3o de mudan\u00e7a.'"
+        },
+        {
+          "text": "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'",
+          "passed": true,
+          "evidence": "'`03_Eco_Clear` \u2014 grafia em duas palavras preservada. Correto.' Nenhuma ocorr\u00eancia de 'EcoClear'."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 4,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 91.0,
+        "tokens": 55637,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "O posicionamento da EduInfo \u00e9 atribu\u00eddo ao subagente EduInfo",
+          "passed": true,
+          "evidence": "SPLIT MAP: 'Sobre a EduInfo -> EduInfo_Identidade_e_Posicionamento -> EduInfo -> RAG'."
+        },
+        {
+          "text": "O link de apresenta\u00e7\u00e3o da Gennera \u00e9 atribu\u00eddo ao subagente Gennera",
+          "passed": true,
+          "evidence": "'Link Gennera (o material) -> Gennera_Apresentacao_Institucional -> Gennera -> ASSET' e 'Link Gennera (quando enviar) -> Gennera_Regras_de_Envio_de_Materiais -> Gennera -> RAG'."
+        },
+        {
+          "text": "O case da Rede Semear \u00e9 atribu\u00eddo ao subagente Eco Clear",
+          "passed": true,
+          "evidence": "'Case Eco Clear (Rede Semear) -> Eco_Clear_Cases_e_Provas -> Eco Clear -> RAG'."
+        },
+        {
+          "text": "A regra comercial de aprova\u00e7\u00e3o de proposta \u00e9 atribu\u00edda ao orquestrador NAR ECO como regra global",
+          "passed": true,
+          "evidence": "'Regra comercial (todas as marcas) -> NAR_ECO_Regras_Comerciais_Globais -> NAR ECO (orquestrador) -> SYSTEM'; 'este bloco \u00e9 o \u00fanico genuinamente global \u2014 o pr\u00f3prio texto enumera as cinco marcas'."
+        },
+        {
+          "text": "As regras de reuni\u00e3o de diagn\u00f3stico/proposta e cancelamento s\u00e3o atribu\u00eddas ao subagente Agenda",
+          "passed": true,
+          "evidence": "'Agendamento (tipos e dura\u00e7\u00e3o) -> Agenda_Regras_de_Reuniao -> Agenda -> WORKFLOW' e 'Agendamento (cancelamento) -> Agenda -> WORKFLOW'; 'Agenda \u00e9 subagente transversal, n\u00e3o marca.'"
+        },
+        {
+          "text": "Nenhuma informa\u00e7\u00e3o de uma marca \u00e9 atribu\u00edda a outra marca (zero contamina\u00e7\u00e3o cruzada)",
+          "passed": true,
+          "evidence": "Cada bloco vai ao seu dono correto (EduInfo\u2192EduInfo, link\u2192Gennera, Rede Semear\u2192Eco Clear) e o relat\u00f3rio refor\u00e7a o isolamento: 'um case da Eco Clear aparecendo numa resposta sobre Gennera n\u00e3o \u00e9 ru\u00eddo, \u00e9 atribui\u00e7\u00e3o errada'. Nenhuma troca de dono encontrada."
+        },
+        {
+          "text": "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'",
+          "passed": true,
+          "evidence": "'Case Eco Clear: prova social de marca...', 'Case Eco Clear (Rede Semear) ... -> Eco Clear'. Nenhuma ocorr\u00eancia de 'EcoClear'."
+        },
+        {
+          "text": "N\u00e3o inventa fatos ausentes da fixture",
+          "passed": true,
+          "evidence": "Lacunas s\u00e3o marcadas em vez de preenchidas: 'Al\u00e7ada padr\u00e3o de desconto: DESCONHECIDO', 'Respons\u00e1vel comercial da conta: DESCONHECIDO', 'Formato do material Gennera: INFERIDO ... a partir da URL'. N\u00fameros do case (4 unidades, 38%) conferem com a fixture."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 0,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.875,
+        "passed": 7,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 85.6,
+        "tokens": 40001,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A decis\u00e3o principal \u00e9 SPLIT (n\u00e3o KEEP nem apenas MOVE)",
+          "passed": true,
+          "evidence": "'Recomenda\u00e7\u00e3o: **manter o arquivo na pasta, mas fati\u00e1-lo (split)**' e se\u00e7\u00e3o 'Plano de split recomendado' com tr\u00eas destinos."
+        },
+        {
+          "text": "O bloco de posicionamento/obje\u00e7\u00f5es da EduInfo \u00e9 atribu\u00eddo ao subagente EduInfo, n\u00e3o ao orquestrador NAR ECO",
+          "passed": true,
+          "evidence": "Tabela: 'Se\u00e7\u00e3o 3 ... Dono correto: **Agente especialista EduInfo** \u2014 A\u00e7\u00e3o: Mover'; item B do plano: 'Vai para o agente especialista EduInfo \u2014 Toda a se\u00e7\u00e3o 3'"
+        },
+        {
+          "text": "As regras de demonstra\u00e7\u00e3o (dias, qualifica\u00e7\u00e3o, reagendamento, confirma\u00e7\u00e3o) s\u00e3o atribu\u00eddas ao subagente Agenda",
+          "passed": true,
+          "evidence": "Item C: 'Vai para o agente comercial / de agendamento \u2014 Se\u00e7\u00e3o 4 ... Janelas e dura\u00e7\u00e3o; Checklist de qualifica\u00e7\u00e3o; Pol\u00edtica de reagendamento, cancelamento e no-show; Cad\u00eancia de confirma\u00e7\u00e3o (D-1 e H-1)'. Terminologia diferente ('agente comercial/de agendamento') mas equivalente ao subagente Agenda em subst\u00e2ncia \u2014 ressalvado o fallback 'se n\u00e3o existir ... vai integralmente para o agente EduInfo'."
+        },
+        {
+          "text": "As regras globais de atendimento (identifica\u00e7\u00e3o da rede, LGPD, escalonamento) permanecem no orquestrador NAR ECO",
+          "passed": true,
+          "evidence": "'A) Permanece em 00_Governanca_e_Arquitetura \u2014 dono: orquestrador (Nathalia Serrano): Se\u00e7\u00e3o 1 \u2014 Princ\u00edpios de atendimento omnichannel (integral)' incluindo SLA, LGPD e escalada."
+        },
+        {
+          "text": "Produz um SPLIT MAP expl\u00edcito ligando se\u00e7\u00e3o de origem a documento/agente/camada de destino",
+          "passed": true,
+          "evidence": "Tabela 'Se\u00e7\u00e3o | Conte\u00fado | Natureza | Dono correto | A\u00e7\u00e3o' cobrindo as 5 se\u00e7\u00f5es, mais o plano A/B/C com destino por bloco. N\u00e3o usa r\u00f3tulos de camada (SYSTEM/RAG/WORKFLOW), mas cada se\u00e7\u00e3o de origem est\u00e1 ligada a dono e destino expl\u00edcitos."
+        },
+        {
+          "text": "N\u00e3o inventa nenhum fato ausente da fixture (nomes de respons\u00e1veis, URLs, pre\u00e7os)",
+          "passed": true,
+          "evidence": "Todos os dados citados ('at\u00e9 300 alunos', '@eduinfo.oficial', 'implanta\u00e7\u00e3o em 30 dias', confirma\u00e7\u00f5es D-1/H-1 = 24h/1h) est\u00e3o na fixture; lacunas viram perguntas na se\u00e7\u00e3o 'Perguntas a resolver'."
+        },
+        {
+          "text": "O relat\u00f3rio cont\u00e9m os campos obrigat\u00f3rios: DECIS\u00c3O, OWNER ALVO, SYSTEM, RAG, DEPEND\u00caNCIAS, PR\u00d3XIMA A\u00c7\u00c3O",
+          "passed": false,
+          "evidence": "Nenhum desses campos existe no relat\u00f3rio. A estrutura \u00e9 livre ('Veredito resumido', 'An\u00e1lise se\u00e7\u00e3o a se\u00e7\u00e3o', 'Problemas identificados', 'Plano de split', 'Perguntas a resolver'), sem classifica\u00e7\u00e3o SYSTEM/RAG nem campos DECIS\u00c3O/OWNER ALVO/DEPEND\u00caNCIAS/PR\u00d3XIMA A\u00c7\u00c3O."
+        },
+        {
+          "text": "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'",
+          "passed": true,
+          "evidence": "'a se\u00e7\u00e3o 2 cita cinco marcas (EduInfo, Gennera, Eco Clear, Educbank, Vibe Flow Educacional)' \u2014 grafia correta; nenhuma ocorr\u00eancia de 'EcoClear'."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 106.1,
+        "tokens": 38947,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Identifica ao menos 4 diverg\u00eancias factuais concretas entre os dois documentos (pre\u00e7os por faixa, taxa de implanta\u00e7\u00e3o, desconto anual, regra de cancelamento, prazo de implanta\u00e7\u00e3o, suporte telef\u00f4nico)",
+          "passed": true,
+          "evidence": "'Invent\u00e1rio de diverg\u00eancias' com 9 linhas divergentes: tr\u00eas faixas de pre\u00e7o, taxa de implanta\u00e7\u00e3o, desconto 10%/15%, cancelamento (multa 30% x aviso 60 dias), prazo 45/60 dias, suporte telef\u00f4nico, contrato semestral."
+        },
+        {
+          "text": "Marca as diverg\u00eancias como CONFLITO/CONFLITANTE de forma expl\u00edcita",
+          "passed": true,
+          "evidence": "T\u00edtulo 'Conflito de informa\u00e7\u00e3o comercial \u2014 Gennera'; 'dois documentos comerciais completos e mutuamente incompat\u00edveis'; 'Os dois documentos s\u00e3o incompat\u00edveis em 9 dimens\u00f5es'."
+        },
+        {
+          "text": "N\u00c3O escolhe sozinho qual vers\u00e3o \u00e9 a verdadeira \u2014 encaminha a decis\u00e3o para valida\u00e7\u00e3o humana",
+          "passed": true,
+          "evidence": "Levanta B como hip\u00f3tese mais prov\u00e1vel mas conclui: 'n\u00e3o h\u00e1 autoridade documental suficiente para decidir sozinho... precisa de uma confirma\u00e7\u00e3o humana do dono comercial da Gennera'; 'N\u00e3o d\u00e1 para decidir por infer\u00eancia.' Tempo 2 traz 5 perguntas fechadas para o respons\u00e1vel."
+        },
+        {
+          "text": "Indica qual documento deveria ser a fonte can\u00f4nica \u00fanica das condi\u00e7\u00f5es comerciais Gennera",
+          "passed": true,
+          "evidence": "'Um \u00fanico documento can\u00f4nico por tema por marca. Criar `03_Gennera/Gennera_Tabela_Comercial_VIGENTE.md` com o conte\u00fado validado... Nada de dois arquivos quase iguais convivendo.'"
+        },
+        {
+          "text": "Aponta que documento comercial da Gennera n\u00e3o pertence \u00e0 pasta 00_Governanca_e_Arquitetura",
+          "passed": true,
+          "evidence": "'B est\u00e1 na pasta errada. `00_Governanca_e_Arquitetura` \u00e9 pasta de governan\u00e7a do ecossistema, n\u00e3o de conte\u00fado comercial de marca'; 'Corrigir a pasta de B... Move para 03_Gennera'."
+        },
+        {
+          "text": "Recomenda ARCHIVE em vez de exclus\u00e3o destrutiva do documento substitu\u00eddo",
+          "passed": true,
+          "evidence": "'**N\u00e3o apagar nada.** Marcar, n\u00e3o deletar'; 'Arquivar os antigos, n\u00e3o exclu\u00ed-los: mover A ... para `03_Gennera/_historico/`... fora do \u00edndice do RAG'."
+        },
+        {
+          "text": "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'",
+          "passed": true,
+          "evidence": "Nenhuma ocorr\u00eancia de 'EcoClear' no relat\u00f3rio (a marca n\u00e3o \u00e9 citada neste caso)."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 6,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 115.3,
+        "tokens": 42350,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Mant\u00e9m em SYSTEM apenas identidade, tom de voz global, classifica\u00e7\u00e3o de inten\u00e7\u00e3o, roteamento e governan\u00e7a/LGPD",
+          "passed": false,
+          "evidence": "O esqueleto proposto do system prompt inclui um bloco extra de conte\u00fado consult\u00e1vel: '## FAQ DO ECOSSISTEMA (s\u00f3 o que \u00e9 do NAR ECO)' com tr\u00eas perguntas do FAQ e o canal institucional ('naareco.com.br, LinkedIn NAR ECO Solu\u00e7\u00f5es'). Isso \u00e9 conhecimento factual respond\u00edvel, n\u00e3o regra de decis\u00e3o, e permanece dentro do SYSTEM."
+        },
+        {
+          "text": "Move os cat\u00e1logos por marca (EduInfo, Gennera, Eco Clear, Educbank, Vibe Flow Educacional) para RAG ou para os respectivos subagentes, fora do SYSTEM",
+          "passed": true,
+          "evidence": "'SOLU\u00c7\u00d5ES DO ECOSSISTEMA (26\u201366) | **QUEBRA** | 1 linha de roteamento por marca fica; todo o resto vai para `01_EduInfo` \u2026 `05_Vibe_Flow_Educacional`'; passo 2 da execu\u00e7\u00e3o extrai os 5 blocos de marca."
+        },
+        {
+          "text": "Move FAQ geral, obje\u00e7\u00f5es e canais/redes sociais para RAG, fora do SYSTEM",
+          "passed": false,
+          "evidence": "As obje\u00e7\u00f5es e os canais de marca saem, mas o FAQ geral n\u00e3o: 'FAQ GERAL (68\u201378) | QUEBRA | 3 perguntas ficam' e o esqueleto do prompt reproduz as tr\u00eas perguntas mais o canal NAR ECO dentro do system prompt. Nenhum destino RAG \u00e9 atribu\u00eddo a esse conte\u00fado."
+        },
+        {
+          "text": "Move as regras de agendamento para o subagente Agenda",
+          "passed": true,
+          "evidence": "'REGRAS DE AGENDAMENTO (89\u201398) | **SAI** | `06_Agenda` | Dom\u00ednio pr\u00f3prio, dono pr\u00f3prio'; roteamento remete 'Agendamento de demo, diagn\u00f3stico ou proposta \u2192 regras de Agenda'."
+        },
+        {
+          "text": "Classifica a se\u00e7\u00e3o de integra\u00e7\u00e3o Evolution GO/n8n/payload como WORKFLOW, n\u00e3o como RAG nem SYSTEM",
+          "passed": true,
+          "evidence": "'INTEGRA\u00c7\u00c3O OPERACIONAL (105\u2013109) | **SAI** | Documenta\u00e7\u00e3o t\u00e9cnica do workflow n8n / runbook ... Isso \u00e9 contrato de sistema, n\u00e3o instru\u00e7\u00e3o de conversa.' Equivale \u00e0 camada WORKFLOW em subst\u00e2ncia."
+        },
+        {
+          "text": "N\u00e3o recomenda indexar o system prompt em si como conhecimento factual no RAG",
+          "passed": true,
+          "evidence": "Nenhuma recomenda\u00e7\u00e3o de indexar o prompt; o conte\u00fado removido \u00e9 realocado para documentos de marca/agenda/t\u00e9cnico e o prompt \u00e9 reescrito, n\u00e3o indexado."
+        },
+        {
+          "text": "A recomenda\u00e7\u00e3o resulta em redu\u00e7\u00e3o substancial do system prompt (a maior parte dos blocos sai de SYSTEM)",
+          "passed": true,
+          "evidence": "'Estimativa: **~35 linhas** contra as 115 atuais (redu\u00e7\u00e3o de ~70%), e o que sai n\u00e3o \u00e9 perdido, \u00e9 realocado.'"
+        },
+        {
+          "text": "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'",
+          "passed": true,
+          "evidence": "'Res\u00edduos, certifica\u00e7\u00e3o ambiental, sustentabilidade \u2192 Eco Clear' \u2014 grafia correta; nenhuma ocorr\u00eancia de 'EcoClear'."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.25,
+        "passed": 2,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 123.8,
+        "tokens": 41124,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A decis\u00e3o \u00e9 KEEP",
+          "passed": false,
+          "evidence": "'**Veredito:** precisa de ajustes ... o documento tem **um erro factual comprovado**, **duas contradi\u00e7\u00f5es internas** e **lacunas cr\u00edticas**', seguido de um checklist com 3 bloqueadores e 15 itens de ajuste."
+        },
+        {
+          "text": "N\u00e3o recomenda SPLIT nem REWRITE do documento",
+          "passed": false,
+          "evidence": "Recomenda reescrita extensa do \u00edndice: 'Adicionar colunas `Tipo`, `Agente leitor` e `Documento can\u00f4nico`', nova se\u00e7\u00e3o '3.1 Escopo de leitura por agente', 'Adicionar regra de preced\u00eancia em conflito', 'Adicionar tabela de grafia can\u00f4nica', reescrever a conven\u00e7\u00e3o de nomes."
+        },
+        {
+          "text": "N\u00e3o prop\u00f5e renomear o documento",
+          "passed": true,
+          "evidence": "Nenhuma proposta de novo nome para o \u00edndice. A \u00fanica renomea\u00e7\u00e3o sugerida \u00e9 de pasta ('renomear `99_Archive` \u2192 `99_Arquivo_Historico`'), n\u00e3o do documento analisado."
+        },
+        {
+          "text": "SYSTEM: N\u00c3O",
+          "passed": false,
+          "evidence": "O relat\u00f3rio n\u00e3o classifica o documento quanto \u00e0 camada SYSTEM em nenhum ponto; o campo \u00e9 inexistente e a expectativa n\u00e3o pode ser verificada."
+        },
+        {
+          "text": "RAG: N\u00c3O",
+          "passed": false,
+          "evidence": "N\u00e3o h\u00e1 classifica\u00e7\u00e3o RAG do \u00edndice. A \u00fanica men\u00e7\u00e3o a RAG \u00e9 sobre excluir `99_Archive` da indexa\u00e7\u00e3o e sobre filtros por prefixo de pasta \u2014 nada diz que este documento n\u00e3o deve ir para RAG."
+        },
+        {
+          "text": "Classifica a camada como REFERENCE",
+          "passed": false,
+          "evidence": "Nenhuma classifica\u00e7\u00e3o de camada (REFERENCE ou equivalente) aparece no relat\u00f3rio."
+        },
+        {
+          "text": "N\u00e3o inventa problemas nem gera trabalho de reestrutura\u00e7\u00e3o sem ganho arquitetural nomeado",
+          "passed": false,
+          "evidence": "Gera reestrutura\u00e7\u00e3o ampla a partir de um documento \u00edntegro: criar pastas novas ('07_Agentes_e_Prompts', '08_Playbooks_Operacionais'), trocar o dono de `06_Agenda` ('Agenda n\u00e3o \u00e9 marca nem pessoa nem agente') \u2014 contrariando o modelo em que Agenda \u00e9 subagente transversal \u2014 e reescrever a conven\u00e7\u00e3o de nomes. V\u00e1rios 'problemas' s\u00e3o do ecossistema, n\u00e3o do \u00edndice, e o checklist final tem 16 itens de trabalho."
+        },
+        {
+          "text": "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'",
+          "passed": true,
+          "evidence": "Em prosa usa 'Eco Clear'. A ocorr\u00eancia de 'EcoClear (8\u00d7)' est\u00e1 na tabela de grafias divergentes encontradas na base \u2014 \u00e9 den\u00fancia da grafia errada, n\u00e3o uso pr\u00f3prio."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 4,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.875,
+        "passed": 7,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 92.5,
+        "tokens": 39261,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "O posicionamento da EduInfo \u00e9 atribu\u00eddo ao subagente EduInfo",
+          "passed": true,
+          "evidence": "'Bloco 1 \u2014 Sobre a EduInfo \u2192 base EduInfo ... Dono: Subagente EduInfo'."
+        },
+        {
+          "text": "O link de apresenta\u00e7\u00e3o da Gennera \u00e9 atribu\u00eddo ao subagente Gennera",
+          "passed": true,
+          "evidence": "'Bloco 2 \u2014 Link Gennera \u2192 base Gennera ... Dono: Subagente Gennera'; sugere `Gennera/ativos-comerciais.md` com link e regra juntos."
+        },
+        {
+          "text": "O case da Rede Semear \u00e9 atribu\u00eddo ao subagente Eco Clear",
+          "passed": true,
+          "evidence": "'Bloco 3 \u2014 Case Eco Clear \u2192 base Eco Clear ... Dono: Subagente Eco Clear'; destino `Eco_Clear/cases/rede-semear.md`."
+        },
+        {
+          "text": "A regra comercial de aprova\u00e7\u00e3o de proposta \u00e9 atribu\u00edda ao orquestrador NAR ECO como regra global",
+          "passed": true,
+          "evidence": "'Bloco 4 \u2014 Regra comercial NAR ECO \u2192 PERMANECE em `00_Governanca_e_Arquitetura` ... \u00e9 a \u00fanica parte do documento que \u00e9 genuinamente transversal ao ecossistema ... pertence \u00e0 camada do orquestrador'."
+        },
+        {
+          "text": "As regras de reuni\u00e3o de diagn\u00f3stico/proposta e cancelamento s\u00e3o atribu\u00eddas ao subagente Agenda",
+          "passed": false,
+          "evidence": "Atribui esses blocos ao orquestrador, n\u00e3o a um subagente Agenda: 'Blocos 5 e 6 \u2014 Agendamento e cancelamento \u2192 governan\u00e7a (processo comercial) ... Dono: Orquestrador (Nathalia)', com destino '00_Governanca_e_Arquitetura/processo-comercial-agendamento.md'. Nenhuma men\u00e7\u00e3o a um agente/subagente Agenda em todo o relat\u00f3rio."
+        },
+        {
+          "text": "Nenhuma informa\u00e7\u00e3o de uma marca \u00e9 atribu\u00edda a outra marca (zero contamina\u00e7\u00e3o cruzada)",
+          "passed": true,
+          "evidence": "O mapa bloco a bloco mant\u00e9m cada conte\u00fado com sua marca de origem (EduInfo, Gennera, Eco Clear); n\u00e3o h\u00e1 troca de atribui\u00e7\u00e3o entre marcas."
+        },
+        {
+          "text": "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'",
+          "passed": true,
+          "evidence": "Em prosa: 'Case Eco Clear', 'base Eco Clear', 'Subagente Eco Clear'. A forma `ecoclear` aparece apenas como identificador citado de `brands.ts`, n\u00e3o como grafia pr\u00f3pria da marca."
+        },
+        {
+          "text": "N\u00e3o inventa fatos ausentes da fixture",
+          "passed": true,
+          "evidence": "N\u00fameros e frases citados conferem com a fixture (4 unidades, 2.300 alunos, 38%, autoriza\u00e7\u00e3o de uso). A refer\u00eancia externa a `/home/user/nar-crm/src/lib/brands.ts` foi verificada e \u00e9 real (`BrandId = \"eduinfo\" | \"gennera\" | \"ecoclear\" | \"educbank\" | \"nareco\"`), e as lacunas s\u00e3o registradas como pend\u00eancias em vez de preenchidas."
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 100.18,
+        "stddev": 24.2766,
+        "min": 64.4,
+        "max": 123.1
+      },
+      "tokens": {
+        "mean": 56909.6,
+        "stddev": 2675.5436,
+        "min": 53032,
+        "max": 60037
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.75,
+        "stddev": 0.2932,
+        "min": 0.25,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 104.66,
+        "stddev": 15.7541,
+        "min": 85.6,
+        "max": 123.8
+      },
+      "tokens": {
+        "mean": 40336.6,
+        "stddev": 1403.06,
+        "min": 38947,
+        "max": 42350
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.25",
+      "time_seconds": "-4.5",
+      "tokens": "+16573"
+    }
+  },
+  "notes": []
+}

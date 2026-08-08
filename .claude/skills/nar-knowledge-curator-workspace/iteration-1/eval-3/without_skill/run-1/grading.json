@@ -1,0 +1,54 @@
+{
+  "eval_id": 3,
+  "configuration": "without_skill",
+  "expectations": [
+    {
+      "text": "A decisão é KEEP",
+      "passed": false,
+      "evidence": "'**Veredito:** precisa de ajustes ... o documento tem **um erro factual comprovado**, **duas contradições internas** e **lacunas críticas**', seguido de um checklist com 3 bloqueadores e 15 itens de ajuste."
+    },
+    {
+      "text": "Não recomenda SPLIT nem REWRITE do documento",
+      "passed": false,
+      "evidence": "Recomenda reescrita extensa do índice: 'Adicionar colunas `Tipo`, `Agente leitor` e `Documento canônico`', nova seção '3.1 Escopo de leitura por agente', 'Adicionar regra de precedência em conflito', 'Adicionar tabela de grafia canônica', reescrever a convenção de nomes."
+    },
+    {
+      "text": "Não propõe renomear o documento",
+      "passed": true,
+      "evidence": "Nenhuma proposta de novo nome para o índice. A única renomeação sugerida é de pasta ('renomear `99_Archive` → `99_Arquivo_Historico`'), não do documento analisado."
+    },
+    {
+      "text": "SYSTEM: NÃO",
+      "passed": false,
+      "evidence": "O relatório não classifica o documento quanto à camada SYSTEM em nenhum ponto; o campo é inexistente e a expectativa não pode ser verificada."
+    },
+    {
+      "text": "RAG: NÃO",
+      "passed": false,
+      "evidence": "Não há classificação RAG do índice. A única menção a RAG é sobre excluir `99_Archive` da indexação e sobre filtros por prefixo de pasta — nada diz que este documento não deve ir para RAG."
+    },
+    {
+      "text": "Classifica a camada como REFERENCE",
+      "passed": false,
+      "evidence": "Nenhuma classificação de camada (REFERENCE ou equivalente) aparece no relatório."
+    },
+    {
+      "text": "Não inventa problemas nem gera trabalho de reestruturação sem ganho arquitetural nomeado",
+      "passed": false,
+      "evidence": "Gera reestruturação ampla a partir de um documento íntegro: criar pastas novas ('07_Agentes_e_Prompts', '08_Playbooks_Operacionais'), trocar o dono de `06_Agenda` ('Agenda não é marca nem pessoa nem agente') — contrariando o modelo em que Agenda é subagente transversal — e reescrever a convenção de nomes. Vários 'problemas' são do ecossistema, não do índice, e o checklist final tem 16 itens de trabalho."
+    },
+    {
+      "text": "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'",
+      "passed": true,
+      "evidence": "Em prosa usa 'Eco Clear'. A ocorrência de 'EcoClear (8×)' está na tabela de grafias divergentes encontradas na base — é denúncia da grafia errada, não uso próprio."
+    }
+  ],
+  "passed_count": 2,
+  "total_count": 8,
+  "pass_rate": 0.25,
+  "summary": {
+    "passed": 2,
+    "total": 8,
+    "pass_rate": 0.25
+  }
+}

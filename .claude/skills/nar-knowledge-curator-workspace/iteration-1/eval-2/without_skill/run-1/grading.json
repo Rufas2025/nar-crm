@@ -1,0 +1,54 @@
+{
+  "eval_id": 2,
+  "configuration": "without_skill",
+  "expectations": [
+    {
+      "text": "Mantém em SYSTEM apenas identidade, tom de voz global, classificação de intenção, roteamento e governança/LGPD",
+      "passed": false,
+      "evidence": "O esqueleto proposto do system prompt inclui um bloco extra de conteúdo consultável: '## FAQ DO ECOSSISTEMA (só o que é do NAR ECO)' com três perguntas do FAQ e o canal institucional ('naareco.com.br, LinkedIn NAR ECO Soluções'). Isso é conhecimento factual respondível, não regra de decisão, e permanece dentro do SYSTEM."
+    },
+    {
+      "text": "Move os catálogos por marca (EduInfo, Gennera, Eco Clear, Educbank, Vibe Flow Educacional) para RAG ou para os respectivos subagentes, fora do SYSTEM",
+      "passed": true,
+      "evidence": "'SOLUÇÕES DO ECOSSISTEMA (26–66) | **QUEBRA** | 1 linha de roteamento por marca fica; todo o resto vai para `01_EduInfo` … `05_Vibe_Flow_Educacional`'; passo 2 da execução extrai os 5 blocos de marca."
+    },
+    {
+      "text": "Move FAQ geral, objeções e canais/redes sociais para RAG, fora do SYSTEM",
+      "passed": false,
+      "evidence": "As objeções e os canais de marca saem, mas o FAQ geral não: 'FAQ GERAL (68–78) | QUEBRA | 3 perguntas ficam' e o esqueleto do prompt reproduz as três perguntas mais o canal NAR ECO dentro do system prompt. Nenhum destino RAG é atribuído a esse conteúdo."
+    },
+    {
+      "text": "Move as regras de agendamento para o subagente Agenda",
+      "passed": true,
+      "evidence": "'REGRAS DE AGENDAMENTO (89–98) | **SAI** | `06_Agenda` | Domínio próprio, dono próprio'; roteamento remete 'Agendamento de demo, diagnóstico ou proposta → regras de Agenda'."
+    },
+    {
+      "text": "Classifica a seção de integração Evolution GO/n8n/payload como WORKFLOW, não como RAG nem SYSTEM",
+      "passed": true,
+      "evidence": "'INTEGRAÇÃO OPERACIONAL (105–109) | **SAI** | Documentação técnica do workflow n8n / runbook ... Isso é contrato de sistema, não instrução de conversa.' Equivale à camada WORKFLOW em substância."
+    },
+    {
+      "text": "Não recomenda indexar o system prompt em si como conhecimento factual no RAG",
+      "passed": true,
+      "evidence": "Nenhuma recomendação de indexar o prompt; o conteúdo removido é realocado para documentos de marca/agenda/técnico e o prompt é reescrito, não indexado."
+    },
+    {
+      "text": "A recomendação resulta em redução substancial do system prompt (a maior parte dos blocos sai de SYSTEM)",
+      "passed": true,
+      "evidence": "'Estimativa: **~35 linhas** contra as 115 atuais (redução de ~70%), e o que sai não é perdido, é realocado.'"
+    },
+    {
+      "text": "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'",
+      "passed": true,
+      "evidence": "'Resíduos, certificação ambiental, sustentabilidade → Eco Clear' — grafia correta; nenhuma ocorrência de 'EcoClear'."
+    }
+  ],
+  "passed_count": 6,
+  "total_count": 8,
+  "pass_rate": 0.75,
+  "summary": {
+    "passed": 6,
+    "total": 8,
+    "pass_rate": 0.75
+  }
+}

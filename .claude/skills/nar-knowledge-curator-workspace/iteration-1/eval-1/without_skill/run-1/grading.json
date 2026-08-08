@@ -1,0 +1,49 @@
+{
+  "eval_id": 1,
+  "configuration": "without_skill",
+  "expectations": [
+    {
+      "text": "Identifica ao menos 4 divergências factuais concretas entre os dois documentos (preços por faixa, taxa de implantação, desconto anual, regra de cancelamento, prazo de implantação, suporte telefônico)",
+      "passed": true,
+      "evidence": "'Inventário de divergências' com 9 linhas divergentes: três faixas de preço, taxa de implantação, desconto 10%/15%, cancelamento (multa 30% x aviso 60 dias), prazo 45/60 dias, suporte telefônico, contrato semestral."
+    },
+    {
+      "text": "Marca as divergências como CONFLITO/CONFLITANTE de forma explícita",
+      "passed": true,
+      "evidence": "Título 'Conflito de informação comercial — Gennera'; 'dois documentos comerciais completos e mutuamente incompatíveis'; 'Os dois documentos são incompatíveis em 9 dimensões'."
+    },
+    {
+      "text": "NÃO escolhe sozinho qual versão é a verdadeira — encaminha a decisão para validação humana",
+      "passed": true,
+      "evidence": "Levanta B como hipótese mais provável mas conclui: 'não há autoridade documental suficiente para decidir sozinho... precisa de uma confirmação humana do dono comercial da Gennera'; 'Não dá para decidir por inferência.' Tempo 2 traz 5 perguntas fechadas para o responsável."
+    },
+    {
+      "text": "Indica qual documento deveria ser a fonte canônica única das condições comerciais Gennera",
+      "passed": true,
+      "evidence": "'Um único documento canônico por tema por marca. Criar `03_Gennera/Gennera_Tabela_Comercial_VIGENTE.md` com o conteúdo validado... Nada de dois arquivos quase iguais convivendo.'"
+    },
+    {
+      "text": "Aponta que documento comercial da Gennera não pertence à pasta 00_Governanca_e_Arquitetura",
+      "passed": true,
+      "evidence": "'B está na pasta errada. `00_Governanca_e_Arquitetura` é pasta de governança do ecossistema, não de conteúdo comercial de marca'; 'Corrigir a pasta de B... Move para 03_Gennera'."
+    },
+    {
+      "text": "Recomenda ARCHIVE em vez de exclusão destrutiva do documento substituído",
+      "passed": true,
+      "evidence": "'**Não apagar nada.** Marcar, não deletar'; 'Arquivar os antigos, não excluí-los: mover A ... para `03_Gennera/_historico/`... fora do índice do RAG'."
+    },
+    {
+      "text": "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'",
+      "passed": true,
+      "evidence": "Nenhuma ocorrência de 'EcoClear' no relatório (a marca não é citada neste caso)."
+    }
+  ],
+  "passed_count": 7,
+  "total_count": 7,
+  "pass_rate": 1.0,
+  "summary": {
+    "passed": 7,
+    "total": 7,
+    "pass_rate": 1.0
+  }
+}

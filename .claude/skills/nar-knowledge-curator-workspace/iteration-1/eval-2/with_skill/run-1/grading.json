@@ -1,0 +1,54 @@
+{
+  "eval_id": 2,
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "Mantém em SYSTEM apenas identidade, tom de voz global, classificação de intenção, roteamento e governança/LGPD",
+      "passed": true,
+      "evidence": "'SYSTEM: SIM — apenas identidade, tom global, classificação de intenção, tabela de roteamento (uma linha por marca), regras comerciais globais e governança/LGPD.' O único item além da lista da assertion são as REGRAS COMERCIAIS, tratadas como regra global de governança que vale para todas as marcas — nenhum catálogo de marca, FAQ, canal, agenda ou integração permanece em SYSTEM."
+    },
+    {
+      "text": "Move os catálogos por marca (EduInfo, Gennera, Eco Clear, Educbank, Vibe Flow Educacional) para RAG ou para os respectivos subagentes, fora do SYSTEM",
+      "passed": true,
+      "evidence": "SPLIT MAP mapeia as cinco marcas para documentos próprios em camada RAG (ex.: 'Gennera: ERP, contratação, prazo, IPCA, suporte, implantação -> Gennera_Produtos_e_Condicoes_Comerciais -> Gennera -> RAG')."
+    },
+    {
+      "text": "Move FAQ geral, objeções e canais/redes sociais para RAG, fora do SYSTEM",
+      "passed": true,
+      "evidence": "'FAQ GERAL (institucional, 4 perguntas) -> NAR_ECO_FAQ_Institucional -> NAR ECO -> RAG'; 'Canais NAR ECO (site + LinkedIn) -> NAR_ECO_Canais_Oficiais -> RAG'; objeções por marca -> '*_FAQ_e_Objecoes -> RAG'."
+    },
+    {
+      "text": "Move as regras de agendamento para o subagente Agenda",
+      "passed": true,
+      "evidence": "Seis linhas do SPLIT MAP com destino Agenda (demonstrações, qualificação, reagendamento/no-show, confirmações 24h/1h, tipos de reunião) e 'REGRAS DE AGENDAMENTO -> Agenda' em CONTEÚDO A MOVER."
+    },
+    {
+      "text": "Classifica a seção de integração Evolution GO/n8n/payload como WORKFLOW, não como RAG nem SYSTEM",
+      "passed": true,
+      "evidence": "'INTEGRAÇÃO OPERACIONAL (Evolution GO, n8n, payload, retry) -> NAR_ECO_Workflow_Encerramento_CRM -> operação -> WORKFLOW'."
+    },
+    {
+      "text": "Não recomenda indexar o system prompt em si como conhecimento factual no RAG",
+      "passed": true,
+      "evidence": "'RAG: SIM — blocos de marca, FAQ institucional e canais, cada um em índice isolado por dono. O documento inteiro nunca deve ser indexado como está.' O original vai para ARCHIVE, não para o índice."
+    },
+    {
+      "text": "A recomendação resulta em redução substancial do system prompt (a maior parte dos blocos sai de SYSTEM)",
+      "passed": true,
+      "evidence": "'cerca de três quartos do documento deve sair do system prompt'; o prompt final tem 5 blocos e 'nenhuma resposta de cliente dentro dele'."
+    },
+    {
+      "text": "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'",
+      "passed": true,
+      "evidence": "'Eco Clear: programa e certificação', 'Eco Clear: case Rede Semear' — sempre duas palavras; nenhuma ocorrência de 'EcoClear' (nomes de arquivo usam underscore: 'Eco_Clear_Cases_e_Provas')."
+    }
+  ],
+  "passed_count": 8,
+  "total_count": 8,
+  "pass_rate": 1.0,
+  "summary": {
+    "passed": 8,
+    "total": 8,
+    "pass_rate": 1.0
+  }
+}

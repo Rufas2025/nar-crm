@@ -1,0 +1,54 @@
+{
+  "eval_id": 4,
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "O posicionamento da EduInfo é atribuído ao subagente EduInfo",
+      "passed": true,
+      "evidence": "SPLIT MAP: 'Sobre a EduInfo -> EduInfo_Identidade_e_Posicionamento -> EduInfo -> RAG'."
+    },
+    {
+      "text": "O link de apresentação da Gennera é atribuído ao subagente Gennera",
+      "passed": true,
+      "evidence": "'Link Gennera (o material) -> Gennera_Apresentacao_Institucional -> Gennera -> ASSET' e 'Link Gennera (quando enviar) -> Gennera_Regras_de_Envio_de_Materiais -> Gennera -> RAG'."
+    },
+    {
+      "text": "O case da Rede Semear é atribuído ao subagente Eco Clear",
+      "passed": true,
+      "evidence": "'Case Eco Clear (Rede Semear) -> Eco_Clear_Cases_e_Provas -> Eco Clear -> RAG'."
+    },
+    {
+      "text": "A regra comercial de aprovação de proposta é atribuída ao orquestrador NAR ECO como regra global",
+      "passed": true,
+      "evidence": "'Regra comercial (todas as marcas) -> NAR_ECO_Regras_Comerciais_Globais -> NAR ECO (orquestrador) -> SYSTEM'; 'este bloco é o único genuinamente global — o próprio texto enumera as cinco marcas'."
+    },
+    {
+      "text": "As regras de reunião de diagnóstico/proposta e cancelamento são atribuídas ao subagente Agenda",
+      "passed": true,
+      "evidence": "'Agendamento (tipos e duração) -> Agenda_Regras_de_Reuniao -> Agenda -> WORKFLOW' e 'Agendamento (cancelamento) -> Agenda -> WORKFLOW'; 'Agenda é subagente transversal, não marca.'"
+    },
+    {
+      "text": "Nenhuma informação de uma marca é atribuída a outra marca (zero contaminação cruzada)",
+      "passed": true,
+      "evidence": "Cada bloco vai ao seu dono correto (EduInfo→EduInfo, link→Gennera, Rede Semear→Eco Clear) e o relatório reforça o isolamento: 'um case da Eco Clear aparecendo numa resposta sobre Gennera não é ruído, é atribuição errada'. Nenhuma troca de dono encontrada."
+    },
+    {
+      "text": "'Eco Clear' aparece sempre em duas palavras, nunca como 'EcoClear'",
+      "passed": true,
+      "evidence": "'Case Eco Clear: prova social de marca...', 'Case Eco Clear (Rede Semear) ... -> Eco Clear'. Nenhuma ocorrência de 'EcoClear'."
+    },
+    {
+      "text": "Não inventa fatos ausentes da fixture",
+      "passed": true,
+      "evidence": "Lacunas são marcadas em vez de preenchidas: 'Alçada padrão de desconto: DESCONHECIDO', 'Responsável comercial da conta: DESCONHECIDO', 'Formato do material Gennera: INFERIDO ... a partir da URL'. Números do case (4 unidades, 38%) conferem com a fixture."
+    }
+  ],
+  "passed_count": 8,
+  "total_count": 8,
+  "pass_rate": 1.0,
+  "summary": {
+    "passed": 8,
+    "total": 8,
+    "pass_rate": 1.0
+  }
+}
