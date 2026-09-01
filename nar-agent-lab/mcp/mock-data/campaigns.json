@@ -1,0 +1,198 @@
+{
+  "_meta": {
+    "dataset": "campaigns",
+    "status": "LAB_MOCK",
+    "real_backend_connected": false,
+    "contains_personal_data": false,
+    "reference_date": "2026-09-01",
+    "note": "Métricas de performance são fictícias e não devem ser citadas como resultado real."
+  },
+  "brands": ["eduinfo", "nar-eco", "jabuticaba"],
+  "campaigns": [
+    {
+      "id": "camp_001",
+      "brand": "eduinfo",
+      "name": "Matrículas 2026 - Awareness",
+      "channel": "instagram",
+      "template_id": "tpl_edu_awareness_01",
+      "start_date": "2026-01-08",
+      "end_date": "2026-02-20",
+      "status": "encerrada",
+      "performance": { "impressions": 184300, "clicks": 5210, "ctr": 0.0283, "leads": 148 }
+    },
+    {
+      "id": "camp_002",
+      "brand": "eduinfo",
+      "name": "Gestão Escolar sem Papel",
+      "channel": "linkedin",
+      "template_id": "tpl_edu_gestao_02",
+      "start_date": "2026-03-02",
+      "end_date": "2026-04-15",
+      "status": "encerrada",
+      "performance": { "impressions": 62100, "clicks": 2480, "ctr": 0.0399, "leads": 91 }
+    },
+    {
+      "id": "camp_003",
+      "brand": "eduinfo",
+      "name": "Webinar - Inadimplência Escolar",
+      "channel": "email",
+      "template_id": "tpl_edu_webinar_03",
+      "start_date": "2026-05-05",
+      "end_date": "2026-05-28",
+      "status": "encerrada",
+      "performance": { "sends": 8400, "opens": 2688, "open_rate": 0.32, "clicks": 512, "leads": 63 }
+    },
+    {
+      "id": "camp_004",
+      "brand": "eduinfo",
+      "name": "Retomada Segundo Semestre",
+      "channel": "email",
+      "template_id": "tpl_edu_retomada_04",
+      "start_date": "2026-07-14",
+      "end_date": "2026-08-25",
+      "status": "encerrada",
+      "performance": { "sends": 9100, "opens": 2639, "open_rate": 0.29, "clicks": 431, "leads": 47 }
+    },
+    {
+      "id": "camp_005",
+      "brand": "eduinfo",
+      "name": "Demonstração ERP - Sempre Ativa",
+      "channel": "google_ads",
+      "template_id": "tpl_edu_demo_05",
+      "start_date": "2026-08-01",
+      "end_date": null,
+      "status": "ativa",
+      "performance": { "impressions": 74800, "clicks": 3210, "ctr": 0.0429, "leads": 112 }
+    },
+    {
+      "id": "camp_006",
+      "brand": "nar-eco",
+      "name": "DNA ECO - Lançamento",
+      "channel": "whatsapp",
+      "template_id": "tpl_eco_lancamento_01",
+      "start_date": "2026-02-10",
+      "end_date": "2026-03-30",
+      "status": "encerrada",
+      "performance": { "sends": 4200, "reads": 3486, "read_rate": 0.83, "replies": 611 }
+    },
+    {
+      "id": "camp_007",
+      "brand": "nar-eco",
+      "name": "Escolas Sustentáveis - Nutrição",
+      "channel": "instagram",
+      "template_id": "tpl_eco_nutricao_02",
+      "start_date": "2026-04-06",
+      "end_date": "2026-06-10",
+      "status": "encerrada",
+      "performance": { "impressions": 128400, "clicks": 4102, "ctr": 0.0319, "leads": 88 }
+    },
+    {
+      "id": "camp_008",
+      "brand": "nar-eco",
+      "name": "Agenda Nathalia - Convite Escolas",
+      "channel": "email",
+      "template_id": "tpl_eco_agenda_03",
+      "start_date": "2026-07-01",
+      "end_date": null,
+      "status": "ativa",
+      "performance": { "sends": 2300, "opens": 897, "open_rate": 0.39, "clicks": 164, "leads": 29 }
+    },
+    {
+      "id": "camp_009",
+      "brand": "jabuticaba",
+      "name": "Coleção Movimento - Vertical 4:5",
+      "channel": "instagram",
+      "template_id": "tpl_jab_movimento_01",
+      "start_date": "2026-03-15",
+      "end_date": "2026-05-01",
+      "status": "encerrada",
+      "performance": { "impressions": 211900, "clicks": 7845, "ctr": 0.037, "leads": 0 }
+    },
+    {
+      "id": "camp_010",
+      "brand": "jabuticaba",
+      "name": "Bem-estar Todo Dia",
+      "channel": "tiktok",
+      "template_id": "tpl_jab_bemestar_02",
+      "start_date": "2026-06-20",
+      "end_date": null,
+      "status": "ativa",
+      "performance": { "impressions": 342700, "clicks": 10920, "ctr": 0.0319, "leads": 0 }
+    }
+  ],
+  "templates": [
+    { "id": "tpl_edu_awareness_01", "brand": "eduinfo", "format": "carrossel", "headline": "Sua escola gasta quantas horas por mês com planilha?" },
+    { "id": "tpl_edu_gestao_02", "brand": "eduinfo", "format": "post_unico", "headline": "Gestão escolar sem papel, sem retrabalho." },
+    { "id": "tpl_edu_webinar_03", "brand": "eduinfo", "format": "email_convite", "headline": "Como reduzir a inadimplência sem constranger a família." },
+    { "id": "tpl_edu_retomada_04", "brand": "eduinfo", "format": "email_sequencia", "headline": "Segundo semestre começa organizado." },
+    { "id": "tpl_edu_demo_05", "brand": "eduinfo", "format": "search_ad", "headline": "ERP para escolas - agende uma demonstração." },
+    { "id": "tpl_eco_lancamento_01", "brand": "nar-eco", "format": "mensagem_whatsapp", "headline": "O DNA ECO chegou na sua escola." },
+    { "id": "tpl_eco_nutricao_02", "brand": "nar-eco", "format": "carrossel", "headline": "Alimentação escolar que educa." },
+    { "id": "tpl_eco_agenda_03", "brand": "nar-eco", "format": "email_convite", "headline": "Convite: encontro com Nathalia Serrano." },
+    { "id": "tpl_jab_movimento_01", "brand": "jabuticaba", "format": "video_vertical_4x5", "headline": "Movimento é o novo conforto." },
+    { "id": "tpl_jab_bemestar_02", "brand": "jabuticaba", "format": "video_vertical_4x5", "headline": "Bem-estar todo dia, do seu jeito." }
+  ],
+  "brand_context": {
+    "eduinfo": {
+      "brand": "eduinfo",
+      "positioning": "ERP de gestão escolar para escolas privadas e redes de ensino no Brasil, com foco em reduzir retrabalho administrativo e inadimplência.",
+      "guardrails": [
+        "Tom profissional, direto e sem jargão técnico desnecessário.",
+        "Usar sempre o Design System oficial da Eduinfo em qualquer peça visual.",
+        "Propostas comerciais seguem o Template V2 sem redesenho estrutural.",
+        "Não comparar nominalmente com concorrentes.",
+        "Não prometer prazo de implantação sem validação do time de produto."
+      ],
+      "approved_messages": [
+        "Gestão escolar sem papel, sem retrabalho.",
+        "Menos planilha, mais tempo com o aluno.",
+        "Do financeiro à secretaria, tudo em um só lugar."
+      ],
+      "restricted_claims": [
+        "Reduz a inadimplência em X%",
+        "O melhor ERP escolar do Brasil",
+        "Implantação garantida em 7 dias",
+        "Aprovado pelo MEC"
+      ]
+    },
+    "nar-eco": {
+      "brand": "nar-eco",
+      "positioning": "Ecossistema de educação e bem-estar escolar (DNA ECO) conduzido por Nathalia Serrano, conectando nutrição, sustentabilidade e cultura escolar.",
+      "guardrails": [
+        "Tom acolhedor, humano e educativo.",
+        "Nunca oferecer orientação clínica, diagnóstico ou prescrição individual.",
+        "Conteúdo sobre alimentação deve ser educacional, nunca terapêutico.",
+        "Preservar a voz pessoal da Nathalia; não gerar fala em nome dela sem revisão humana."
+      ],
+      "approved_messages": [
+        "Alimentação escolar que educa.",
+        "Bem-estar começa na cultura da escola.",
+        "O DNA ECO da sua escola."
+      ],
+      "restricted_claims": [
+        "Emagrecimento",
+        "Cura",
+        "Tratamento de transtornos alimentares",
+        "Resultado garantido de saúde"
+      ]
+    },
+    "jabuticaba": {
+      "brand": "jabuticaba",
+      "positioning": "Moda fitness e bem-estar, com comunicação social em vídeo vertical 1080x1350 (4:5).",
+      "guardrails": [
+        "Todo vídeo social entregue em 1080x1350, proporção 4:5.",
+        "Representar corpos diversos; sem linguagem de vergonha corporal.",
+        "Não usar imagem de pessoa real sem autorização registrada."
+      ],
+      "approved_messages": [
+        "Movimento é o novo conforto.",
+        "Bem-estar todo dia, do seu jeito."
+      ],
+      "restricted_claims": [
+        "Emagreça em N dias",
+        "Corpo perfeito",
+        "Resultado garantido"
+      ]
+    }
+  }
+}

@@ -1,0 +1,1286 @@
+{
+  "registry_name": "nar-capability-registry",
+  "registry_version": "0.1.0",
+  "status": "LAB",
+  "environment": "mock",
+  "frozen": true,
+  "frozen_at": "2026-09-01",
+  "describes_contract": "nar-ops-mcp@0.1.0",
+  "principle": "O MCP expõe capabilities de negócio delimitadas, nunca acesso técnico genérico.",
+  "policy": {
+    "read_only_enforced": true,
+    "fail_closed": true,
+    "deny_by_default": true,
+    "no_credentials": true,
+    "no_secrets": true,
+    "no_side_effects": true,
+    "no_capability_invention": true,
+    "no_generic_access": true,
+    "forbidden_tool_shapes": [
+      "sql_query",
+      "execute_any_api",
+      "drive_search_global",
+      "http_request_anywhere",
+      "run_code",
+      "write_file_anywhere"
+    ],
+    "rules": [
+      "Um agente só pode invocar tool explicitamente listada em seu allowed_tools.",
+      "Agente desconhecido é tratado como não autorizado (ACCESS_DENIED), nunca como permitido.",
+      "Tool não declarada neste contrato não existe (UNKNOWN_TOOL), mesmo que o agente peça por ela.",
+      "Nenhum input pode ampliar escopo: raízes e allowlists são fixas no contrato.",
+      "Toda resposta usa o envelope padrão; erros nunca são silenciosos."
+    ]
+  },
+  "agents": [
+    {
+      "id": "rufas-router",
+      "role": "Roteador de intenção entre subagentes. Não executa capability de negócio.",
+      "allowed_tools": []
+    },
+    {
+      "id": "marketing-nar",
+      "role": "Conteúdo, campanhas e assets de marca.",
+      "allowed_tools": [
+        "eduinfo_list_root",
+        "eduinfo_search_folder",
+        "eduinfo_get_asset",
+        "campaign_get_history",
+        "campaign_get_brand_context"
+      ]
+    },
+    {
+      "id": "atendimento-nar",
+      "role": "Atendimento e cadência com contatos.",
+      "allowed_tools": [
+        "crm_list_eligible_contacts",
+        "crm_get_contact_context",
+        "crm_get_followups_due",
+        "crm_get_demo_scheduled",
+        "proposal_get_pending"
+      ]
+    },
+    {
+      "id": "crm-nar",
+      "role": "Higiene, priorização e leitura do funil.",
+      "allowed_tools": [
+        "crm_list_eligible_contacts",
+        "crm_get_contact_context",
+        "crm_get_followups_due",
+        "crm_get_demo_scheduled",
+        "proposal_get_pending"
+      ]
+    },
+    {
+      "id": "produto-nar",
+      "role": "Produto, documentação e posicionamento.",
+      "allowed_tools": [
+        "eduinfo_list_root",
+        "eduinfo_search_folder",
+        "eduinfo_get_asset",
+        "proposal_get_pending",
+        "campaign_get_history",
+        "campaign_get_brand_context"
+      ]
+    },
+    {
+      "id": "engenharia-nar",
+      "role": "Engenharia e integrações.",
+      "allowed_tools": [
+        "eduinfo_list_root",
+        "eduinfo_search_folder",
+        "eduinfo_get_asset"
+      ]
+    }
+  ],
+  "agent_access_matrix": {
+    "rufas-router": {
+      "eduinfo_list_root": "DENY",
+      "eduinfo_search_folder": "DENY",
+      "eduinfo_get_asset": "DENY",
+      "crm_list_eligible_contacts": "DENY",
+      "crm_get_contact_context": "DENY",
+      "crm_get_followups_due": "DENY",
+      "crm_get_demo_scheduled": "DENY",
+      "proposal_get_pending": "DENY",
+      "campaign_get_history": "DENY",
+      "campaign_get_brand_context": "DENY"
+    },
+    "marketing-nar": {
+      "eduinfo_list_root": "ALLOW",
+      "eduinfo_search_folder": "ALLOW",
+      "eduinfo_get_asset": "ALLOW",
+      "crm_list_eligible_contacts": "DENY",
+      "crm_get_contact_context": "DENY",
+      "crm_get_followups_due": "DENY",
+      "crm_get_demo_scheduled": "DENY",
+      "proposal_get_pending": "DENY",
+      "campaign_get_history": "ALLOW",
+      "campaign_get_brand_context": "ALLOW"
+    },
+    "atendimento-nar": {
+      "eduinfo_list_root": "DENY",
+      "eduinfo_search_folder": "DENY",
+      "eduinfo_get_asset": "DENY",
+      "crm_list_eligible_contacts": "ALLOW",
+      "crm_get_contact_context": "ALLOW",
+      "crm_get_followups_due": "ALLOW",
+      "crm_get_demo_scheduled": "ALLOW",
+      "proposal_get_pending": "ALLOW",
+      "campaign_get_history": "DENY",
+      "campaign_get_brand_context": "DENY"
+    },
+    "crm-nar": {
+      "eduinfo_list_root": "DENY",
+      "eduinfo_search_folder": "DENY",
+      "eduinfo_get_asset": "DENY",
+      "crm_list_eligible_contacts": "ALLOW",
+      "crm_get_contact_context": "ALLOW",
+      "crm_get_followups_due": "ALLOW",
+      "crm_get_demo_scheduled": "ALLOW",
+      "proposal_get_pending": "ALLOW",
+      "campaign_get_history": "DENY",
+      "campaign_get_brand_context": "DENY"
+    },
+    "produto-nar": {
+      "eduinfo_list_root": "ALLOW",
+      "eduinfo_search_folder": "ALLOW",
+      "eduinfo_get_asset": "ALLOW",
+      "crm_list_eligible_contacts": "DENY",
+      "crm_get_contact_context": "DENY",
+      "crm_get_followups_due": "DENY",
+      "crm_get_demo_scheduled": "DENY",
+      "proposal_get_pending": "ALLOW",
+      "campaign_get_history": "ALLOW",
+      "campaign_get_brand_context": "ALLOW"
+    },
+    "engenharia-nar": {
+      "eduinfo_list_root": "ALLOW",
+      "eduinfo_search_folder": "ALLOW",
+      "eduinfo_get_asset": "ALLOW",
+      "crm_list_eligible_contacts": "DENY",
+      "crm_get_contact_context": "DENY",
+      "crm_get_followups_due": "DENY",
+      "crm_get_demo_scheduled": "DENY",
+      "proposal_get_pending": "DENY",
+      "campaign_get_history": "DENY",
+      "campaign_get_brand_context": "DENY"
+    }
+  },
+  "capabilities": [
+    {
+      "TOOL_NAME": "eduinfo_list_root",
+      "DOMAIN": "eduinfo",
+      "OWNER": "engenharia-nar",
+      "PURPOSE": "Listar itens autorizados da raiz Eduinfo.",
+      "INPUT_SCHEMA": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20
+          }
+        },
+        "required": []
+      },
+      "OUTPUT_SCHEMA": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "name",
+                "mimeType",
+                "isFolder",
+                "size"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "mimeType": {
+                  "type": "string"
+                },
+                "isFolder": {
+                  "type": "boolean"
+                },
+                "size": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "READ_ONLY": true,
+      "ALLOWED_AGENTS": [
+        "marketing-nar",
+        "produto-nar",
+        "engenharia-nar"
+      ],
+      "DENIED_AGENTS": [
+        "rufas-router",
+        "atendimento-nar",
+        "crm-nar"
+      ],
+      "SIDE_EFFECTS": [],
+      "APPROVAL_REQUIRED": false,
+      "FAILURE_MODES": [
+        "ACCESS_DENIED para atendimento-nar, crm-nar e rufas-router",
+        "INVALID_INPUT se o chamador tentar passar raiz ou credencial",
+        "LIMIT_EXCEEDED acima de 100"
+      ],
+      "MOCK_BEHAVIOR": "Retorna as 3 pastas autorizadas de mock-data/eduinfo.json. A pasta Financeiro_Restrito nunca é listada.",
+      "FUTURE_REAL_BACKEND": "Google Drive API (files.list) restrita por allowlist de Folder_ID no servidor, com service account de leitura."
+    },
+    {
+      "TOOL_NAME": "eduinfo_search_folder",
+      "DOMAIN": "eduinfo",
+      "OWNER": "engenharia-nar",
+      "PURPOSE": "Pesquisar arquivos e pastas dentro de um Folder_ID autorizado.",
+      "INPUT_SCHEMA": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "Search_Query",
+          "Folder_ID"
+        ],
+        "properties": {
+          "Search_Query": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "Folder_ID": {
+            "type": "string",
+            "minLength": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20
+          }
+        }
+      },
+      "OUTPUT_SCHEMA": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "name",
+                "mimeType",
+                "isFolder",
+                "size"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "mimeType": {
+                  "type": "string"
+                },
+                "isFolder": {
+                  "type": "boolean"
+                },
+                "size": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "READ_ONLY": true,
+      "ALLOWED_AGENTS": [
+        "marketing-nar",
+        "produto-nar",
+        "engenharia-nar"
+      ],
+      "DENIED_AGENTS": [
+        "rufas-router",
+        "atendimento-nar",
+        "crm-nar"
+      ],
+      "SIDE_EFFECTS": [],
+      "APPROVAL_REQUIRED": false,
+      "FAILURE_MODES": [
+        "ASSET_OUT_OF_SCOPE para pasta fora da allowlist",
+        "FOLDER_NOT_FOUND para Folder_ID inexistente",
+        "INVALID_INPUT para Search_Query vazia ou campo extra",
+        "LIMIT_EXCEEDED acima de 100"
+      ],
+      "MOCK_BEHAVIOR": "Filtra por substring no nome dentro do Folder_ID autorizado. Resultado vazio é sucesso.",
+      "FUTURE_REAL_BACKEND": "Google Drive API (files.list com q= e parents), sempre com o parent forçado à allowlist — nunca busca global."
+    },
+    {
+      "TOOL_NAME": "eduinfo_get_asset",
+      "DOMAIN": "eduinfo",
+      "OWNER": "engenharia-nar",
+      "PURPOSE": "Obter um asset autorizado de forma consumível, com URL temporária.",
+      "INPUT_SCHEMA": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "File_ID"
+        ],
+        "properties": {
+          "File_ID": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "OUTPUT_SCHEMA": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "file_id",
+          "name",
+          "mimeType",
+          "asset_available",
+          "download_url",
+          "expires"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "file_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "asset_available": {
+            "type": "boolean"
+          },
+          "download_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "expires": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "ISO-8601"
+          }
+        }
+      },
+      "READ_ONLY": true,
+      "ALLOWED_AGENTS": [
+        "marketing-nar",
+        "produto-nar",
+        "engenharia-nar"
+      ],
+      "DENIED_AGENTS": [
+        "rufas-router",
+        "atendimento-nar",
+        "crm-nar"
+      ],
+      "SIDE_EFFECTS": [],
+      "APPROVAL_REQUIRED": false,
+      "FAILURE_MODES": [
+        "ASSET_OUT_OF_SCOPE para arquivo fora da allowlist",
+        "FILE_NOT_FOUND para File_ID inexistente",
+        "INVALID_INPUT se vier token ou campo extra"
+      ],
+      "MOCK_BEHAVIOR": "Emite download_url mock:// não resolvível com expiração de 900s. Nenhum byte transferido.",
+      "FUTURE_REAL_BACKEND": "Google Drive API com link assinado de curta duração, gerado no servidor. O agente nunca recebe credencial."
+    },
+    {
+      "TOOL_NAME": "crm_list_eligible_contacts",
+      "DOMAIN": "crm",
+      "OWNER": "crm-nar",
+      "PURPOSE": "Listar contatos aptos a entrar em cadência numa data de referência.",
+      "INPUT_SCHEMA": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "date",
+          "limit"
+        ],
+        "properties": {
+          "date": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "segment": {
+            "type": "string",
+            "enum": [
+              "escola_privada",
+              "rede_ensino"
+            ]
+          }
+        }
+      },
+      "OUTPUT_SCHEMA": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "contacts",
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "contacts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "name",
+                "email",
+                "stage",
+                "segment",
+                "last_interaction"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "stage": {
+                  "type": "string"
+                },
+                "segment": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "school": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "last_interaction": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "READ_ONLY": true,
+      "ALLOWED_AGENTS": [
+        "atendimento-nar",
+        "crm-nar"
+      ],
+      "DENIED_AGENTS": [
+        "rufas-router",
+        "marketing-nar",
+        "produto-nar",
+        "engenharia-nar"
+      ],
+      "SIDE_EFFECTS": [],
+      "APPROVAL_REQUIRED": false,
+      "FAILURE_MODES": [
+        "ACCESS_DENIED para marketing-nar, produto-nar, engenharia-nar e rufas-router",
+        "INVALID_INPUT para date fora de YYYY-MM-DD ou segment fora do enum",
+        "LIMIT_EXCEEDED acima de 100"
+      ],
+      "MOCK_BEHAVIOR": "18 contatos elegíveis em 2026-09-01. Exclui inválidos, sem email e stages terminais.",
+      "FUTURE_REAL_BACKEND": "View somente-leitura no Postgres/Supabase do CRM, com RLS por papel de agente. Nunca SQL arbitrário."
+    },
+    {
+      "TOOL_NAME": "crm_get_contact_context",
+      "DOMAIN": "crm",
+      "OWNER": "crm-nar",
+      "PURPOSE": "Obter o contexto consolidado de um contato para decisão de atendimento.",
+      "INPUT_SCHEMA": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "contact_id"
+        ],
+        "properties": {
+          "contact_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "OUTPUT_SCHEMA": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "contact",
+          "stage",
+          "history",
+          "last_interaction",
+          "demo_status",
+          "followup_status"
+        ],
+        "properties": {
+          "contact": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "name",
+              "email"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "email": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "phone": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "school": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "segment": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "stage": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "history": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "date",
+                "channel",
+                "summary"
+              ],
+              "properties": {
+                "date": {
+                  "type": "string"
+                },
+                "channel": {
+                  "type": "string"
+                },
+                "summary": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "last_interaction": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "demo_status": {
+            "type": "string",
+            "enum": [
+              "none",
+              "scheduled",
+              "completed"
+            ]
+          },
+          "followup_status": {
+            "type": "string",
+            "enum": [
+              "none",
+              "scheduled",
+              "due_today",
+              "overdue"
+            ]
+          }
+        }
+      },
+      "READ_ONLY": true,
+      "ALLOWED_AGENTS": [
+        "atendimento-nar",
+        "crm-nar"
+      ],
+      "DENIED_AGENTS": [
+        "rufas-router",
+        "marketing-nar",
+        "produto-nar",
+        "engenharia-nar"
+      ],
+      "SIDE_EFFECTS": [],
+      "APPROVAL_REQUIRED": false,
+      "FAILURE_MODES": [
+        "ACCESS_DENIED fora de atendimento-nar e crm-nar",
+        "CONTACT_NOT_FOUND para contact_id inexistente",
+        "INVALID_INPUT para contact_id vazio"
+      ],
+      "MOCK_BEHAVIOR": "Retorna contexto consolidado. Contatos inválidos são legíveis (stage null) para diagnóstico de higiene.",
+      "FUTURE_REAL_BACKEND": "Endpoint de leitura por id no CRM, com minimização de campos e log de acesso a dado pessoal."
+    },
+    {
+      "TOOL_NAME": "crm_get_followups_due",
+      "DOMAIN": "crm",
+      "OWNER": "crm-nar",
+      "PURPOSE": "Listar follow-ups vencidos ou devidos até uma data de referência.",
+      "INPUT_SCHEMA": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "date",
+          "limit"
+        ],
+        "properties": {
+          "date": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          }
+        }
+      },
+      "OUTPUT_SCHEMA": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "contacts",
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "contacts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "name",
+                "stage",
+                "followup_due_date",
+                "followup_status"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "stage": {
+                  "type": "string"
+                },
+                "school": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "followup_due_date": {
+                  "type": "string"
+                },
+                "followup_status": {
+                  "type": "string",
+                  "enum": [
+                    "due_today",
+                    "overdue"
+                  ]
+                },
+                "days_overdue": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "READ_ONLY": true,
+      "ALLOWED_AGENTS": [
+        "atendimento-nar",
+        "crm-nar"
+      ],
+      "DENIED_AGENTS": [
+        "rufas-router",
+        "marketing-nar",
+        "produto-nar",
+        "engenharia-nar"
+      ],
+      "SIDE_EFFECTS": [],
+      "APPROVAL_REQUIRED": false,
+      "FAILURE_MODES": [
+        "ACCESS_DENIED fora de atendimento-nar e crm-nar",
+        "INVALID_INPUT para date malformada",
+        "LIMIT_EXCEEDED acima de 100"
+      ],
+      "MOCK_BEHAVIOR": "14 follow-ups vencidos em 2026-09-01, ordenados do mais vencido para o menos.",
+      "FUTURE_REAL_BACKEND": "Query parametrizada e nomeada no CRM (sem SQL do agente), com data de referência do servidor."
+    },
+    {
+      "TOOL_NAME": "crm_get_demo_scheduled",
+      "DOMAIN": "crm",
+      "OWNER": "crm-nar",
+      "PURPOSE": "Listar demos agendadas num intervalo de datas.",
+      "INPUT_SCHEMA": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "date_from",
+          "date_to"
+        ],
+        "properties": {
+          "date_from": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "date_to": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20
+          }
+        }
+      },
+      "OUTPUT_SCHEMA": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "demos",
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "demos": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "contact_id",
+                "name",
+                "scheduled_at",
+                "stage"
+              ],
+              "properties": {
+                "contact_id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "school": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "scheduled_at": {
+                  "type": "string"
+                },
+                "stage": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "READ_ONLY": true,
+      "ALLOWED_AGENTS": [
+        "atendimento-nar",
+        "crm-nar"
+      ],
+      "DENIED_AGENTS": [
+        "rufas-router",
+        "marketing-nar",
+        "produto-nar",
+        "engenharia-nar"
+      ],
+      "SIDE_EFFECTS": [],
+      "APPROVAL_REQUIRED": false,
+      "FAILURE_MODES": [
+        "ACCESS_DENIED fora de atendimento-nar e crm-nar",
+        "INVALID_INPUT para date_to < date_from",
+        "LIMIT_EXCEEDED acima de 100"
+      ],
+      "MOCK_BEHAVIOR": "5 demos agendadas entre 2026-09-01 e 2026-09-30.",
+      "FUTURE_REAL_BACKEND": "CRM + Google Calendar (somente leitura de eventos de demo), nunca criação ou alteração de evento."
+    },
+    {
+      "TOOL_NAME": "proposal_get_pending",
+      "DOMAIN": "proposals",
+      "OWNER": "produto-nar",
+      "PURPOSE": "Listar propostas aguardando ação da escola ou do time.",
+      "INPUT_SCHEMA": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "limit"
+        ],
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "rascunho",
+              "enviada",
+              "aguardando_resposta",
+              "negociacao",
+              "aceita",
+              "recusada",
+              "expirada"
+            ]
+          },
+          "proposal_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "OUTPUT_SCHEMA": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "proposals",
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "proposals": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "contact_id",
+                "title",
+                "status",
+                "value_brl",
+                "sent_at"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "contact_id": {
+                  "type": "string"
+                },
+                "school": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "title": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "value_brl": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "sent_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "valid_until": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "days_waiting": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "READ_ONLY": true,
+      "ALLOWED_AGENTS": [
+        "atendimento-nar",
+        "produto-nar",
+        "crm-nar"
+      ],
+      "DENIED_AGENTS": [
+        "rufas-router",
+        "marketing-nar",
+        "engenharia-nar"
+      ],
+      "SIDE_EFFECTS": [],
+      "APPROVAL_REQUIRED": false,
+      "FAILURE_MODES": [
+        "ACCESS_DENIED para marketing-nar, engenharia-nar e rufas-router",
+        "PROPOSAL_NOT_FOUND quando proposal_id não existe",
+        "INVALID_INPUT para status fora do enum",
+        "LIMIT_EXCEEDED acima de 100"
+      ],
+      "MOCK_BEHAVIOR": "Sem status, retorna as 6 propostas pendentes ordenadas por days_waiting desc.",
+      "FUTURE_REAL_BACKEND": "Módulo de propostas do ERP Eduinfo, leitura por status. Criação de proposta permanece fora do MCP."
+    },
+    {
+      "TOOL_NAME": "campaign_get_history",
+      "DOMAIN": "campaigns",
+      "OWNER": "marketing-nar",
+      "PURPOSE": "Consultar campanhas e templates anteriores, com performance mock.",
+      "INPUT_SCHEMA": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "brand": {
+            "type": "string",
+            "minLength": 1
+          },
+          "date_from": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "date_to": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20
+          }
+        },
+        "required": []
+      },
+      "OUTPUT_SCHEMA": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "campaigns",
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "campaigns": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "brand",
+                "name",
+                "channel",
+                "status",
+                "start_date"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "brand": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "channel": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "start_date": {
+                  "type": "string"
+                },
+                "end_date": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "template_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "template": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "format": {
+                      "type": "string"
+                    },
+                    "headline": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "performance": {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "READ_ONLY": true,
+      "ALLOWED_AGENTS": [
+        "marketing-nar",
+        "produto-nar"
+      ],
+      "DENIED_AGENTS": [
+        "rufas-router",
+        "atendimento-nar",
+        "crm-nar",
+        "engenharia-nar"
+      ],
+      "SIDE_EFFECTS": [],
+      "APPROVAL_REQUIRED": false,
+      "FAILURE_MODES": [
+        "ACCESS_DENIED fora de marketing-nar e produto-nar",
+        "BRAND_UNKNOWN para marca não registrada",
+        "INVALID_INPUT para date_to < date_from",
+        "LIMIT_EXCEEDED acima de 100"
+      ],
+      "MOCK_BEHAVIOR": "10 campanhas com template embutido e performance fictícia. Métricas não devem ser citadas como resultado real.",
+      "FUTURE_REAL_BACKEND": "Data warehouse de marketing (leitura agregada), sem acesso a plataformas de anúncio."
+    },
+    {
+      "TOOL_NAME": "campaign_get_brand_context",
+      "DOMAIN": "campaigns",
+      "OWNER": "marketing-nar",
+      "PURPOSE": "Obter posicionamento e guardrails de marca antes de produzir conteúdo.",
+      "INPUT_SCHEMA": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "brand"
+        ],
+        "properties": {
+          "brand": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "OUTPUT_SCHEMA": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "brand",
+          "positioning",
+          "guardrails",
+          "approved_messages",
+          "restricted_claims"
+        ],
+        "properties": {
+          "brand": {
+            "type": "string"
+          },
+          "positioning": {
+            "type": "string"
+          },
+          "guardrails": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "approved_messages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "restricted_claims": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "READ_ONLY": true,
+      "ALLOWED_AGENTS": [
+        "marketing-nar",
+        "produto-nar"
+      ],
+      "DENIED_AGENTS": [
+        "rufas-router",
+        "atendimento-nar",
+        "crm-nar",
+        "engenharia-nar"
+      ],
+      "SIDE_EFFECTS": [],
+      "APPROVAL_REQUIRED": false,
+      "FAILURE_MODES": [
+        "ACCESS_DENIED fora de marketing-nar e produto-nar",
+        "BRAND_UNKNOWN para marca não registrada",
+        "INVALID_INPUT para brand vazia"
+      ],
+      "MOCK_BEHAVIOR": "Retorna positioning, guardrails, approved_messages e restricted_claims de eduinfo, nar-eco ou jabuticaba.",
+      "FUTURE_REAL_BACKEND": "Repositório versionado de guardrails de marca, com revisão humana obrigatória para alteração."
+    }
+  ],
+  "not_yet_created": {
+    "gate": "Somente após benchmark read-only aprovado e desenho de aprovação humana.",
+    "tools": [
+      "crm_update_contact",
+      "crm_change_stage",
+      "send_email",
+      "send_whatsapp",
+      "publish_campaign",
+      "create_proposal",
+      "delete_anything",
+      "share_drive_file",
+      "upload_drive_file"
+    ],
+    "behavior_now": "Qualquer chamada a estes nomes retorna UNKNOWN_TOOL."
+  },
+  "mock_datasets": {
+    "eduinfo": "mock-data/eduinfo.json",
+    "crm": "mock-data/crm.json",
+    "proposals": "mock-data/proposals.json",
+    "campaigns": "mock-data/campaigns.json"
+  }
+}

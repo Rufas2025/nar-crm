@@ -1,0 +1,174 @@
+{
+  "_meta": {
+    "dataset": "eduinfo",
+    "status": "LAB_MOCK",
+    "real_backend_connected": false,
+    "contains_personal_data": false,
+    "note": "Dados totalmente fictícios. Nenhum Folder_ID/File_ID aqui corresponde a um recurso real do Google Drive."
+  },
+  "authorized_roots": ["fld_eduinfo_root"],
+  "folders": [
+    {
+      "id": "fld_eduinfo_root",
+      "name": "Eduinfo",
+      "mimeType": "application/vnd.google-apps.folder",
+      "isFolder": true,
+      "size": 0,
+      "parent_id": null,
+      "in_scope": true
+    },
+    {
+      "id": "fld_marketing_assets",
+      "name": "Marketing_Assets",
+      "mimeType": "application/vnd.google-apps.folder",
+      "isFolder": true,
+      "size": 0,
+      "parent_id": "fld_eduinfo_root",
+      "in_scope": true
+    },
+    {
+      "id": "fld_produto_docs",
+      "name": "Produto_Docs",
+      "mimeType": "application/vnd.google-apps.folder",
+      "isFolder": true,
+      "size": 0,
+      "parent_id": "fld_eduinfo_root",
+      "in_scope": true
+    },
+    {
+      "id": "fld_institucional",
+      "name": "Institucional",
+      "mimeType": "application/vnd.google-apps.folder",
+      "isFolder": true,
+      "size": 0,
+      "parent_id": "fld_eduinfo_root",
+      "in_scope": true
+    },
+    {
+      "id": "fld_financeiro_restrito",
+      "name": "Financeiro_Restrito",
+      "mimeType": "application/vnd.google-apps.folder",
+      "isFolder": true,
+      "size": 0,
+      "parent_id": null,
+      "in_scope": false,
+      "note": "Fora da allowlist. Existe apenas para testar bloqueio de escopo (T5)."
+    }
+  ],
+  "files": [
+    {
+      "id": "file_mkt_001",
+      "name": "eduinfo-logo-principal.png",
+      "mimeType": "image/png",
+      "isFolder": false,
+      "size": 184320,
+      "parent_id": "fld_marketing_assets",
+      "in_scope": true
+    },
+    {
+      "id": "file_mkt_002",
+      "name": "eduinfo-logo-monocromatico.png",
+      "mimeType": "image/png",
+      "isFolder": false,
+      "size": 121904,
+      "parent_id": "fld_marketing_assets",
+      "in_scope": true
+    },
+    {
+      "id": "file_mkt_003",
+      "name": "banner-campanha-matriculas.jpg",
+      "mimeType": "image/jpeg",
+      "isFolder": false,
+      "size": 942081,
+      "parent_id": "fld_marketing_assets",
+      "in_scope": true
+    },
+    {
+      "id": "file_mkt_004",
+      "name": "post-instagram-gestao-escolar.jpg",
+      "mimeType": "image/jpeg",
+      "isFolder": false,
+      "size": 655360,
+      "parent_id": "fld_marketing_assets",
+      "in_scope": true
+    },
+    {
+      "id": "file_mkt_005",
+      "name": "guia-de-marca-eduinfo.pdf",
+      "mimeType": "application/pdf",
+      "isFolder": false,
+      "size": 3145728,
+      "parent_id": "fld_marketing_assets",
+      "in_scope": true
+    },
+    {
+      "id": "file_prod_001",
+      "name": "eduinfo-erp-visao-geral.pdf",
+      "mimeType": "application/pdf",
+      "isFolder": false,
+      "size": 2359296,
+      "parent_id": "fld_produto_docs",
+      "in_scope": true
+    },
+    {
+      "id": "file_prod_002",
+      "name": "modulo-financeiro-especificacao.pdf",
+      "mimeType": "application/pdf",
+      "isFolder": false,
+      "size": 1887436,
+      "parent_id": "fld_produto_docs",
+      "in_scope": true
+    },
+    {
+      "id": "file_prod_003",
+      "name": "roadmap-produto-diagrama.png",
+      "mimeType": "image/png",
+      "isFolder": false,
+      "size": 512000,
+      "parent_id": "fld_produto_docs",
+      "in_scope": true
+    },
+    {
+      "id": "file_inst_001",
+      "name": "apresentacao-institucional.pdf",
+      "mimeType": "application/pdf",
+      "isFolder": false,
+      "size": 5242880,
+      "parent_id": "fld_institucional",
+      "in_scope": true
+    },
+    {
+      "id": "file_inst_002",
+      "name": "template-proposta-v2.pdf",
+      "mimeType": "application/pdf",
+      "isFolder": false,
+      "size": 1048576,
+      "parent_id": "fld_institucional",
+      "in_scope": true
+    },
+    {
+      "id": "file_inst_003",
+      "name": "foto-equipe-eduinfo.jpg",
+      "mimeType": "image/jpeg",
+      "isFolder": false,
+      "size": 1258291,
+      "parent_id": "fld_institucional",
+      "in_scope": true
+    },
+    {
+      "id": "file_out_of_scope_001",
+      "name": "planilha-margens-2026.pdf",
+      "mimeType": "application/pdf",
+      "isFolder": false,
+      "size": 409600,
+      "parent_id": "fld_financeiro_restrito",
+      "in_scope": false,
+      "note": "Arquivo fora de escopo. Qualquer acesso deve retornar ASSET_OUT_OF_SCOPE (T5)."
+    }
+  ],
+  "asset_delivery": {
+    "url_template": "mock://eduinfo-assets/{file_id}",
+    "ttl_seconds": 900,
+    "note": "URL fake, não resolvível. Nenhum download real ocorre no laboratório."
+  }
+}

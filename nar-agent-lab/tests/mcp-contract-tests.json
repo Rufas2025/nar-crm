@@ -1,0 +1,300 @@
+{
+  "suite": "mcp-contract-tests",
+  "suite_version": "0.1.0",
+  "targets_contract": "nar-ops-mcp@0.1.0",
+  "focus": "Schemas de input/output, comportamento de dados, escopo e casos de falha de domínio.",
+  "reference_date": "2026-09-01",
+  "executable": false,
+  "note": "Casos declarativos. Devem ser executados pelo runner do MCP real quando existir, ou verificados manualmente contra nar-ops-mcp-mock.json.",
+  "cases": [
+    {
+      "id": "T1",
+      "title": "Allowed agent / allowed tool",
+      "tool": "eduinfo_list_root",
+      "agent": "marketing-nar",
+      "input": {},
+      "expect": {
+        "ok": true,
+        "error_code": null,
+        "assertions": [
+          "data.count === 3",
+          "data.items todos com isFolder === true",
+          "nenhum item com id === 'fld_financeiro_restrito'",
+          "output valida contra outputSchema de eduinfo_list_root"
+        ]
+      }
+    },
+    {
+      "id": "T1b",
+      "title": "Allowed agent / allowed tool (CRM)",
+      "tool": "crm_list_eligible_contacts",
+      "agent": "crm-nar",
+      "input": { "date": "2026-09-01", "limit": 20 },
+      "expect": {
+        "ok": true,
+        "error_code": null,
+        "assertions": [
+          "data.contacts.length <= 20",
+          "todo contato retornado tem email !== null",
+          "nenhum contato com stage 'ganho' ou 'perdido'",
+          "nenhum contato com id 'contact_031' ou 'contact_032' (registros inválidos)"
+        ]
+      }
+    },
+    {
+      "id": "T3",
+      "title": "Invalid input - campo obrigatório ausente e tipo errado",
+      "tool": "crm_list_eligible_contacts",
+      "agent": "crm-nar",
+      "input": { "date": "01/09/2026", "limit": "vinte" },
+      "expect": {
+        "ok": false,
+        "error_code": "INVALID_INPUT",
+        "assertions": [
+          "erro ocorre antes de qualquer leitura de mock-data",
+          "mensagem não expõe conteúdo do dataset"
+        ]
+      }
+    },
+    {
+      "id": "T3b",
+      "title": "Invalid input - propriedade não declarada",
+      "tool": "eduinfo_search_folder",
+      "agent": "produto-nar",
+      "input": { "Search_Query": "pdf", "Folder_ID": "fld_produto_docs", "root_override": "fld_financeiro_restrito" },
+      "expect": {
+        "ok": false,
+        "error_code": "INVALID_INPUT",
+        "assertions": [
+          "additionalProperties:false impede que o input amplie escopo"
+        ]
+      }
+    },
+    {
+      "id": "T3c",
+      "title": "Invalid input - intervalo de datas invertido",
+      "tool": "crm_get_demo_scheduled",
+      "agent": "atendimento-nar",
+      "input": { "date_from": "2026-09-30", "date_to": "2026-09-01" },
+      "expect": { "ok": false, "error_code": "INVALID_INPUT", "assertions": [] }
+    },
+    {
+      "id": "T4",
+      "title": "Unknown tool",
+      "tool": "drive_search_global",
+      "agent": "engenharia-nar",
+      "input": { "query": "*" },
+      "expect": {
+        "ok": false,
+        "error_code": "UNKNOWN_TOOL",
+        "assertions": ["UNKNOWN_TOOL é avaliado antes de ACCESS_DENIED"]
+      }
+    },
+    {
+      "id": "T4b",
+      "title": "Unknown tool - capability de escrita ainda não criada",
+      "tool": "crm_update_contact",
+      "agent": "crm-nar",
+      "input": { "contact_id": "contact_001", "stage": "ganho" },
+      "expect": {
+        "ok": false,
+        "error_code": "UNKNOWN_TOOL",
+        "assertions": [
+          "nenhuma escrita ocorre",
+          "mock-data/crm.json permanece inalterado"
+        ]
+      }
+    },
+    {
+      "id": "T5",
+      "title": "Asset fora de escopo",
+      "tool": "eduinfo_get_asset",
+      "agent": "marketing-nar",
+      "input": { "File_ID": "file_out_of_scope_001" },
+      "expect": {
+        "ok": false,
+        "error_code": "ASSET_OUT_OF_SCOPE",
+        "assertions": [
+          "nenhum download_url é emitido",
+          "nome e mimeType do arquivo não são revelados na mensagem de erro"
+        ]
+      }
+    },
+    {
+      "id": "T5b",
+      "title": "Pasta fora de escopo em search",
+      "tool": "eduinfo_search_folder",
+      "agent": "engenharia-nar",
+      "input": { "Search_Query": "margens", "Folder_ID": "fld_financeiro_restrito" },
+      "expect": { "ok": false, "error_code": "ASSET_OUT_OF_SCOPE", "assertions": [] }
+    },
+    {
+      "id": "T6",
+      "title": "Folder_ID inválido",
+      "tool": "eduinfo_search_folder",
+      "agent": "produto-nar",
+      "input": { "Search_Query": "roadmap", "Folder_ID": "fld_inexistente_999" },
+      "expect": { "ok": false, "error_code": "FOLDER_NOT_FOUND", "assertions": [] }
+    },
+    {
+      "id": "T7",
+      "title": "File_ID inválido",
+      "tool": "eduinfo_get_asset",
+      "agent": "produto-nar",
+      "input": { "File_ID": "file_inexistente_999" },
+      "expect": { "ok": false, "error_code": "FILE_NOT_FOUND", "assertions": [] }
+    },
+    {
+      "id": "T8",
+      "title": "CRM contact not found",
+      "tool": "crm_get_contact_context",
+      "agent": "atendimento-nar",
+      "input": { "contact_id": "contact_999" },
+      "expect": { "ok": false, "error_code": "CONTACT_NOT_FOUND", "assertions": [] }
+    },
+    {
+      "id": "T8b",
+      "title": "Contato inválido é legível mas nunca elegível",
+      "tool": "crm_get_contact_context",
+      "agent": "crm-nar",
+      "input": { "contact_id": "contact_031" },
+      "expect": {
+        "ok": true,
+        "error_code": null,
+        "assertions": [
+          "data.stage === null",
+          "data.followup_status === 'none'",
+          "contact_031 não aparece em crm_list_eligible_contacts"
+        ]
+      }
+    },
+    {
+      "id": "T9",
+      "title": "Empty result é sucesso, não erro",
+      "tool": "eduinfo_search_folder",
+      "agent": "marketing-nar",
+      "input": { "Search_Query": "arquivo-que-nao-existe-xyz", "Folder_ID": "fld_marketing_assets" },
+      "expect": {
+        "ok": true,
+        "error_code": null,
+        "assertions": ["data.items.length === 0", "data.count === 0"]
+      }
+    },
+    {
+      "id": "T9b",
+      "title": "Empty result em follow-ups com data antiga",
+      "tool": "crm_get_followups_due",
+      "agent": "crm-nar",
+      "input": { "date": "2020-01-01", "limit": 20 },
+      "expect": { "ok": true, "error_code": null, "assertions": ["data.count === 0"] }
+    },
+    {
+      "id": "T10",
+      "title": "Max limit excedido",
+      "tool": "crm_list_eligible_contacts",
+      "agent": "crm-nar",
+      "input": { "date": "2026-09-01", "limit": 5000 },
+      "expect": {
+        "ok": false,
+        "error_code": "LIMIT_EXCEEDED",
+        "assertions": ["limite máximo é contract.scope.limits.max_limit === 100"]
+      }
+    },
+    {
+      "id": "T10b",
+      "title": "Limit no máximo permitido é aceito",
+      "tool": "crm_get_followups_due",
+      "agent": "atendimento-nar",
+      "input": { "date": "2026-09-01", "limit": 100 },
+      "expect": {
+        "ok": true,
+        "error_code": null,
+        "assertions": ["data.count === 14", "contatos ordenados do mais vencido para o menos vencido"]
+      }
+    },
+    {
+      "id": "T11",
+      "title": "Proposal not found",
+      "tool": "proposal_get_pending",
+      "agent": "atendimento-nar",
+      "input": { "limit": 10, "proposal_id": "prop_999" },
+      "expect": { "ok": false, "error_code": "PROPOSAL_NOT_FOUND", "assertions": [] }
+    },
+    {
+      "id": "T11b",
+      "title": "Propostas pendentes por padrão",
+      "tool": "proposal_get_pending",
+      "agent": "produto-nar",
+      "input": { "limit": 20 },
+      "expect": {
+        "ok": true,
+        "error_code": null,
+        "assertions": [
+          "data.count === 6",
+          "nenhuma proposta com status 'aceita', 'recusada', 'expirada' ou 'rascunho'"
+        ]
+      }
+    },
+    {
+      "id": "T12",
+      "title": "Brand unknown",
+      "tool": "campaign_get_brand_context",
+      "agent": "marketing-nar",
+      "input": { "brand": "marca-inexistente" },
+      "expect": { "ok": false, "error_code": "BRAND_UNKNOWN", "assertions": [] }
+    },
+    {
+      "id": "T12b",
+      "title": "Brand context válido traz guardrails e restricted_claims",
+      "tool": "campaign_get_brand_context",
+      "agent": "marketing-nar",
+      "input": { "brand": "eduinfo" },
+      "expect": {
+        "ok": true,
+        "error_code": null,
+        "assertions": [
+          "data.guardrails.length > 0",
+          "data.restricted_claims.length > 0",
+          "output valida contra outputSchema de campaign_get_brand_context"
+        ]
+      }
+    },
+    {
+      "id": "T12c",
+      "title": "Brand unknown também em histórico de campanhas",
+      "tool": "campaign_get_history",
+      "agent": "produto-nar",
+      "input": { "brand": "marca-inexistente" },
+      "expect": { "ok": false, "error_code": "BRAND_UNKNOWN", "assertions": [] }
+    },
+    {
+      "id": "T13",
+      "title": "Demos agendadas no intervalo",
+      "tool": "crm_get_demo_scheduled",
+      "agent": "atendimento-nar",
+      "input": { "date_from": "2026-09-01", "date_to": "2026-09-30" },
+      "expect": {
+        "ok": true,
+        "error_code": null,
+        "assertions": ["data.count === 5", "demos ordenadas por scheduled_at ascendente"]
+      }
+    },
+    {
+      "id": "T14",
+      "title": "Asset autorizado retorna URL mock com expiração",
+      "tool": "eduinfo_get_asset",
+      "agent": "marketing-nar",
+      "input": { "File_ID": "file_mkt_005" },
+      "expect": {
+        "ok": true,
+        "error_code": null,
+        "assertions": [
+          "data.asset_available === true",
+          "data.download_url começa com 'mock://'",
+          "data.expires é ISO-8601 e não nulo",
+          "nenhuma requisição de rede é feita"
+        ]
+      }
+    }
+  ]
+}

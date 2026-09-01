@@ -1,0 +1,186 @@
+{
+  "mock_name": "nar-ops-mcp-mock",
+  "mock_version": "0.1.0",
+  "implements_contract": "nar-ops-mcp@0.1.0",
+  "status": "LAB",
+  "executable": false,
+  "description": "Especificação declarativa de resolução do MCP em laboratório. Descreve COMO cada tool resolve a resposta a partir de mock-data/, sem servidor, sem rede e sem endpoint.",
+  "non_production_notice": [
+    "Isto não é um servidor. Não há processo, porta, endpoint ou handler publicado.",
+    "Nenhuma leitura sai do diretório mock-data/.",
+    "Nenhuma credencial é lida do ambiente."
+  ],
+  "datasets": {
+    "eduinfo": "mock-data/eduinfo.json",
+    "crm": "mock-data/crm.json",
+    "proposals": "mock-data/proposals.json",
+    "campaigns": "mock-data/campaigns.json"
+  },
+  "defaults": {
+    "limit": 20,
+    "max_limit": 100,
+    "reference_date": "2026-09-01",
+    "asset_url_template": "mock://eduinfo-assets/{file_id}",
+    "asset_ttl_seconds": 900
+  },
+  "guard_pipeline": [
+    { "order": 1, "guard": "tool_exists", "source": "contract.tools[].name", "on_fail": "UNKNOWN_TOOL" },
+    { "order": 2, "guard": "agent_authorized", "source": "contract.agents[].allowed_tools", "unknown_agent": "ACCESS_DENIED", "on_fail": "ACCESS_DENIED" },
+    { "order": 3, "guard": "input_schema_valid", "source": "contract.tools[].inputSchema", "on_fail": "INVALID_INPUT" },
+    { "order": 4, "guard": "limit_within_max", "source": "contract.scope.limits.max_limit", "on_fail": "LIMIT_EXCEEDED" },
+    { "order": 5, "guard": "scope_allowlist", "source": "contract.scope.eduinfo.authorized_folders", "on_fail": "ASSET_OUT_OF_SCOPE" },
+    { "order": 6, "guard": "resource_exists", "on_fail": "FOLDER_NOT_FOUND | FILE_NOT_FOUND | CONTACT_NOT_FOUND | PROPOSAL_NOT_FOUND | BRAND_UNKNOWN" },
+    { "order": 7, "guard": "resolve", "on_fail": null }
+  ],
+  "resolvers": {
+    "eduinfo_list_root": {
+      "reads": ["eduinfo"],
+      "selection": "folders + files onde parent_id === scope.eduinfo.authorized_roots[0] e in_scope === true",
+      "order_by": "isFolder desc, name asc",
+      "limit": "input.limit ?? defaults.limit",
+      "projection": ["id", "name", "mimeType", "isFolder", "size"],
+      "returns": { "items": "[]", "count": "items.length" },
+      "expected_mock_result": "3 pastas (Marketing_Assets, Produto_Docs, Institucional). fld_financeiro_restrito nunca aparece.",
+      "error_conditions": []
+    },
+    "eduinfo_search_folder": {
+      "reads": ["eduinfo"],
+      "selection": "folders + files onde parent_id === input.Folder_ID e name contém input.Search_Query (case-insensitive) e in_scope === true",
+      "order_by": "isFolder desc, name asc",
+      "limit": "input.limit ?? defaults.limit",
+      "projection": ["id", "name", "mimeType", "isFolder", "size"],
+      "returns": { "items": "[]", "count": "items.length" },
+      "error_conditions": [
+        { "when": "Folder_ID existe no dataset mas não está em contract.scope.eduinfo.authorized_folders", "code": "ASSET_OUT_OF_SCOPE" },
+        { "when": "Folder_ID não existe no dataset", "code": "FOLDER_NOT_FOUND" },
+        { "when": "nenhum item corresponde", "code": null, "result": "ok:true, items:[], count:0" }
+      ]
+    },
+    "eduinfo_get_asset": {
+      "reads": ["eduinfo"],
+      "selection": "files onde id === input.File_ID",
+      "returns": {
+        "success": true,
+        "file_id": "file.id",
+        "name": "file.name",
+        "mimeType": "file.mimeType",
+        "asset_available": true,
+        "download_url": "defaults.asset_url_template com {file_id} substituído",
+        "expires": "reference_date + defaults.asset_ttl_seconds, em ISO-8601"
+      },
+      "error_conditions": [
+        { "when": "arquivo existe mas in_scope === false ou parent_id fora da allowlist (ex.: file_out_of_scope_001)", "code": "ASSET_OUT_OF_SCOPE" },
+        { "when": "File_ID não existe no dataset", "code": "FILE_NOT_FOUND" }
+      ],
+      "note": "download_url é mock:// e não é resolvível. Nenhum byte é transferido."
+    },
+    "crm_list_eligible_contacts": {
+      "reads": ["crm"],
+      "selection": "contacts onde valid === true e eligible_for_cadence === true e (input.segment ausente ou segment === input.segment)",
+      "excludes": "registros inválidos, sem email, e stages ganho/perdido/demo_agendada",
+      "order_by": "last_interaction asc (mais frios primeiro)",
+      "limit": "input.limit",
+      "projection": ["id", "name", "email", "stage", "segment", "school", "last_interaction"],
+      "returns": { "contacts": "[]", "count": "contacts.length" },
+      "expected_mock_result": "18 contatos elegíveis no dataset com date = 2026-09-01.",
+      "error_conditions": [
+        { "when": "input.limit > 100", "code": "LIMIT_EXCEEDED" },
+        { "when": "segment sem correspondência", "code": null, "result": "ok:true, contacts:[], count:0" }
+      ]
+    },
+    "crm_get_contact_context": {
+      "reads": ["crm"],
+      "selection": "contacts onde id === input.contact_id",
+      "returns": {
+        "contact": ["id", "name", "email", "phone", "school", "segment"],
+        "stage": "contact.stage",
+        "history": "contact.history",
+        "last_interaction": "contact.last_interaction",
+        "demo_status": "contact.demo_status",
+        "followup_status": "contact.followup_status"
+      },
+      "error_conditions": [
+        { "when": "contact_id não existe", "code": "CONTACT_NOT_FOUND" }
+      ],
+      "note": "Contatos inválidos (valid === false) SÃO retornáveis aqui, com stage null ou fora do vocabulário, para que o agente consiga diagnosticar higiene de base. Eles nunca aparecem em listagens de cadência."
+    },
+    "crm_get_followups_due": {
+      "reads": ["crm"],
+      "selection": "contacts onde valid === true e followup_due_date != null e followup_due_date <= input.date",
+      "computed": { "days_overdue": "input.date - followup_due_date em dias", "followup_status": "due_today se igual, senão overdue" },
+      "order_by": "followup_due_date asc (mais vencido primeiro)",
+      "limit": "input.limit",
+      "projection": ["id", "name", "email", "stage", "school", "followup_due_date", "followup_status", "days_overdue"],
+      "returns": { "contacts": "[]", "count": "contacts.length" },
+      "expected_mock_result": "14 contatos com followup vencido em 2026-09-01.",
+      "error_conditions": [
+        { "when": "input.limit > 100", "code": "LIMIT_EXCEEDED" },
+        { "when": "data muito antiga sem vencidos (ex.: 2020-01-01)", "code": null, "result": "ok:true, contacts:[], count:0" }
+      ]
+    },
+    "crm_get_demo_scheduled": {
+      "reads": ["crm"],
+      "selection": "contacts onde demo_status === 'scheduled' e a data de demo_scheduled_at está entre input.date_from e input.date_to (inclusive)",
+      "order_by": "demo_scheduled_at asc",
+      "limit": "input.limit ?? defaults.limit",
+      "projection": ["contact_id", "name", "school", "scheduled_at", "stage"],
+      "returns": { "demos": "[]", "count": "demos.length" },
+      "expected_mock_result": "5 demos agendadas entre 2026-09-01 e 2026-09-30.",
+      "error_conditions": [
+        { "when": "date_to < date_from", "code": "INVALID_INPUT" },
+        { "when": "intervalo sem demos", "code": null, "result": "ok:true, demos:[], count:0" }
+      ]
+    },
+    "proposal_get_pending": {
+      "reads": ["proposals"],
+      "selection": "proposals filtradas por input.proposal_id, senão por input.status, senão por vocabulary.pending_status",
+      "order_by": "days_waiting desc",
+      "limit": "input.limit",
+      "projection": ["id", "contact_id", "school", "title", "status", "value_brl", "sent_at", "valid_until", "days_waiting"],
+      "returns": { "proposals": "[]", "count": "proposals.length" },
+      "expected_mock_result": "6 propostas pendentes sem filtro de status.",
+      "error_conditions": [
+        { "when": "input.proposal_id informado e inexistente", "code": "PROPOSAL_NOT_FOUND" },
+        { "when": "input.limit > 100", "code": "LIMIT_EXCEEDED" },
+        { "when": "status válido sem correspondência", "code": null, "result": "ok:true, proposals:[], count:0" }
+      ]
+    },
+    "campaign_get_history": {
+      "reads": ["campaigns"],
+      "selection": "campaigns filtradas por input.brand (se informado) e por interseção com [date_from, date_to] (se informado)",
+      "joins": "templates por template_id, embutido como campaign.template",
+      "order_by": "start_date desc",
+      "limit": "input.limit ?? defaults.limit",
+      "returns": { "campaigns": "[]", "count": "campaigns.length" },
+      "expected_mock_result": "10 campanhas sem filtro; 5 para brand=eduinfo.",
+      "error_conditions": [
+        { "when": "brand informado e ausente de campaigns.brands", "code": "BRAND_UNKNOWN" },
+        { "when": "date_to < date_from", "code": "INVALID_INPUT" }
+      ]
+    },
+    "campaign_get_brand_context": {
+      "reads": ["campaigns"],
+      "selection": "campaigns.brand_context[input.brand]",
+      "projection": ["brand", "positioning", "guardrails", "approved_messages", "restricted_claims"],
+      "error_conditions": [
+        { "when": "brand ausente de brand_context", "code": "BRAND_UNKNOWN" }
+      ],
+      "note": "Marca é comparada em minúsculas exatas: eduinfo, nar-eco, jabuticaba."
+    }
+  },
+  "unknown_tools_behavior": {
+    "any_name_not_in_contract": "UNKNOWN_TOOL",
+    "explicitly_blocked_write_tools": [
+      "crm_update_contact",
+      "crm_change_stage",
+      "send_email",
+      "send_whatsapp",
+      "publish_campaign",
+      "create_proposal",
+      "delete_anything",
+      "share_drive_file",
+      "upload_drive_file"
+    ],
+    "note": "Tools de escrita não estão desabilitadas: elas não existem. O mock não possui caminho de execução para escrita."
+  }
+}

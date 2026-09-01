@@ -1,0 +1,857 @@
+{
+  "_meta": {
+    "dataset": "crm",
+    "status": "LAB_MOCK",
+    "real_backend_connected": false,
+    "contains_personal_data": false,
+    "reference_date": "2026-09-01",
+    "note": "Nomes, emails (@exemplo-fake.test) e telefones são fictícios e não correspondem a pessoas reais."
+  },
+  "vocabulary": {
+    "stages": [
+      "novo",
+      "qualificado",
+      "demo_agendada",
+      "demo_realizada",
+      "proposta_enviada",
+      "negociacao",
+      "followup",
+      "ganho",
+      "perdido"
+    ],
+    "eligible_stages": [
+      "novo",
+      "qualificado",
+      "demo_realizada",
+      "proposta_enviada",
+      "negociacao",
+      "followup"
+    ],
+    "followup_status": [
+      "none",
+      "scheduled",
+      "due_today",
+      "overdue"
+    ],
+    "demo_status": [
+      "none",
+      "scheduled",
+      "completed"
+    ]
+  },
+  "contacts": [
+    {
+      "id": "contact_001",
+      "name": "Ana Beatriz Nogueira",
+      "email": "ana.nogueira@exemplo-fake.test",
+      "phone": "+55 11 940000000",
+      "school": "Colégio Horizonte Azul",
+      "segment": "escola_privada",
+      "stage": "novo",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": true,
+      "last_interaction": "2026-08-28",
+      "followup_due_date": null,
+      "followup_status": "none",
+      "demo_status": "none",
+      "demo_scheduled_at": null,
+      "notes": "",
+      "history": [
+        {
+          "date": "2026-08-28",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_002",
+      "name": "Bruno Tavares Lima",
+      "email": "bruno.lima@exemplo-fake.test",
+      "phone": "+55 11 940000137",
+      "school": "Instituto Vale Verde",
+      "segment": "escola_privada",
+      "stage": "novo",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": true,
+      "last_interaction": "2026-08-29",
+      "followup_due_date": null,
+      "followup_status": "none",
+      "demo_status": "none",
+      "demo_scheduled_at": null,
+      "notes": "",
+      "history": [
+        {
+          "date": "2026-08-29",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_003",
+      "name": "Camila Rocha Prado",
+      "email": "camila.prado@exemplo-fake.test",
+      "phone": "+55 11 940000274",
+      "school": "Escola Nova Aurora",
+      "segment": "escola_privada",
+      "stage": "qualificado",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": true,
+      "last_interaction": "2026-08-25",
+      "followup_due_date": "2026-08-29",
+      "followup_status": "overdue",
+      "demo_status": "none",
+      "demo_scheduled_at": null,
+      "notes": "",
+      "history": [
+        {
+          "date": "2026-08-25",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_004",
+      "name": "Diego Fontes Alencar",
+      "email": "diego.alencar@exemplo-fake.test",
+      "phone": "+55 11 940000411",
+      "school": "Colégio São Ramiro",
+      "segment": "escola_privada",
+      "stage": "qualificado",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": true,
+      "last_interaction": "2026-08-20",
+      "followup_due_date": "2026-08-27",
+      "followup_status": "overdue",
+      "demo_status": "none",
+      "demo_scheduled_at": null,
+      "notes": "",
+      "history": [
+        {
+          "date": "2026-08-20",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_005",
+      "name": "Elisa Moraes Barreto",
+      "email": null,
+      "phone": "+55 11 940000548",
+      "school": "Centro Educacional Aurora",
+      "segment": "escola_privada",
+      "stage": "qualificado",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": false,
+      "last_interaction": "2026-08-22",
+      "followup_due_date": "2026-08-30",
+      "followup_status": "overdue",
+      "demo_status": "none",
+      "demo_scheduled_at": null,
+      "notes": "Contato sem email cadastrado",
+      "history": [
+        {
+          "date": "2026-08-22",
+          "channel": "whatsapp",
+          "summary": "Interação registrada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_006",
+      "name": "Fabio Queiroz Menezes",
+      "email": "fabio.menezes@exemplo-fake.test",
+      "phone": "+55 11 940000685",
+      "school": "Colégio Ponte Nova",
+      "segment": "escola_privada",
+      "stage": "demo_agendada",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": false,
+      "last_interaction": "2026-08-30",
+      "followup_due_date": null,
+      "followup_status": "none",
+      "demo_status": "scheduled",
+      "demo_scheduled_at": "2026-09-03T14:00:00-03:00",
+      "notes": "",
+      "history": [
+        {
+          "date": "2026-08-30",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        },
+        {
+          "date": "2026-08-30",
+          "channel": "agenda",
+          "summary": "Demo agendada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_007",
+      "name": "Gabriela Siqueira Vieira",
+      "email": "gabriela.vieira@exemplo-fake.test",
+      "phone": "+55 11 940000822",
+      "school": "Escola Girassol",
+      "segment": "escola_privada",
+      "stage": "demo_agendada",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": false,
+      "last_interaction": "2026-08-31",
+      "followup_due_date": null,
+      "followup_status": "none",
+      "demo_status": "scheduled",
+      "demo_scheduled_at": "2026-09-04T10:30:00-03:00",
+      "notes": "",
+      "history": [
+        {
+          "date": "2026-08-31",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        },
+        {
+          "date": "2026-08-31",
+          "channel": "agenda",
+          "summary": "Demo agendada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_008",
+      "name": "Henrique Bastos Coelho",
+      "email": "henrique.coelho@exemplo-fake.test",
+      "phone": "+55 11 940000959",
+      "school": "Instituto Farol",
+      "segment": "escola_privada",
+      "stage": "demo_agendada",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": false,
+      "last_interaction": "2026-08-27",
+      "followup_due_date": null,
+      "followup_status": "none",
+      "demo_status": "scheduled",
+      "demo_scheduled_at": "2026-09-08T16:00:00-03:00",
+      "notes": "",
+      "history": [
+        {
+          "date": "2026-08-27",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        },
+        {
+          "date": "2026-08-27",
+          "channel": "agenda",
+          "summary": "Demo agendada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_009",
+      "name": "Isabela Cordeiro Pinto",
+      "email": "isabela.pinto@exemplo-fake.test",
+      "phone": "+55 11 940001096",
+      "school": "Colégio Monte Claro",
+      "segment": "escola_privada",
+      "stage": "demo_realizada",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": true,
+      "last_interaction": "2026-08-26",
+      "followup_due_date": "2026-08-31",
+      "followup_status": "overdue",
+      "demo_status": "completed",
+      "demo_scheduled_at": null,
+      "notes": "",
+      "history": [
+        {
+          "date": "2026-08-26",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_010",
+      "name": "Joao Pedro Andrade",
+      "email": "joao.andrade@exemplo-fake.test",
+      "phone": "+55 11 940001233",
+      "school": "Escola Semente Viva",
+      "segment": "escola_privada",
+      "stage": "demo_realizada",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": true,
+      "last_interaction": "2026-08-24",
+      "followup_due_date": "2026-08-28",
+      "followup_status": "overdue",
+      "demo_status": "completed",
+      "demo_scheduled_at": null,
+      "notes": "",
+      "history": [
+        {
+          "date": "2026-08-24",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_011",
+      "name": "Karina Lopes Estevao",
+      "email": "karina.estevao@exemplo-fake.test",
+      "phone": "+55 11 940001370",
+      "school": "Colégio Alvorada",
+      "segment": "escola_privada",
+      "stage": "proposta_enviada",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": true,
+      "last_interaction": "2026-08-21",
+      "followup_due_date": "2026-08-26",
+      "followup_status": "overdue",
+      "demo_status": "none",
+      "demo_scheduled_at": null,
+      "notes": "",
+      "history": [
+        {
+          "date": "2026-08-21",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_012",
+      "name": "Lucas Ferraz Duarte",
+      "email": "lucas.duarte@exemplo-fake.test",
+      "phone": "+55 11 940001507",
+      "school": "Instituto Bandeirantes do Sul",
+      "segment": "escola_privada",
+      "stage": "proposta_enviada",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": true,
+      "last_interaction": "2026-08-19",
+      "followup_due_date": "2026-08-25",
+      "followup_status": "overdue",
+      "demo_status": "none",
+      "demo_scheduled_at": null,
+      "notes": "",
+      "history": [
+        {
+          "date": "2026-08-19",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_013",
+      "name": "Mariana Peixoto Cunha",
+      "email": null,
+      "phone": "+55 11 940001644",
+      "school": "Escola Raiz Forte",
+      "segment": "escola_privada",
+      "stage": "proposta_enviada",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": false,
+      "last_interaction": "2026-08-18",
+      "followup_due_date": "2026-08-24",
+      "followup_status": "overdue",
+      "demo_status": "none",
+      "demo_scheduled_at": null,
+      "notes": "Contato sem email cadastrado",
+      "history": [
+        {
+          "date": "2026-08-18",
+          "channel": "whatsapp",
+          "summary": "Interação registrada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_014",
+      "name": "Nelson Aguiar Ribas",
+      "email": "nelson.ribas@exemplo-fake.test",
+      "phone": "+55 11 940001781",
+      "school": "Colégio Trilha Nova",
+      "segment": "escola_privada",
+      "stage": "negociacao",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": true,
+      "last_interaction": "2026-08-29",
+      "followup_due_date": "2026-09-02",
+      "followup_status": "scheduled",
+      "demo_status": "none",
+      "demo_scheduled_at": null,
+      "notes": "",
+      "history": [
+        {
+          "date": "2026-08-29",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_015",
+      "name": "Olivia Sampaio Freitas",
+      "email": "olivia.freitas@exemplo-fake.test",
+      "phone": "+55 11 940001918",
+      "school": "Centro Educacional Ipê",
+      "segment": "escola_privada",
+      "stage": "negociacao",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": true,
+      "last_interaction": "2026-08-28",
+      "followup_due_date": "2026-09-05",
+      "followup_status": "scheduled",
+      "demo_status": "none",
+      "demo_scheduled_at": null,
+      "notes": "",
+      "history": [
+        {
+          "date": "2026-08-28",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_016",
+      "name": "Paulo Rezende Mattos",
+      "email": "paulo.mattos@exemplo-fake.test",
+      "phone": "+55 11 940002055",
+      "school": "Escola Caminho Certo",
+      "segment": "escola_privada",
+      "stage": "followup",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": true,
+      "last_interaction": "2026-08-12",
+      "followup_due_date": "2026-08-20",
+      "followup_status": "overdue",
+      "demo_status": "none",
+      "demo_scheduled_at": null,
+      "notes": "",
+      "history": [
+        {
+          "date": "2026-08-12",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_017",
+      "name": "Queila Nunes Barros",
+      "email": "queila.barros@exemplo-fake.test",
+      "phone": "+55 11 940002192",
+      "school": "Colégio Vista Alegre",
+      "segment": "escola_privada",
+      "stage": "followup",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": true,
+      "last_interaction": "2026-08-10",
+      "followup_due_date": "2026-08-18",
+      "followup_status": "overdue",
+      "demo_status": "none",
+      "demo_scheduled_at": null,
+      "notes": "",
+      "history": [
+        {
+          "date": "2026-08-10",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_018",
+      "name": "Rafael Domingues Sa",
+      "email": "rafael.sa@exemplo-fake.test",
+      "phone": "+55 11 940002329",
+      "school": "Instituto Luz do Saber",
+      "segment": "escola_privada",
+      "stage": "followup",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": true,
+      "last_interaction": "2026-08-14",
+      "followup_due_date": "2026-08-23",
+      "followup_status": "overdue",
+      "demo_status": "none",
+      "demo_scheduled_at": null,
+      "notes": "",
+      "history": [
+        {
+          "date": "2026-08-14",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_019",
+      "name": "Simone Carvalho Antunes",
+      "email": "simone.antunes@exemplo-fake.test",
+      "phone": "+55 11 940002466",
+      "school": "Escola Passo a Passo",
+      "segment": "escola_privada",
+      "stage": "followup",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": true,
+      "last_interaction": "2026-08-16",
+      "followup_due_date": "2026-09-10",
+      "followup_status": "scheduled",
+      "demo_status": "none",
+      "demo_scheduled_at": null,
+      "notes": "",
+      "history": [
+        {
+          "date": "2026-08-16",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_020",
+      "name": "Tiago Miranda Vasques",
+      "email": "tiago.vasques@exemplo-fake.test",
+      "phone": "+55 11 940002603",
+      "school": "Colégio Novo Tempo",
+      "segment": "rede_ensino",
+      "stage": "qualificado",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": true,
+      "last_interaction": "2026-08-23",
+      "followup_due_date": "2026-08-31",
+      "followup_status": "overdue",
+      "demo_status": "none",
+      "demo_scheduled_at": null,
+      "notes": "",
+      "history": [
+        {
+          "date": "2026-08-23",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_021",
+      "name": "Ursula Beltrao Camargo",
+      "email": "ursula.camargo@exemplo-fake.test",
+      "phone": "+55 11 940002740",
+      "school": "Rede Educar Mais",
+      "segment": "rede_ensino",
+      "stage": "demo_agendada",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": false,
+      "last_interaction": "2026-08-30",
+      "followup_due_date": null,
+      "followup_status": "none",
+      "demo_status": "scheduled",
+      "demo_scheduled_at": "2026-09-05T09:00:00-03:00",
+      "notes": "",
+      "history": [
+        {
+          "date": "2026-08-30",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        },
+        {
+          "date": "2026-08-30",
+          "channel": "agenda",
+          "summary": "Demo agendada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_022",
+      "name": "Vinicius Paiva Correia",
+      "email": "vinicius.correia@exemplo-fake.test",
+      "phone": "+55 11 940002877",
+      "school": "Rede Aprende Brasil Fake",
+      "segment": "rede_ensino",
+      "stage": "proposta_enviada",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": true,
+      "last_interaction": "2026-08-17",
+      "followup_due_date": "2026-08-27",
+      "followup_status": "overdue",
+      "demo_status": "none",
+      "demo_scheduled_at": null,
+      "notes": "",
+      "history": [
+        {
+          "date": "2026-08-17",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_023",
+      "name": "Wanda Teixeira Lisboa",
+      "email": "wanda.lisboa@exemplo-fake.test",
+      "phone": "+55 11 940003014",
+      "school": "Rede Saber Integrado",
+      "segment": "rede_ensino",
+      "stage": "negociacao",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": true,
+      "last_interaction": "2026-08-27",
+      "followup_due_date": "2026-09-03",
+      "followup_status": "scheduled",
+      "demo_status": "none",
+      "demo_scheduled_at": null,
+      "notes": "",
+      "history": [
+        {
+          "date": "2026-08-27",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_024",
+      "name": "Xavier Pontes Almeida",
+      "email": "xavier.almeida@exemplo-fake.test",
+      "phone": "+55 11 940003151",
+      "school": "Rede Conecta Escola",
+      "segment": "rede_ensino",
+      "stage": "ganho",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": false,
+      "last_interaction": "2026-08-05",
+      "followup_due_date": null,
+      "followup_status": "none",
+      "demo_status": "none",
+      "demo_scheduled_at": null,
+      "notes": "",
+      "history": [
+        {
+          "date": "2026-08-05",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_025",
+      "name": "Yara Guimaraes Castro",
+      "email": "yara.castro@exemplo-fake.test",
+      "phone": "+55 11 940003288",
+      "school": "Colégio Estrela Guia",
+      "segment": "escola_privada",
+      "stage": "ganho",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": false,
+      "last_interaction": "2026-07-30",
+      "followup_due_date": null,
+      "followup_status": "none",
+      "demo_status": "none",
+      "demo_scheduled_at": null,
+      "notes": "",
+      "history": [
+        {
+          "date": "2026-07-30",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_026",
+      "name": "Zeca Mendonca Furtado",
+      "email": "zeca.furtado@exemplo-fake.test",
+      "phone": "+55 11 940003425",
+      "school": "Escola Aprender Junto",
+      "segment": "escola_privada",
+      "stage": "perdido",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": false,
+      "last_interaction": "2026-07-22",
+      "followup_due_date": null,
+      "followup_status": "none",
+      "demo_status": "none",
+      "demo_scheduled_at": null,
+      "notes": "Optou por concorrente",
+      "history": [
+        {
+          "date": "2026-07-22",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_027",
+      "name": "Alice Ramalho Souto",
+      "email": "alice.souto@exemplo-fake.test",
+      "phone": "+55 11 940003562",
+      "school": "Colégio Portal do Sol",
+      "segment": "escola_privada",
+      "stage": "perdido",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": false,
+      "last_interaction": "2026-07-18",
+      "followup_due_date": null,
+      "followup_status": "none",
+      "demo_status": "none",
+      "demo_scheduled_at": null,
+      "notes": "Sem orçamento no ciclo",
+      "history": [
+        {
+          "date": "2026-07-18",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_028",
+      "name": "Bento Farias Correa",
+      "email": null,
+      "phone": "+55 11 940003699",
+      "school": "Instituto Recomeço",
+      "segment": "escola_privada",
+      "stage": "novo",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": false,
+      "last_interaction": "2026-08-31",
+      "followup_due_date": null,
+      "followup_status": "none",
+      "demo_status": "none",
+      "demo_scheduled_at": null,
+      "notes": "Contato sem email cadastrado",
+      "history": [
+        {
+          "date": "2026-08-31",
+          "channel": "whatsapp",
+          "summary": "Interação registrada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_029",
+      "name": "Clarice Vilela Braga",
+      "email": "clarice.braga@exemplo-fake.test",
+      "phone": "+55 11 940003836",
+      "school": "Escola Ponte do Saber",
+      "segment": "escola_privada",
+      "stage": "demo_agendada",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": false,
+      "last_interaction": "2026-08-31",
+      "followup_due_date": null,
+      "followup_status": "none",
+      "demo_status": "scheduled",
+      "demo_scheduled_at": "2026-09-02T11:00:00-03:00",
+      "notes": "",
+      "history": [
+        {
+          "date": "2026-08-31",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        },
+        {
+          "date": "2026-08-31",
+          "channel": "agenda",
+          "summary": "Demo agendada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_030",
+      "name": "Davi Salgado Neves",
+      "email": "davi.neves@exemplo-fake.test",
+      "phone": "+55 11 940003973",
+      "school": "Colégio Terra Nova",
+      "segment": "escola_privada",
+      "stage": "followup",
+      "owner": "crm-nar",
+      "valid": true,
+      "eligible_for_cadence": true,
+      "last_interaction": "2026-08-08",
+      "followup_due_date": "2026-08-15",
+      "followup_status": "overdue",
+      "demo_status": "none",
+      "demo_scheduled_at": null,
+      "notes": "",
+      "history": [
+        {
+          "date": "2026-08-08",
+          "channel": "email",
+          "summary": "Interação registrada (mock)."
+        }
+      ]
+    },
+    {
+      "id": "contact_031",
+      "name": "REGISTRO INCOMPLETO 001",
+      "email": null,
+      "phone": null,
+      "school": null,
+      "segment": null,
+      "stage": null,
+      "owner": "crm-nar",
+      "valid": false,
+      "eligible_for_cadence": false,
+      "last_interaction": null,
+      "followup_due_date": null,
+      "followup_status": "none",
+      "demo_status": "none",
+      "demo_scheduled_at": null,
+      "notes": "Registro inválido: sem stage e sem escola. Deve ser excluído de listagens elegíveis.",
+      "history": []
+    },
+    {
+      "id": "contact_032",
+      "name": "REGISTRO INCOMPLETO 002",
+      "email": null,
+      "phone": null,
+      "school": "Escola Sem Cadastro",
+      "segment": "escola_privada",
+      "stage": "stage_desconhecido",
+      "owner": "crm-nar",
+      "valid": false,
+      "eligible_for_cadence": false,
+      "last_interaction": null,
+      "followup_due_date": null,
+      "followup_status": "none",
+      "demo_status": "none",
+      "demo_scheduled_at": null,
+      "notes": "Registro inválido: stage fora do vocabulário controlado.",
+      "history": []
+    }
+  ]
+}

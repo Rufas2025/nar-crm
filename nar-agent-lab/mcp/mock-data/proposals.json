@@ -1,0 +1,145 @@
+{
+  "_meta": {
+    "dataset": "proposals",
+    "status": "LAB_MOCK",
+    "real_backend_connected": false,
+    "contains_personal_data": false,
+    "reference_date": "2026-09-01"
+  },
+  "vocabulary": {
+    "status": ["rascunho", "enviada", "aguardando_resposta", "negociacao", "aceita", "recusada", "expirada"],
+    "pending_status": ["enviada", "aguardando_resposta", "negociacao"]
+  },
+  "proposals": [
+    {
+      "id": "prop_001",
+      "contact_id": "contact_011",
+      "school": "Colégio Alvorada",
+      "title": "Eduinfo ERP - Plano Essencial",
+      "status": "aguardando_resposta",
+      "value_brl": 34800,
+      "created_at": "2026-08-12",
+      "sent_at": "2026-08-13",
+      "valid_until": "2026-09-12",
+      "days_waiting": 19,
+      "owner": "crm-nar"
+    },
+    {
+      "id": "prop_002",
+      "contact_id": "contact_012",
+      "school": "Instituto Bandeirantes do Sul",
+      "title": "Eduinfo ERP - Plano Completo",
+      "status": "aguardando_resposta",
+      "value_brl": 58200,
+      "created_at": "2026-08-10",
+      "sent_at": "2026-08-11",
+      "valid_until": "2026-09-10",
+      "days_waiting": 21,
+      "owner": "crm-nar"
+    },
+    {
+      "id": "prop_003",
+      "contact_id": "contact_013",
+      "school": "Escola Raiz Forte",
+      "title": "Eduinfo ERP - Plano Essencial",
+      "status": "enviada",
+      "value_brl": 29900,
+      "created_at": "2026-08-18",
+      "sent_at": "2026-08-19",
+      "valid_until": "2026-09-18",
+      "days_waiting": 13,
+      "owner": "crm-nar"
+    },
+    {
+      "id": "prop_004",
+      "contact_id": "contact_014",
+      "school": "Colégio Trilha Nova",
+      "title": "Eduinfo ERP - Plano Completo + Módulo Financeiro",
+      "status": "negociacao",
+      "value_brl": 71500,
+      "created_at": "2026-08-05",
+      "sent_at": "2026-08-06",
+      "valid_until": "2026-09-06",
+      "days_waiting": 26,
+      "owner": "crm-nar"
+    },
+    {
+      "id": "prop_005",
+      "contact_id": "contact_015",
+      "school": "Centro Educacional Ipê",
+      "title": "Eduinfo ERP - Plano Intermediário",
+      "status": "negociacao",
+      "value_brl": 46300,
+      "created_at": "2026-08-08",
+      "sent_at": "2026-08-09",
+      "valid_until": "2026-09-09",
+      "days_waiting": 23,
+      "owner": "crm-nar"
+    },
+    {
+      "id": "prop_006",
+      "contact_id": "contact_022",
+      "school": "Rede Aprende Brasil Fake",
+      "title": "Eduinfo ERP - Contrato Rede (8 unidades)",
+      "status": "aguardando_resposta",
+      "value_brl": 198000,
+      "created_at": "2026-08-14",
+      "sent_at": "2026-08-15",
+      "valid_until": "2026-09-15",
+      "days_waiting": 17,
+      "owner": "crm-nar"
+    },
+    {
+      "id": "prop_007",
+      "contact_id": "contact_023",
+      "school": "Rede Saber Integrado",
+      "title": "Eduinfo ERP - Contrato Rede (5 unidades)",
+      "status": "rascunho",
+      "value_brl": 132000,
+      "created_at": "2026-08-30",
+      "sent_at": null,
+      "valid_until": null,
+      "days_waiting": 0,
+      "owner": "produto-nar"
+    },
+    {
+      "id": "prop_008",
+      "contact_id": "contact_024",
+      "school": "Rede Conecta Escola",
+      "title": "Eduinfo ERP - Contrato Rede (12 unidades)",
+      "status": "aceita",
+      "value_brl": 264000,
+      "created_at": "2026-07-15",
+      "sent_at": "2026-07-16",
+      "valid_until": "2026-08-16",
+      "days_waiting": 0,
+      "owner": "crm-nar"
+    },
+    {
+      "id": "prop_009",
+      "contact_id": "contact_026",
+      "school": "Escola Aprender Junto",
+      "title": "Eduinfo ERP - Plano Essencial",
+      "status": "recusada",
+      "value_brl": 27400,
+      "created_at": "2026-07-02",
+      "sent_at": "2026-07-03",
+      "valid_until": "2026-08-03",
+      "days_waiting": 0,
+      "owner": "crm-nar"
+    },
+    {
+      "id": "prop_010",
+      "contact_id": "contact_027",
+      "school": "Colégio Portal do Sol",
+      "title": "Eduinfo ERP - Plano Intermediário",
+      "status": "expirada",
+      "value_brl": 41200,
+      "created_at": "2026-06-20",
+      "sent_at": "2026-06-21",
+      "valid_until": "2026-07-21",
+      "days_waiting": 0,
+      "owner": "crm-nar"
+    }
+  ]
+}

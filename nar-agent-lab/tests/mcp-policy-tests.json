@@ -1,0 +1,230 @@
+{
+  "suite": "mcp-policy-tests",
+  "suite_version": "0.1.0",
+  "targets_contract": "nar-ops-mcp@0.1.0",
+  "focus": "Autorização por agente, fail-closed, deny-by-default e ausência de side effects.",
+  "executable": false,
+  "policy_under_test": {
+    "deny_by_default": true,
+    "fail_closed": true,
+    "read_only_enforced": true
+  },
+  "cases": [
+    {
+      "id": "T2",
+      "title": "Denied agent / denied tool - CRM tentando Drive",
+      "tool": "eduinfo_list_root",
+      "agent": "crm-nar",
+      "input": {},
+      "expect": { "ok": false, "error_code": "ACCESS_DENIED", "assertions": ["nenhum dado de eduinfo.json é lido"] }
+    },
+    {
+      "id": "T2b",
+      "title": "Denied agent - atendimento tentando Drive",
+      "tool": "eduinfo_get_asset",
+      "agent": "atendimento-nar",
+      "input": { "File_ID": "file_mkt_001" },
+      "expect": { "ok": false, "error_code": "ACCESS_DENIED", "assertions": [] }
+    },
+    {
+      "id": "T2c",
+      "title": "Denied agent - marketing tentando CRM",
+      "tool": "crm_get_contact_context",
+      "agent": "marketing-nar",
+      "input": { "contact_id": "contact_001" },
+      "expect": { "ok": false, "error_code": "ACCESS_DENIED", "assertions": ["nenhum dado pessoal mock é exposto ao agente de marketing"] }
+    },
+    {
+      "id": "T2d",
+      "title": "Denied agent - engenharia tentando propostas",
+      "tool": "proposal_get_pending",
+      "agent": "engenharia-nar",
+      "input": { "limit": 10 },
+      "expect": { "ok": false, "error_code": "ACCESS_DENIED", "assertions": [] }
+    },
+    {
+      "id": "T2e",
+      "title": "Denied agent - engenharia tentando contexto de marca",
+      "tool": "campaign_get_brand_context",
+      "agent": "engenharia-nar",
+      "input": { "brand": "eduinfo" },
+      "expect": { "ok": false, "error_code": "ACCESS_DENIED", "assertions": [] }
+    },
+    {
+      "id": "P1",
+      "title": "Router não tem capability alguma",
+      "tool": "crm_list_eligible_contacts",
+      "agent": "rufas-router",
+      "input": { "date": "2026-09-01", "limit": 10 },
+      "expect": {
+        "ok": false,
+        "error_code": "ACCESS_DENIED",
+        "assertions": ["rufas-router.allowed_tools === []", "router apenas roteia, nunca lê dado"]
+      }
+    },
+    {
+      "id": "P1b",
+      "title": "Router negado também em Drive",
+      "tool": "eduinfo_list_root",
+      "agent": "rufas-router",
+      "input": {},
+      "expect": { "ok": false, "error_code": "ACCESS_DENIED", "assertions": [] }
+    },
+    {
+      "id": "P2",
+      "title": "Agente desconhecido é negado (deny-by-default)",
+      "tool": "eduinfo_list_root",
+      "agent": "agente-nao-registrado",
+      "input": {},
+      "expect": {
+        "ok": false,
+        "error_code": "ACCESS_DENIED",
+        "assertions": ["agente ausente do contrato nunca é tratado como autorizado"]
+      }
+    },
+    {
+      "id": "P3",
+      "title": "Agente sem identificação é negado",
+      "tool": "crm_get_followups_due",
+      "agent": null,
+      "input": { "date": "2026-09-01", "limit": 10 },
+      "expect": { "ok": false, "error_code": "ACCESS_DENIED", "assertions": ["ausência de agente não é permissão"] }
+    },
+    {
+      "id": "P4",
+      "title": "Ordem de avaliação - tool inexistente vence agente autorizado",
+      "tool": "tool_que_nao_existe",
+      "agent": "marketing-nar",
+      "input": {},
+      "expect": { "ok": false, "error_code": "UNKNOWN_TOOL", "assertions": ["step 1 do evaluation_order precede o step 2"] }
+    },
+    {
+      "id": "P5",
+      "title": "Ordem de avaliação - agente negado vence input inválido",
+      "tool": "crm_list_eligible_contacts",
+      "agent": "marketing-nar",
+      "input": { "date": "data-invalida", "limit": -5 },
+      "expect": {
+        "ok": false,
+        "error_code": "ACCESS_DENIED",
+        "assertions": ["input nunca é processado para agente não autorizado"]
+      }
+    },
+    {
+      "id": "P6",
+      "title": "Ordem de avaliação - input inválido vence escopo",
+      "tool": "eduinfo_search_folder",
+      "agent": "marketing-nar",
+      "input": { "Folder_ID": "fld_financeiro_restrito" },
+      "expect": {
+        "ok": false,
+        "error_code": "INVALID_INPUT",
+        "assertions": ["Search_Query obrigatório ausente; validação de schema precede checagem de escopo"]
+      }
+    },
+    {
+      "id": "P7",
+      "title": "Nenhuma tool de escrita existe no contrato",
+      "tool": "send_whatsapp",
+      "agent": "atendimento-nar",
+      "input": { "contact_id": "contact_001", "message": "olá" },
+      "expect": {
+        "ok": false,
+        "error_code": "UNKNOWN_TOOL",
+        "assertions": ["nenhuma mensagem é enviada", "nenhum canal externo é acionado"]
+      }
+    },
+    {
+      "id": "P7b",
+      "title": "Publicação de campanha não existe",
+      "tool": "publish_campaign",
+      "agent": "marketing-nar",
+      "input": { "campaign_id": "camp_005" },
+      "expect": { "ok": false, "error_code": "UNKNOWN_TOOL", "assertions": ["nenhuma publicação ocorre"] }
+    },
+    {
+      "id": "P7c",
+      "title": "Compartilhamento de arquivo não existe",
+      "tool": "share_drive_file",
+      "agent": "engenharia-nar",
+      "input": { "File_ID": "file_mkt_001", "email": "externo@exemplo-fake.test" },
+      "expect": { "ok": false, "error_code": "UNKNOWN_TOOL", "assertions": ["nenhuma permissão de arquivo é alterada"] }
+    },
+    {
+      "id": "P8",
+      "title": "Tools genéricas proibidas não existem",
+      "tool": "sql_query",
+      "agent": "engenharia-nar",
+      "input": { "query": "select * from contacts" },
+      "expect": {
+        "ok": false,
+        "error_code": "UNKNOWN_TOOL",
+        "assertions": ["nomes em policy.forbidden_tool_shapes nunca podem ser registrados"]
+      }
+    },
+    {
+      "id": "P8b",
+      "title": "Execução arbitrária não existe",
+      "tool": "run_code",
+      "agent": "engenharia-nar",
+      "input": { "code": "console.log(1)" },
+      "expect": { "ok": false, "error_code": "UNKNOWN_TOOL", "assertions": [] }
+    },
+    {
+      "id": "P9",
+      "title": "Input não pode ampliar a raiz autorizada",
+      "tool": "eduinfo_list_root",
+      "agent": "engenharia-nar",
+      "input": { "root_id": "fld_financeiro_restrito" },
+      "expect": {
+        "ok": false,
+        "error_code": "INVALID_INPUT",
+        "assertions": ["eduinfo_list_root não aceita parâmetro de raiz", "a raiz vem apenas de contract.scope"]
+      }
+    },
+    {
+      "id": "P10",
+      "title": "Nenhuma credencial é aceita como input",
+      "tool": "eduinfo_get_asset",
+      "agent": "marketing-nar",
+      "input": { "File_ID": "file_mkt_001", "access_token": "ya29.fake" },
+      "expect": {
+        "ok": false,
+        "error_code": "INVALID_INPUT",
+        "assertions": ["additionalProperties:false rejeita qualquer campo de credencial", "nenhum token é logado"]
+      }
+    },
+    {
+      "id": "P11",
+      "title": "Invariante read-only do contrato",
+      "tool": null,
+      "agent": null,
+      "input": null,
+      "expect": {
+        "ok": true,
+        "error_code": null,
+        "assertions": [
+          "toda tool em contract.tools tem read_only === true",
+          "toda tool em contract.tools tem side_effects === []",
+          "toda tool em contract.tools tem approval_required === false",
+          "nenhum arquivo em mock-data/ é modificado por qualquer caso de teste"
+        ]
+      }
+    },
+    {
+      "id": "P12",
+      "title": "Matriz de acesso é simétrica entre agentes e tools",
+      "tool": null,
+      "agent": null,
+      "input": null,
+      "expect": {
+        "ok": true,
+        "error_code": null,
+        "assertions": [
+          "para toda tool T e agente A: A em T.allowed_agents se e somente se T em A.allowed_tools",
+          "T.allowed_agents e T.denied_agents são disjuntos e cobrem os 6 agentes"
+        ]
+      }
+    }
+  ]
+}

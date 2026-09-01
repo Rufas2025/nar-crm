@@ -1,0 +1,1294 @@
+{
+  "mcp_name": "nar-ops-mcp",
+  "contract_version": "0.1.0",
+  "status": "LAB",
+  "environment": "mock",
+  "frozen": true,
+  "frozen_at": "2026-09-01",
+  "description": "Contrato de capabilities de negócio do ecossistema NAR. Laboratório read-only: nenhum backend real, nenhum endpoint publicado, nenhuma credencial.",
+  "non_production_notice": [
+    "Este contrato NÃO descreve um servidor de produção.",
+    "Nenhuma tool aqui conecta CRM real, Google Drive real ou n8n real.",
+    "Nenhuma credencial ou secret é requerida, aceita ou armazenada.",
+    "Nenhuma tool produz side effect."
+  ],
+  "policy": {
+    "read_only_enforced": true,
+    "fail_closed": true,
+    "deny_by_default": true,
+    "no_credentials": true,
+    "no_secrets": true,
+    "no_side_effects": true,
+    "no_capability_invention": true,
+    "no_generic_access": true,
+    "forbidden_tool_shapes": [
+      "sql_query",
+      "execute_any_api",
+      "drive_search_global",
+      "http_request_anywhere",
+      "run_code",
+      "write_file_anywhere"
+    ],
+    "rules": [
+      "Um agente só pode invocar tool explicitamente listada em seu allowed_tools.",
+      "Agente desconhecido é tratado como não autorizado (ACCESS_DENIED), nunca como permitido.",
+      "Tool não declarada neste contrato não existe (UNKNOWN_TOOL), mesmo que o agente peça por ela.",
+      "Nenhum input pode ampliar escopo: raízes e allowlists são fixas no contrato.",
+      "Toda resposta usa o envelope padrão; erros nunca são silenciosos."
+    ]
+  },
+  "agents": [
+    {
+      "id": "rufas-router",
+      "role": "Roteador de intenção entre subagentes. Não executa capability de negócio.",
+      "allowed_tools": [],
+      "rationale": "Router não acessa dado. Qualquer tool invocada por ele retorna ACCESS_DENIED."
+    },
+    {
+      "id": "marketing-nar",
+      "role": "Conteúdo, campanhas e assets de marca.",
+      "allowed_tools": [
+        "eduinfo_list_root",
+        "eduinfo_search_folder",
+        "eduinfo_get_asset",
+        "campaign_get_history",
+        "campaign_get_brand_context"
+      ]
+    },
+    {
+      "id": "atendimento-nar",
+      "role": "Atendimento e cadência com contatos.",
+      "allowed_tools": [
+        "crm_list_eligible_contacts",
+        "crm_get_contact_context",
+        "crm_get_followups_due",
+        "crm_get_demo_scheduled",
+        "proposal_get_pending"
+      ]
+    },
+    {
+      "id": "crm-nar",
+      "role": "Higiene, priorização e leitura do funil.",
+      "allowed_tools": [
+        "crm_list_eligible_contacts",
+        "crm_get_contact_context",
+        "crm_get_followups_due",
+        "crm_get_demo_scheduled",
+        "proposal_get_pending"
+      ]
+    },
+    {
+      "id": "produto-nar",
+      "role": "Produto, documentação e posicionamento.",
+      "allowed_tools": [
+        "eduinfo_list_root",
+        "eduinfo_search_folder",
+        "eduinfo_get_asset",
+        "proposal_get_pending",
+        "campaign_get_history",
+        "campaign_get_brand_context"
+      ]
+    },
+    {
+      "id": "engenharia-nar",
+      "role": "Engenharia e integrações.",
+      "allowed_tools": [
+        "eduinfo_list_root",
+        "eduinfo_search_folder",
+        "eduinfo_get_asset"
+      ]
+    }
+  ],
+  "scope": {
+    "eduinfo": {
+      "authorized_roots": [
+        "fld_eduinfo_root"
+      ],
+      "authorized_folders": [
+        "fld_eduinfo_root",
+        "fld_marketing_assets",
+        "fld_produto_docs",
+        "fld_institucional"
+      ],
+      "note": "Qualquer folder ou file fora desta allowlist retorna ASSET_OUT_OF_SCOPE. O input não pode alterar a raiz."
+    },
+    "limits": {
+      "default_limit": 20,
+      "max_limit": 100
+    }
+  },
+  "response_envelope": {
+    "success": {
+      "ok": true,
+      "tool": "<tool_name>",
+      "agent": "<agent_id>",
+      "data": "<output conforme outputSchema da tool>"
+    },
+    "error": {
+      "ok": false,
+      "tool": "<tool_name>",
+      "agent": "<agent_id>",
+      "error": {
+        "code": "<error_code>",
+        "message": "<mensagem legível, sem vazar dado sensível>"
+      }
+    }
+  },
+  "evaluation_order": [
+    {
+      "step": 1,
+      "check": "A tool existe neste contrato?",
+      "on_fail": "UNKNOWN_TOOL"
+    },
+    {
+      "step": 2,
+      "check": "O agente existe e tem a tool em allowed_tools?",
+      "on_fail": "ACCESS_DENIED"
+    },
+    {
+      "step": 3,
+      "check": "O input valida contra o inputSchema?",
+      "on_fail": "INVALID_INPUT"
+    },
+    {
+      "step": 4,
+      "check": "O limit respeita max_limit?",
+      "on_fail": "LIMIT_EXCEEDED"
+    },
+    {
+      "step": 5,
+      "check": "O recurso está dentro do escopo autorizado?",
+      "on_fail": "ASSET_OUT_OF_SCOPE"
+    },
+    {
+      "step": 6,
+      "check": "O recurso existe no dataset?",
+      "on_fail": "<*>_NOT_FOUND | BRAND_UNKNOWN"
+    },
+    {
+      "step": 7,
+      "check": "Resolver dados do mock",
+      "on_fail": null
+    }
+  ],
+  "error_codes": {
+    "UNKNOWN_TOOL": "Tool não declarada no contrato.",
+    "ACCESS_DENIED": "Agente não autorizado para esta tool (inclui agente desconhecido).",
+    "INVALID_INPUT": "Input não valida contra o inputSchema da tool.",
+    "LIMIT_EXCEEDED": "Parâmetro limit acima de scope.limits.max_limit.",
+    "ASSET_OUT_OF_SCOPE": "Recurso existe, mas está fora da allowlist autorizada.",
+    "FOLDER_NOT_FOUND": "Folder_ID inexistente dentro do escopo autorizado.",
+    "FILE_NOT_FOUND": "File_ID inexistente dentro do escopo autorizado.",
+    "CONTACT_NOT_FOUND": "contact_id inexistente no dataset CRM.",
+    "PROPOSAL_NOT_FOUND": "proposal_id inexistente no dataset de propostas.",
+    "BRAND_UNKNOWN": "Marca não registrada em brand_context."
+  },
+  "empty_result_convention": {
+    "is_error": false,
+    "shape": {
+      "ok": true,
+      "data": {
+        "<collection>": [],
+        "count": 0
+      }
+    },
+    "note": "Resultado vazio é sucesso, nunca erro."
+  },
+  "tools": [
+    {
+      "name": "eduinfo_list_root",
+      "domain": "eduinfo",
+      "purpose": "Listar itens autorizados da raiz Eduinfo.",
+      "read_only": true,
+      "side_effects": [],
+      "approval_required": false,
+      "allowed_agents": [
+        "marketing-nar",
+        "produto-nar",
+        "engenharia-nar"
+      ],
+      "denied_agents": [
+        "rufas-router",
+        "atendimento-nar",
+        "crm-nar"
+      ],
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20
+          }
+        },
+        "required": []
+      },
+      "input_notes": "Input técnico mínimo. Não há parâmetro de raiz: a raiz é fixada em scope.eduinfo.authorized_roots e não pode ser alterada pelo chamador.",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "name",
+                "mimeType",
+                "isFolder",
+                "size"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "mimeType": {
+                  "type": "string"
+                },
+                "isFolder": {
+                  "type": "boolean"
+                },
+                "size": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "errors": [
+        "UNKNOWN_TOOL",
+        "ACCESS_DENIED",
+        "INVALID_INPUT",
+        "LIMIT_EXCEEDED"
+      ]
+    },
+    {
+      "name": "eduinfo_search_folder",
+      "domain": "eduinfo",
+      "purpose": "Pesquisar arquivos e pastas dentro de um Folder_ID autorizado.",
+      "read_only": true,
+      "side_effects": [],
+      "approval_required": false,
+      "allowed_agents": [
+        "marketing-nar",
+        "produto-nar",
+        "engenharia-nar"
+      ],
+      "denied_agents": [
+        "rufas-router",
+        "atendimento-nar",
+        "crm-nar"
+      ],
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "Search_Query",
+          "Folder_ID"
+        ],
+        "properties": {
+          "Search_Query": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "Folder_ID": {
+            "type": "string",
+            "minLength": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20
+          }
+        }
+      },
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "name",
+                "mimeType",
+                "isFolder",
+                "size"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "mimeType": {
+                  "type": "string"
+                },
+                "isFolder": {
+                  "type": "boolean"
+                },
+                "size": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "errors": [
+        "UNKNOWN_TOOL",
+        "ACCESS_DENIED",
+        "INVALID_INPUT",
+        "LIMIT_EXCEEDED",
+        "ASSET_OUT_OF_SCOPE",
+        "FOLDER_NOT_FOUND"
+      ]
+    },
+    {
+      "name": "eduinfo_get_asset",
+      "domain": "eduinfo",
+      "purpose": "Obter um asset autorizado de forma consumível, com URL temporária.",
+      "read_only": true,
+      "side_effects": [],
+      "approval_required": false,
+      "allowed_agents": [
+        "marketing-nar",
+        "produto-nar",
+        "engenharia-nar"
+      ],
+      "denied_agents": [
+        "rufas-router",
+        "atendimento-nar",
+        "crm-nar"
+      ],
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "File_ID"
+        ],
+        "properties": {
+          "File_ID": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "file_id",
+          "name",
+          "mimeType",
+          "asset_available",
+          "download_url",
+          "expires"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "file_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "asset_available": {
+            "type": "boolean"
+          },
+          "download_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "expires": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "ISO-8601"
+          }
+        }
+      },
+      "errors": [
+        "UNKNOWN_TOOL",
+        "ACCESS_DENIED",
+        "INVALID_INPUT",
+        "ASSET_OUT_OF_SCOPE",
+        "FILE_NOT_FOUND"
+      ]
+    },
+    {
+      "name": "crm_list_eligible_contacts",
+      "domain": "crm",
+      "purpose": "Listar contatos aptos a entrar em cadência numa data de referência.",
+      "read_only": true,
+      "side_effects": [],
+      "approval_required": false,
+      "allowed_agents": [
+        "atendimento-nar",
+        "crm-nar"
+      ],
+      "denied_agents": [
+        "rufas-router",
+        "marketing-nar",
+        "produto-nar",
+        "engenharia-nar"
+      ],
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "date",
+          "limit"
+        ],
+        "properties": {
+          "date": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "segment": {
+            "type": "string",
+            "enum": [
+              "escola_privada",
+              "rede_ensino"
+            ]
+          }
+        }
+      },
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "contacts",
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "contacts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "name",
+                "email",
+                "stage",
+                "segment",
+                "last_interaction"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "stage": {
+                  "type": "string"
+                },
+                "segment": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "school": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "last_interaction": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "errors": [
+        "UNKNOWN_TOOL",
+        "ACCESS_DENIED",
+        "INVALID_INPUT",
+        "LIMIT_EXCEEDED"
+      ]
+    },
+    {
+      "name": "crm_get_contact_context",
+      "domain": "crm",
+      "purpose": "Obter o contexto consolidado de um contato para decisão de atendimento.",
+      "read_only": true,
+      "side_effects": [],
+      "approval_required": false,
+      "allowed_agents": [
+        "atendimento-nar",
+        "crm-nar"
+      ],
+      "denied_agents": [
+        "rufas-router",
+        "marketing-nar",
+        "produto-nar",
+        "engenharia-nar"
+      ],
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "contact_id"
+        ],
+        "properties": {
+          "contact_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "contact",
+          "stage",
+          "history",
+          "last_interaction",
+          "demo_status",
+          "followup_status"
+        ],
+        "properties": {
+          "contact": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "name",
+              "email"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "email": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "phone": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "school": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "segment": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "stage": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "history": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "date",
+                "channel",
+                "summary"
+              ],
+              "properties": {
+                "date": {
+                  "type": "string"
+                },
+                "channel": {
+                  "type": "string"
+                },
+                "summary": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "last_interaction": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "demo_status": {
+            "type": "string",
+            "enum": [
+              "none",
+              "scheduled",
+              "completed"
+            ]
+          },
+          "followup_status": {
+            "type": "string",
+            "enum": [
+              "none",
+              "scheduled",
+              "due_today",
+              "overdue"
+            ]
+          }
+        }
+      },
+      "errors": [
+        "UNKNOWN_TOOL",
+        "ACCESS_DENIED",
+        "INVALID_INPUT",
+        "CONTACT_NOT_FOUND"
+      ]
+    },
+    {
+      "name": "crm_get_followups_due",
+      "domain": "crm",
+      "purpose": "Listar follow-ups vencidos ou devidos até uma data de referência.",
+      "read_only": true,
+      "side_effects": [],
+      "approval_required": false,
+      "allowed_agents": [
+        "atendimento-nar",
+        "crm-nar"
+      ],
+      "denied_agents": [
+        "rufas-router",
+        "marketing-nar",
+        "produto-nar",
+        "engenharia-nar"
+      ],
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "date",
+          "limit"
+        ],
+        "properties": {
+          "date": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          }
+        }
+      },
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "contacts",
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "contacts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "name",
+                "stage",
+                "followup_due_date",
+                "followup_status"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "stage": {
+                  "type": "string"
+                },
+                "school": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "followup_due_date": {
+                  "type": "string"
+                },
+                "followup_status": {
+                  "type": "string",
+                  "enum": [
+                    "due_today",
+                    "overdue"
+                  ]
+                },
+                "days_overdue": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "errors": [
+        "UNKNOWN_TOOL",
+        "ACCESS_DENIED",
+        "INVALID_INPUT",
+        "LIMIT_EXCEEDED"
+      ]
+    },
+    {
+      "name": "crm_get_demo_scheduled",
+      "domain": "crm",
+      "purpose": "Listar demos agendadas num intervalo de datas.",
+      "read_only": true,
+      "side_effects": [],
+      "approval_required": false,
+      "allowed_agents": [
+        "atendimento-nar",
+        "crm-nar"
+      ],
+      "denied_agents": [
+        "rufas-router",
+        "marketing-nar",
+        "produto-nar",
+        "engenharia-nar"
+      ],
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "date_from",
+          "date_to"
+        ],
+        "properties": {
+          "date_from": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "date_to": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20
+          }
+        }
+      },
+      "input_notes": "date_to deve ser maior ou igual a date_from; caso contrário INVALID_INPUT.",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "demos",
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "demos": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "contact_id",
+                "name",
+                "scheduled_at",
+                "stage"
+              ],
+              "properties": {
+                "contact_id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "school": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "scheduled_at": {
+                  "type": "string"
+                },
+                "stage": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "errors": [
+        "UNKNOWN_TOOL",
+        "ACCESS_DENIED",
+        "INVALID_INPUT",
+        "LIMIT_EXCEEDED"
+      ]
+    },
+    {
+      "name": "proposal_get_pending",
+      "domain": "proposals",
+      "purpose": "Listar propostas aguardando ação da escola ou do time.",
+      "read_only": true,
+      "side_effects": [],
+      "approval_required": false,
+      "allowed_agents": [
+        "atendimento-nar",
+        "produto-nar",
+        "crm-nar"
+      ],
+      "denied_agents": [
+        "rufas-router",
+        "marketing-nar",
+        "engenharia-nar"
+      ],
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "limit"
+        ],
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "rascunho",
+              "enviada",
+              "aguardando_resposta",
+              "negociacao",
+              "aceita",
+              "recusada",
+              "expirada"
+            ]
+          },
+          "proposal_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "input_notes": "Sem status, retorna apenas os status pendentes (enviada, aguardando_resposta, negociacao). Com proposal_id, retorna aquela proposta ou PROPOSAL_NOT_FOUND.",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "proposals",
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "proposals": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "contact_id",
+                "title",
+                "status",
+                "value_brl",
+                "sent_at"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "contact_id": {
+                  "type": "string"
+                },
+                "school": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "title": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "value_brl": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "sent_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "valid_until": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "days_waiting": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "errors": [
+        "UNKNOWN_TOOL",
+        "ACCESS_DENIED",
+        "INVALID_INPUT",
+        "LIMIT_EXCEEDED",
+        "PROPOSAL_NOT_FOUND"
+      ]
+    },
+    {
+      "name": "campaign_get_history",
+      "domain": "campaigns",
+      "purpose": "Consultar campanhas e templates anteriores, com performance mock.",
+      "read_only": true,
+      "side_effects": [],
+      "approval_required": false,
+      "allowed_agents": [
+        "marketing-nar",
+        "produto-nar"
+      ],
+      "denied_agents": [
+        "rufas-router",
+        "atendimento-nar",
+        "crm-nar",
+        "engenharia-nar"
+      ],
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "brand": {
+            "type": "string",
+            "minLength": 1
+          },
+          "date_from": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "date_to": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20
+          }
+        },
+        "required": []
+      },
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "campaigns",
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "campaigns": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "brand",
+                "name",
+                "channel",
+                "status",
+                "start_date"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "brand": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "channel": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "start_date": {
+                  "type": "string"
+                },
+                "end_date": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "template_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "template": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "format": {
+                      "type": "string"
+                    },
+                    "headline": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "performance": {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "errors": [
+        "UNKNOWN_TOOL",
+        "ACCESS_DENIED",
+        "INVALID_INPUT",
+        "LIMIT_EXCEEDED",
+        "BRAND_UNKNOWN"
+      ],
+      "input_notes": "brand é string livre no schema para que marca desconhecida produza BRAND_UNKNOWN (erro de domínio) em vez de INVALID_INPUT. date_to deve ser maior ou igual a date_from."
+    },
+    {
+      "name": "campaign_get_brand_context",
+      "domain": "campaigns",
+      "purpose": "Obter posicionamento e guardrails de marca antes de produzir conteúdo.",
+      "read_only": true,
+      "side_effects": [],
+      "approval_required": false,
+      "allowed_agents": [
+        "marketing-nar",
+        "produto-nar"
+      ],
+      "denied_agents": [
+        "rufas-router",
+        "atendimento-nar",
+        "crm-nar",
+        "engenharia-nar"
+      ],
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "brand"
+        ],
+        "properties": {
+          "brand": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "input_notes": "brand é string livre no schema para que marca desconhecida produza BRAND_UNKNOWN (erro de domínio) em vez de INVALID_INPUT.",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "brand",
+          "positioning",
+          "guardrails",
+          "approved_messages",
+          "restricted_claims"
+        ],
+        "properties": {
+          "brand": {
+            "type": "string"
+          },
+          "positioning": {
+            "type": "string"
+          },
+          "guardrails": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "approved_messages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "restricted_claims": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "errors": [
+        "UNKNOWN_TOOL",
+        "ACCESS_DENIED",
+        "INVALID_INPUT",
+        "BRAND_UNKNOWN"
+      ]
+    }
+  ],
+  "not_yet_created": {
+    "gate": "Somente após benchmark read-only aprovado e desenho de aprovação humana.",
+    "tools": [
+      "crm_update_contact",
+      "crm_change_stage",
+      "send_email",
+      "send_whatsapp",
+      "publish_campaign",
+      "create_proposal",
+      "delete_anything",
+      "share_drive_file",
+      "upload_drive_file"
+    ],
+    "behavior_now": "Qualquer chamada a estes nomes retorna UNKNOWN_TOOL."
+  }
+}
