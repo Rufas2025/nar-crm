@@ -8,6 +8,8 @@
 | Status | `LAB` · ambiente `mock` |
 | Superfície | 10 capabilities, **todas read-only** |
 | Agentes | `rufas-router`, `marketing-nar`, `atendimento-nar`, `crm-nar`, `produto-nar`, `engenharia-nar` |
+| Orquestração | `rufas-router@0.1.0` + 4 contratos (`NAR-SUBAGENTS-ROUTER-V0.1`) |
+| Agentes especialistas | ainda não escritos — primeiro provar o router |
 
 ## O que isto NÃO é
 
@@ -36,6 +38,13 @@ técnico genérico.
 | `tests/mcp-contract-tests.json` | 24 casos de contrato |
 | `tests/mcp-policy-tests.json` | 21 casos de política |
 | `reports/mcp-readiness-report.md` | **Comece por aqui** |
+| `agents/rufas-router.md` | Orquestrador `rufas-router@0.1.0` — `allowed_tools: []` |
+| `contracts/task-contract.md` | Formato obrigatório de missão emitida pelo router |
+| `contracts/handoff-contract.md` | Formato obrigatório de retorno dos agentes |
+| `contracts/escalation-policy.md` | Quando parar e para quem escalar |
+| `contracts/approval-policy.md` | O que exige aprovação humana |
+| `benchmarks/router-cases.json` | 22 casos de roteamento |
+| `benchmarks/router-report.md` | Resultado da camada de orquestração |
 
 ## Política
 
