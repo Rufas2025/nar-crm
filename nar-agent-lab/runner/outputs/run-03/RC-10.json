@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Intenção 'Resolve aquilo da escola que a gente falou' não identifica escola, ação, entregável nem domínio. Informação insuficiente e ambiguidade real (E1.2/E1.3) — não há dado obtenível pelas tools do registry que resolva a ambiguidade. Escalar a HUMAN para nomear a escola e a ação pedida antes de qualquer missão."
+}

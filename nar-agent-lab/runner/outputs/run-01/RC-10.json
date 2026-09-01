@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Intenção 'Resolve aquilo da escola que a gente falou' não identifica escola, problema, domínio nem resultado esperado. Duas ou mais leituras razoáveis (ex.: proposta parada, dado de CRM incorreto, follow-up pendente, questão de oferta) levam a trabalhos materialmente diferentes, e a informação faltante não é obtenível pelas tools do registry sem antes saber a que a intenção se refere. Conforme E1.2/E1.3 e regra 9 do router, decisão material ou ambígua vai para HUMAN; não se deve escolher a interpretação mais provável."
+}

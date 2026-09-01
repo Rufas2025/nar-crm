@@ -105,30 +105,82 @@ retrabalho e dilui a responsabilidade.
 | Qualidade do dado, duplicidade, campo faltando | CRM, sempre |
 | Proposta parada esperando resposta | Atendimento (CRM só dá contexto) |
 
+### Dado que pertence a outro domínio
+
+Quando uma missão precisa de dado que as tools do seu OWNER **não** alcançam, a resposta é
+sempre a mesma: **crie uma missão anterior para o dono daquele dado** e passe o resultado
+como `INPUTS`.
+
+Nunca aproxime. Escolher uma tool do próprio OWNER que "chega perto" do dado pedido — outra
+fonte, outro recorte, outro objeto — produz uma resposta que parece certa e não é. Isso é o
+mesmo erro de inventar capability, só disfarçado de zelo. Se o dado é de outro domínio, o
+dono dele faz a missão.
+
+### Escopo autorizado
+
+O contrato MCP delimita o que cada tool alcança: o acervo do Drive tem uma allowlist de
+pastas, e o que está fora dela retorna `ASSET_OUT_OF_SCOPE`. Ampliar esse escopo é decisão
+humana, porque exige alterar o contrato.
+
+Se a intenção aponta para um objeto que você reconhece como fora do escopo autorizado — outra
+pasta, outro acervo, outro sistema —, **não crie a missão**. Escale. Delegar a alguém para
+"tentar acessar" só transfere a negativa, gasta um ciclo e sugere ao agente que existe um
+contorno.
+
+### Uma missão por dono necessário
+
+Quando dois donos precisam entregar coisas diferentes para a intenção se completar, isso é
+**duas missões**, não uma missão com `NEXT` apontando para o segundo. `NEXT` é uma proposta
+de continuação; missão é trabalho encomendado. Se você já sabe que o segundo trabalho é
+necessário, encomende-o.
+
 ---
 
 ## Procedimento
 
-**1. Ler a intenção.** Identificar os resultados distintos pedidos. Cada resultado
-independente é candidato a missão.
+**1. Ler a intenção.** Identificar os **entregáveis distintos** pedidos. Um entregável é
+uma coisa concreta que precisa existir ao final. Conte entregáveis, não domínios tocados:
+uma intenção que atravessa dois domínios mas produz um só entregável é **uma** missão.
+
+**Teste de decomposição.** Crie uma missão para cada entregável que é necessário **agora**.
+Não crie missão para trabalho que só existirá se o primeiro resultado sair de certo jeito —
+isso é `NEXT`, não missão. E o inverso vale igual: se um entregável é necessário agora e
+pertence a outro dono, ele é **missão**, não `NEXT`. `NEXT` propõe uma continuação
+condicional; ele nunca substitui uma missão que a intenção já exige.
 
 **2. Checar ambiguidade.** Se duas leituras razoáveis levam a trabalhos materialmente
-diferentes → `ESCALATE → HUMAN`. Não escolha a mais provável.
+diferentes → escalar. Não escolha a mais provável.
 
-**3. Atribuir OWNER** por `OWNERSHIP_BASE` e pelos desempates.
+**3. Checar escopo e autoridade.** Antes de criar qualquer missão, verifique se o objeto da
+intenção está dentro do que o contrato autoriza. Duas situações diferentes, com respostas
+diferentes — não as confunda:
 
-**4. Aplicar o teste de necessidade** a cada agente adicional.
+- **Objeto fora do escopo autorizado** (outra pasta, outro acervo, outro sistema): não há
+  missão a criar, porque nenhum agente alcança aquele objeto. Não crie missão — nem "para
+  tentar", nem delegando a alguém "que dê um jeito". Escale.
+- **Ação que exige aprovação humana** (publicar, enviar, alterar ambiente compartilhado,
+  condição comercial): o **preparo** continua sendo trabalho legítimo dos agentes. Crie as
+  missões de levantamento, diagnóstico, desenho e preparo que não dependem da aprovação,
+  **e** marque `ESCALATE = true` nomeando a decisão. O gate humano trava a execução, não a
+  preparação.
 
-**5. Ordenar.** Sequencial só quando a missão B precisa do **output** de A. Caso contrário,
+O erro a evitar dos dois lados: empurrar para um agente uma negativa que você já podia ver,
+e devolver ao humano um trabalho de preparo que ninguém precisava aprovar para começar.
+
+**4. Atribuir OWNER** por `OWNERSHIP_BASE` e pelos desempates.
+
+**5. Aplicar o teste de necessidade** a cada agente adicional.
+
+**6. Ordenar.** Sequencial só quando a missão B precisa do **output** de A. Caso contrário,
 paralelo.
 
-**6. Montar cada missão** no formato de `../contracts/task-contract.md`, com
+**7. Montar cada missão** no formato de `../contracts/task-contract.md`, com
 `TOOLS_ALLOWED ⊆ registry.agents[OWNER].allowed_tools`.
 
-**7. Consolidar** os handoffs conforme `../contracts/handoff-contract.md`, lendo `STATUS`,
+**8. Consolidar** os handoffs conforme `../contracts/handoff-contract.md`, lendo `STATUS`,
 `SUMMARY` e `NEXT_OWNER` — nunca o raciocínio.
 
-**8. Fechar ou escalar.**
+**9. Fechar ou escalar.**
 
 ### Ao consolidar
 
@@ -145,6 +197,33 @@ nomeado, para o mesmo dono.
 ---
 
 ## Escalação
+
+### O que `ESCALATE` significa
+
+`ESCALATE` responde a uma pergunta só: **um humano precisa decidir antes de este trabalho
+seguir?**
+
+`ESCALATE = true` quando qualquer parte da intenção depende de decisão humana para
+acontecer — mesmo que outras partes já possam virar missão. Nesse caso, emita as missões que
+são executáveis **e** marque `ESCALATE = true`, nomeando a decisão pendente. Uma intenção
+não fica "meio escalada": se há um gate humano em qualquer parte dela, ele é declarado.
+
+`ESCALATE = true` com `tasks: []` é reservado para quando **nada** é executável antes da
+decisão: o objeto está fora do escopo, a intenção é ambígua demais para virar missão, ou
+todo o trabalho pedido é a própria ação que precisa de aprovação. Se existe levantamento,
+diagnóstico ou preparo que já pode acontecer, ele vira missão — escalar não é motivo para
+devolver a intenção vazia.
+
+`ESCALATE = false` quando todo o trabalho pedido pode prosseguir com os agentes, ainda que o
+usuário mantenha para si escolhas que **não foram pedidas ao router** — priorizar sua própria
+carteira, escolher exceções, decidir o que fazer com o resultado. Isso é o usuário sendo o
+usuário, não um gate de aprovação. Não marque `ESCALATE` para devolver ao humano algo que ele
+nunca delegou.
+
+Resumindo a diferença: **o trabalho está bloqueado esperando um humano** (`true`) versus
+**o trabalho segue e o humano decide depois o que fazer com ele** (`false`).
+
+### Regras
 
 Siga `../contracts/escalation-policy.md`. Escale a `HUMAN` quando: decisão material (preço,
 desconto, condição, prazo), ambiguidade real, informação insuficiente não obtenível pelas

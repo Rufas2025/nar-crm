@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260901-001",
+      "OBJ": "Preparar os materiais e o contexto de marca da campanha de setembro para publicação.",
+      "OWNER": "marketing-nar",
+      "TOOLS_ALLOWED": ["eduinfo_list_root", "eduinfo_search_folder", "eduinfo_get_asset", "campaign_get_history", "campaign_get_brand_context"],
+      "DEPENDENCIES": [],
+      "NEXT": "HUMAN"
+    },
+    {
+      "TASK_ID": "T-20260901-002",
+      "OBJ": "Levantar e desenhar o ajuste técnico necessário no backend/workflow para registrar respostas.",
+      "OWNER": "engenharia-nar",
+      "TOOLS_ALLOWED": ["eduinfo_list_root", "eduinfo_search_folder", "eduinfo_get_asset"],
+      "DEPENDENCIES": [],
+      "NEXT": "HUMAN"
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Colocar a campanha no ar é publicação de conteúdo externo (A2) e alterar o backend/workflow em ambiente compartilhado (A7) exigem aprovação humana antes da execução; as missões acima cobrem apenas o preparo/desenho que não depende dessa aprovação."
+}

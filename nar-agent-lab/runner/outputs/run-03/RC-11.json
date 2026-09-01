@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Pedido exige decisão material de condição comercial (desconto de 20%) e o envio da resposta à escola — E1.1 (decisão material: desconto) e E1.4 (ação externa/irreversível: enviar resposta ao contato). A3 e A9 não têm exceção: preço/desconto e comunicação em nome da empresa exigem aprovação humana comercial antes de qualquer execução. Não há trabalho de preparo pendente que já não esteja disponível (contexto do desconto e do contato cabe ao humano decidir); nenhum agente possui capability de escrita para responder ao contato."
+}

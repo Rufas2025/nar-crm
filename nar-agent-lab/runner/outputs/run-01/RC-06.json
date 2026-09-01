@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260901-001",
+      "OBJ": "Identificar o contato no CRM sem email valido e o campo/dado inconsistente.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_get_contact_context", "crm_list_eligible_contacts"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

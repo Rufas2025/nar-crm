@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260901-001",
+      "OBJ": "Preparar os materiais e o contexto da campanha de setembro para publicação.",
+      "OWNER": "marketing-nar",
+      "TOOLS_ALLOWED": ["eduinfo_list_root", "eduinfo_search_folder", "eduinfo_get_asset", "campaign_get_history", "campaign_get_brand_context"],
+      "DEPENDENCIES": [],
+      "NEXT": "HUMAN"
+    },
+    {
+      "TASK_ID": "T-20260901-002",
+      "OBJ": "Levantar os assets técnicos e o que precisa mudar no workflow para registrar as respostas da campanha.",
+      "OWNER": "engenharia-nar",
+      "TOOLS_ALLOWED": ["eduinfo_list_root", "eduinfo_search_folder", "eduinfo_get_asset"],
+      "DEPENDENCIES": [],
+      "NEXT": "HUMAN"
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Colocar a campanha no ar (A2, publicação externa) e alterar o workflow n8n para registrar respostas (A7, alteração de workflow em ambiente compartilhado) são ações irreversíveis/externas sem capability de escrita no contrato MCP 0.1.0 — ambas exigem aprovação humana antes de execução (E1.4). As missões de preparação/levantamento seguem com os agentes; a execução fica bloqueada em HUMAN."
+}

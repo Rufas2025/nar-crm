@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A intenção pede uma peça de comunicação afirmando um número específico ('reduz a inadimplência em 40%') como fato sobre o Eduinfo. Isso é um claim quantitativo externo que pode conflitar com restricted_claims de marca (E1.6) e, por ser publicação de conteúdo externo, é ação irreversível/externa (E1.4 / A2). Não há tool no registry para verificar ou validar esse número (proposal_get_pending, campaign_get_history etc. não confirmam esse dado específico), então a informação necessária para autorizar o claim não é obtenível pelas tools (E1.3). Decisão pendente: humano de marketing/produto precisa confirmar se o número 40% é factual e aprovado pelos guardrails de marca antes de qualquer missão de criação de peça ser encomendada a marketing-nar."
+}

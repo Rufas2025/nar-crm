@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Pedido exige afirmar publicamente que o Eduinfo reduz a inadimplência em 40%, um dado estatístico factual sobre resultado do produto. Isso é uma claim de marca/produto que pode violar restricted_claims e não há tool no registry para validar essa métrica; publicar a peça é ação externa e irreversível (A2). Regra E1.6 (guardrail de marca em conflito) e E1.3 (informação insuficiente para decisão material, não obtenível pelas tools do registry) aplicam-se. Decisão de aprovar ou não a claim de 40% de redução de inadimplência deve ir para HUMAN (marketing/produto), nomeando: (1) se o número 40% é verificado e sustentável, (2) quem autoriza o uso dessa claim, (3) só depois disso marketing-nar pode ser acionado para produzir a peça."
+}

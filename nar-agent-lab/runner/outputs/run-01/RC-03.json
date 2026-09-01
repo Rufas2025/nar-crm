@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260901-001",
+      "OBJ": "Levantar o contexto do contato e a demo agendada.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_get_contact_context", "crm_get_demo_scheduled"],
+      "DEPENDENCIES": [],
+      "NEXT": "atendimento-nar"
+    },
+    {
+      "TASK_ID": "T-20260901-002",
+      "OBJ": "Definir e conduzir o próximo passo com o contato interessado, considerando a demo agendada.",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": ["crm_get_followups_due", "proposal_get_pending"],
+      "DEPENDENCIES": ["T-20260901-001"],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

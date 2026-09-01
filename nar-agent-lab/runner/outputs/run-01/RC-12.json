@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260901-001",
+      "OBJ": "Levantar a quantidade de follow-ups vencidos na data de referência de hoje.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_get_followups_due"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

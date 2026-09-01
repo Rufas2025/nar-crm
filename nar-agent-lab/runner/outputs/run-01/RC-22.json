@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260901-001",
+      "OBJ": "Levantar demos agendadas, propostas paradas e contatos sem interação recente (follow-up devido) para montar a prioridade de atendimento da semana.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_get_demo_scheduled", "proposal_get_pending", "crm_get_followups_due"],
+      "DEPENDENCIES": [],
+      "NEXT": "atendimento-nar"
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

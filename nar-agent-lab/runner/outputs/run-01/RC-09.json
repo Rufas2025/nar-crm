@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260901-001",
+      "OBJ": "Levantar histórico e contexto de marca para colocar a campanha de setembro no ar.",
+      "OWNER": "marketing-nar",
+      "TOOLS_ALLOWED": ["campaign_get_history", "campaign_get_brand_context"],
+      "DEPENDENCIES": [],
+      "NEXT": "HUMAN"
+    },
+    {
+      "TASK_ID": "T-20260901-002",
+      "OBJ": "Diagnosticar os assets/workflow necessários para ajustar o backend a registrar as respostas da campanha.",
+      "OWNER": "engenharia-nar",
+      "TOOLS_ALLOWED": ["eduinfo_list_root", "eduinfo_search_folder", "eduinfo_get_asset"],
+      "DEPENDENCIES": [],
+      "NEXT": "HUMAN"
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

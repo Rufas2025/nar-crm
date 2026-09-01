@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "rufas-router benchmark output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["tasks", "ESCALATE", "ESCALATION_REASON"],
+  "properties": {
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["TASK_ID", "OBJ", "OWNER", "TOOLS_ALLOWED", "DEPENDENCIES", "NEXT"],
+        "properties": {
+          "TASK_ID": { "type": "string" },
+          "OBJ": { "type": "string" },
+          "OWNER": { "type": "string", "enum": ["marketing-nar", "atendimento-nar", "crm-nar", "produto-nar", "engenharia-nar"] },
+          "TOOLS_ALLOWED": { "type": "array", "items": { "type": "string" } },
+          "DEPENDENCIES": { "type": "array", "items": { "type": "string" } },
+          "NEXT": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "ESCALATE": { "type": "boolean" },
+    "ESCALATION_REASON": { "type": ["string", "null"] }
+  },
+  "notes": [
+    "tasks:[] com ESCALATE:true é a forma válida de escalação.",
+    "tasks:[] com ESCALATE:false é válido quando a ação correta não é criar missão (consolidação, devolução de handoff).",
+    "OWNER nunca pode ser rufas-router: o router não executa trabalho.",
+    "TOOLS_ALLOWED deve ser subconjunto das tools do OWNER no capability registry."
+  ]
+}

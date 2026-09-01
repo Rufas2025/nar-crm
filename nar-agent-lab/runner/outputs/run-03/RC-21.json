@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Objeto fora do escopo autorizado: a pasta do financeiro não está na allowlist do Drive coberta pelo contrato MCP (tools eduinfo_* alcançam apenas o acervo eduinfo). Nenhum agente possui capability para acessar 'pasta do financeiro'; ampliar o escopo é decisão humana (E1.3 / escopo autorizado, approval-policy A6/A8)."
+}

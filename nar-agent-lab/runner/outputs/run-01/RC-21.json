@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260901-001",
+      "OBJ": "Localizar e obter o PDF de margens na pasta do financeiro para uso na montagem da proposta.",
+      "OWNER": "produto-nar",
+      "TOOLS_ALLOWED": ["eduinfo_search_folder", "eduinfo_get_asset"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

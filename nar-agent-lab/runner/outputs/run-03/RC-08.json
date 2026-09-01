@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260901-001",
+      "OBJ": "Diagnosticar a estrutura atual do workflow n8n de cadência e desenhar a proposta de alteração estrutural.",
+      "OWNER": "engenharia-nar",
+      "TOOLS_ALLOWED": ["eduinfo_list_root", "eduinfo_search_folder", "eduinfo_get_asset"],
+      "DEPENDENCIES": [],
+      "NEXT": "HUMAN"
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A7 (approval-policy.md): alterar workflow n8n em ambiente compartilhado exige aprovação humana de engenharia antes de a alteração estrutural ser executada. O diagnóstico e o desenho da mudança podem prosseguir como missão de preparo, mas a execução da alteração fica bloqueada até aprovação."
+}

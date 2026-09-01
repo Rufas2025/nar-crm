@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260901-001",
+      "OBJ": "Levantar o histórico e contexto do contato indicado.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_get_contact_context"],
+      "DEPENDENCIES": [],
+      "NEXT": "marketing-nar"
+    },
+    {
+      "TASK_ID": "T-20260901-002",
+      "OBJ": "Escrever a mensagem ao contato usando o histórico levantado.",
+      "OWNER": "marketing-nar",
+      "TOOLS_ALLOWED": [],
+      "DEPENDENCIES": ["T-20260901-001"],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

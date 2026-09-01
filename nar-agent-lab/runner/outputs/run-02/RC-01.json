@@ -1,0 +1,38 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260901-001",
+      "OBJ": "Corrigir o erro do MCP identificado.",
+      "OWNER": "engenharia-nar",
+      "TOOLS_ALLOWED": ["eduinfo_list_root", "eduinfo_search_folder", "eduinfo_get_asset"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    },
+    {
+      "TASK_ID": "T-20260901-002",
+      "OBJ": "Disparar a cadência de follow-up da semana para os contatos elegíveis.",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": ["crm_get_followups_due", "crm_get_demo_scheduled"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    },
+    {
+      "TASK_ID": "T-20260901-003",
+      "OBJ": "Levantar o estado e o tracking das propostas em acompanhamento.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["proposal_get_pending", "crm_get_contact_context"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    },
+    {
+      "TASK_ID": "T-20260901-004",
+      "OBJ": "Esclarecer dúvida de oferta relacionada às propostas em resposta aos clientes.",
+      "OWNER": "produto-nar",
+      "TOOLS_ALLOWED": ["proposal_get_pending"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260901-001",
+      "OBJ": "Montar a lista priorizada de atendimento da semana cruzando contatos com demo agendada, proposta parada e contatos sem interação recente.",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": ["crm_get_demo_scheduled", "proposal_get_pending", "crm_get_followups_due"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

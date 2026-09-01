@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260901-001",
+      "OBJ": "Montar a lista priorizada de atendimento da semana com quem tem demo agendada, quem tem proposta parada e quem sumiu.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_get_demo_scheduled", "proposal_get_pending", "crm_get_followups_due"],
+      "DEPENDENCIES": [],
+      "NEXT": "atendimento-nar"
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

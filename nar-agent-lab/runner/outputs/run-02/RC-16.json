@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260901-001",
+      "OBJ": "Obter o contexto do contato necessário para a missão de marketing que ficou bloqueada.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_get_contact_context"],
+      "DEPENDENCIES": [],
+      "NEXT": "marketing-nar"
+    },
+    {
+      "TASK_ID": "T-20260901-002",
+      "OBJ": "Retomar a missão original de marketing usando o contexto do contato entregue por crm-nar como INPUTS.",
+      "OWNER": "marketing-nar",
+      "TOOLS_ALLOWED": ["eduinfo_list_root", "eduinfo_search_folder", "eduinfo_get_asset", "campaign_get_history", "campaign_get_brand_context"],
+      "DEPENDENCIES": ["T-20260901-001"],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Alteração estrutural em workflow n8n é ação que exige aprovação humana (approval-policy A7: alterar workflow n8n em ambiente compartilhado — aprovador: humano de engenharia, com rollback definido) e nenhuma capability de leitura ou escrita de workflow n8n existe no capability registry 0.1.0 (engenharia-nar só tem eduinfo_list_root, eduinfo_search_folder, eduinfo_get_asset — todas de Drive, nenhuma toca n8n). Não há missão executável a criar: seria necessário inventar tool inexistente para sequer levantar o estado atual do workflow. Registra-se CAPABILITY_GAP — decisão bloqueada: qualquer alteração de estrutura do workflow n8n de cadência; capability que faltaria: leitura/escrita de workflow n8n; dono seria engenharia-nar — e escala por E1.8/E1.4, com o gate de aprovação humana A7 citado."
+}

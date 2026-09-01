@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260901-001",
+      "OBJ": "Definir o ajuste de posicionamento necessário no template para alinhar com a marca.",
+      "OWNER": "produto-nar",
+      "TOOLS_ALLOWED": ["campaign_get_brand_context", "campaign_get_history"],
+      "DEPENDENCIES": [],
+      "NEXT": "marketing-nar"
+    },
+    {
+      "TASK_ID": "T-20260901-002",
+      "OBJ": "Refazer a peça do template aplicando o ajuste de posicionamento definido.",
+      "OWNER": "marketing-nar",
+      "TOOLS_ALLOWED": ["eduinfo_get_asset", "campaign_get_brand_context"],
+      "DEPENDENCIES": ["T-20260901-001"],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

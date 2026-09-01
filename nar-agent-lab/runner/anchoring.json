@@ -1,0 +1,142 @@
+{
+  "audited_at_contract": "0.1.0",
+  "explanation": "Casos ancorados têm o roteamento correto disponível dentro do próprio rufas-router.md. Métricas sobre eles medem recuperação, não julgamento. O gate deve ser lido primariamente sobre os casos cegos.",
+  "anchored": [
+    "RC-01",
+    "RC-02",
+    "RC-03",
+    "RC-04",
+    "RC-05",
+    "RC-06",
+    "RC-07",
+    "RC-08",
+    "RC-09",
+    "RC-10"
+  ],
+  "blind": [
+    "RC-11",
+    "RC-12",
+    "RC-13",
+    "RC-14",
+    "RC-15",
+    "RC-16",
+    "RC-17",
+    "RC-18",
+    "RC-19",
+    "RC-20",
+    "RC-21",
+    "RC-22"
+  ],
+  "rows": [
+    {
+      "id": "RC-01",
+      "anchored": true,
+      "reason": "caso obrigatório do briefing, coberto pela tabela de casos de referência"
+    },
+    {
+      "id": "RC-02",
+      "anchored": true,
+      "reason": "caso obrigatório do briefing, coberto pela tabela de casos de referência"
+    },
+    {
+      "id": "RC-03",
+      "anchored": true,
+      "reason": "caso obrigatório do briefing, coberto pela tabela de casos de referência"
+    },
+    {
+      "id": "RC-04",
+      "anchored": true,
+      "reason": "título presente na tabela de casos de referência do spec"
+    },
+    {
+      "id": "RC-05",
+      "anchored": true,
+      "reason": "caso obrigatório do briefing, coberto pela tabela de casos de referência"
+    },
+    {
+      "id": "RC-06",
+      "anchored": true,
+      "reason": "caso obrigatório do briefing, coberto pela tabela de casos de referência"
+    },
+    {
+      "id": "RC-07",
+      "anchored": true,
+      "reason": "caso obrigatório do briefing, coberto pela tabela de casos de referência"
+    },
+    {
+      "id": "RC-08",
+      "anchored": true,
+      "reason": "título presente na tabela de casos de referência do spec"
+    },
+    {
+      "id": "RC-09",
+      "anchored": true,
+      "reason": "caso obrigatório do briefing, coberto pela tabela de casos de referência"
+    },
+    {
+      "id": "RC-10",
+      "anchored": true,
+      "reason": "título presente na tabela de casos de referência do spec"
+    },
+    {
+      "id": "RC-11",
+      "anchored": false,
+      "reason": "não referenciado no spec"
+    },
+    {
+      "id": "RC-12",
+      "anchored": false,
+      "reason": "não referenciado no spec"
+    },
+    {
+      "id": "RC-13",
+      "anchored": false,
+      "reason": "não referenciado no spec"
+    },
+    {
+      "id": "RC-14",
+      "anchored": false,
+      "reason": "não referenciado no spec"
+    },
+    {
+      "id": "RC-15",
+      "anchored": false,
+      "reason": "não referenciado no spec"
+    },
+    {
+      "id": "RC-16",
+      "anchored": false,
+      "reason": "não referenciado no spec"
+    },
+    {
+      "id": "RC-17",
+      "anchored": false,
+      "reason": "não referenciado no spec"
+    },
+    {
+      "id": "RC-18",
+      "anchored": false,
+      "reason": "não referenciado no spec"
+    },
+    {
+      "id": "RC-19",
+      "anchored": false,
+      "reason": "não referenciado no spec"
+    },
+    {
+      "id": "RC-20",
+      "anchored": false,
+      "reason": "não referenciado no spec"
+    },
+    {
+      "id": "RC-21",
+      "anchored": false,
+      "reason": "não referenciado no spec"
+    },
+    {
+      "id": "RC-22",
+      "anchored": false,
+      "reason": "não referenciado no spec"
+    }
+  ]
+}

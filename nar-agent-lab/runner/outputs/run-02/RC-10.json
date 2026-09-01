@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Intenção sem informação suficiente para decisão (E1.2/E1.3): 'resolve aquilo da escola que a gente falou' não identifica a escola, o problema, nem o domínio (dado, comunicação, produto ou técnico). Duas ou mais leituras razoáveis levam a trabalhos materialmente diferentes, e o dado faltante (qual escola, qual pendência) não é obtenível pelas tools do registry."
+}

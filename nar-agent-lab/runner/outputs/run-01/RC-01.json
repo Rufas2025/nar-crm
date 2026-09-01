@@ -1,0 +1,38 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260901-001",
+      "OBJ": "Diagnosticar e corrigir o problema técnico reportado no MCP.",
+      "OWNER": "engenharia-nar",
+      "TOOLS_ALLOWED": ["eduinfo_list_root", "eduinfo_search_folder", "eduinfo_get_asset"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    },
+    {
+      "TASK_ID": "T-20260901-002",
+      "OBJ": "Disparar a cadência da semana e responder os clientes com follow-up e demo pendentes.",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": ["crm_get_followups_due", "crm_get_demo_scheduled", "crm_list_eligible_contacts", "proposal_get_pending"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    },
+    {
+      "TASK_ID": "T-20260901-003",
+      "OBJ": "Levantar o estado e o tracking das propostas em acompanhamento, com contexto de cada contato.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["proposal_get_pending", "crm_get_contact_context"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    },
+    {
+      "TASK_ID": "T-20260901-004",
+      "OBJ": "Esclarecer eventual dúvida de oferta relacionada às propostas pendentes antes da resposta aos clientes.",
+      "OWNER": "produto-nar",
+      "TOOLS_ALLOWED": ["proposal_get_pending", "campaign_get_brand_context"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Priorização de clientes e exceções no atendimento é decisão material do usuário (E1.1/E1.2) e fica com HUMAN; não decidida pelo router nem por nenhum agente."
+}

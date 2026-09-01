@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Objeto fora do escopo autorizado: a intenção pede um PDF na pasta do financeiro, que não está na allowlist de pastas do Drive do contrato MCP. Ampliar o escopo autorizado é decisão humana (E1.3 / Escopo autorizado)."
+}

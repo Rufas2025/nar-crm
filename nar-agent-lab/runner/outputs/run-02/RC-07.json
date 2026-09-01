@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260901-001",
+      "OBJ": "Levantar as propostas pendentes há vários dias e o contexto de cada contato associado.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["proposal_get_pending", "crm_get_contact_context"],
+      "DEPENDENCIES": [],
+      "NEXT": "atendimento-nar"
+    },
+    {
+      "TASK_ID": "T-20260901-002",
+      "OBJ": "Priorizar e conduzir a retomada das propostas paradas com base no contexto de cada contato.",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": ["proposal_get_pending", "crm_get_contact_context"],
+      "DEPENDENCIES": ["T-20260901-001"],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

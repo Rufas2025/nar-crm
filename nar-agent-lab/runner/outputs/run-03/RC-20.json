@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A intenção pede uma peça de comunicação afirmando que o Eduinfo reduz a inadimplência em 40% — é uma claim numérica de resultado/benefício de produto, potencialmente um restricted_claim de marca (E1.6) e uma alegação factual que precisa de validação/aprovação antes de qualquer peça ser produzida ou publicada (E1.1/E1.4, approval-policy A2). Não há tool no registry para verificar se o dado de 40% é sustentável ou aprovado para uso externo, e nenhum agente tem autoridade para decidir sozinho publicar uma métrica de produto como claim de marketing. Um humano precisa confirmar a veracidade/fonte do número 40% e aprovar seu uso como claim antes que marketing-nar ou produto-nar produzam qualquer material."
+}
