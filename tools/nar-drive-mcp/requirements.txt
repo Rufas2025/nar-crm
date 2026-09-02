@@ -1,0 +1,4 @@
+# Runtime dependencies (minimal, read-only Drive access over MCP stdio).
+mcp>=1.9,<3
+google-api-python-client>=2.100.0
+google-auth>=2.30.0
