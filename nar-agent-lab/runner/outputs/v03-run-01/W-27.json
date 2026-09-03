@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A intenção pede uma decisão de política comercial (permitir desconto por volume no módulo de propostas) e um julgamento sobre se a regra vigente está correta — E1.1: decisão material de desconto/condição comercial, sem exceção possível. Também não há capability no registry que consulte a configuração ou regra de negócio do módulo de propostas quanto a desconto por volume (proposal_get_pending expõe propostas e status, não regras de precificação) — E1.3: informação necessária não obtenível pelas tools disponíveis. Não há levantamento de estado ou preparo com tools do registry que avance esta decisão sem primeiro o humano definir o que é 'correto' aqui; portanto nenhuma missão é executável antes da decisão."
+}

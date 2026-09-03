@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Intenção ambígua e sem insumo executável: não especifica qual 'sistema' ou 'última atualização' (workflow n8n, contrato MCP, ou outro) — duas leituras levam a trabalhos materialmente diferentes (E1.2). Além disso, nenhum agente do registry possui tool que alcance histórico de deploy, versão de workflow n8n ou estado de sistema para avaliar segurança de reversão — as tools disponíveis a engenharia-nar cobrem apenas o acervo Drive (eduinfo_list_root, eduinfo_search_folder, eduinfo_get_asset), não estado técnico do sistema (CAPABILITY_GAPS: decisão bloqueada = avaliar segurança do revert; capability faltante = leitura de histórico/versão de workflow ou deploy; dono provável = engenharia-nar). Reverter é ação irreversível em ambiente compartilhado e exige aprovação humana (A7, E1.4). Sem saber qual atualização e qual sistema, nenhuma missão de preparo pode ser montada com contexto mínimo válido."
+}

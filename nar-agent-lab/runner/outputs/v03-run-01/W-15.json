@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "E1.1 decisão material: aprovar condição especial de pagamento é decisão comercial (preço/condição) que só HUMAN pode tomar. Não há capability de escrita no contrato (0 write tools) e A3/A4 exigem aprovador humano comercial, sem exceção. Nenhum preparo é necessário antes da decisão: o pedido é a própria aprovação, então tasks:[]."
+}

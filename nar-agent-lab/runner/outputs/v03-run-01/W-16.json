@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Levantar os contatos cujo stage de pipeline no CRM está inconsistente com o histórico/estado registrado, com a divergência encontrada em cada caso.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_list_eligible_contacts", "crm_get_contact_context"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Corrigir o stage de um contato é escrita em dado de CRM (A5 da approval-policy): não há capability de escrita no contrato MCP 0.1.0, e mesmo se houvesse exigiria aprovação humana de CRM. O diagnóstico dos contatos classificados errado pode ser preparado agora por crm-nar, mas a correção em si fica bloqueada até decisão/execução humana."
+}

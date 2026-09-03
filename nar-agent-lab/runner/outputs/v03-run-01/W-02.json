@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Levantar as campanhas de email que a Eduinfo já rodou este ano.",
+      "OWNER": "marketing-nar",
+      "TOOLS_ALLOWED": ["campaign_get_history"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

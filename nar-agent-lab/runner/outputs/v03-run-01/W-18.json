@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "O objeto da intenção (\"repositório jurídico\") não está dentro do escopo autorizado pelo contrato MCP 0.1.0: nenhum agente tem tool que alcance um acervo jurídico — o Drive acessível (eduinfo_list_root, eduinfo_search_folder, eduinfo_get_asset) é limitado à allowlist de pastas do domínio comercial/marketing, não ao repositório jurídico. Ampliar esse escopo é decisão humana, pois exige alterar o contrato. Nenhuma missão é criada porque não há nenhum trabalho de preparo que um agente do registry consiga executar sobre esse objeto; a resposta correta é escalar, não delegar 'para tentar'."
+}

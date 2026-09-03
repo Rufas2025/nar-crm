@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Confirmar a integridade do cadastro das escolas que sumiram.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_list_eligible_contacts", "crm_get_contact_context"],
+      "DEPENDENCIES": [],
+      "NEXT": "T-20260903-002"
+    },
+    {
+      "TASK_ID": "T-20260903-002",
+      "OBJ": "Preparar a abordagem às escolas que sumiram com cadastro confirmado como íntegro.",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": ["crm_get_contact_context"],
+      "DEPENDENCIES": ["T-20260903-001"],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

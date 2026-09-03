@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Levantar o histórico de campanhas da Eduinfo.",
+      "OWNER": "marketing-nar",
+      "TOOLS_ALLOWED": ["campaign_get_history"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    },
+    {
+      "TASK_ID": "T-20260903-002",
+      "OBJ": "Levantar o estado das propostas pendentes.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["proposal_get_pending"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

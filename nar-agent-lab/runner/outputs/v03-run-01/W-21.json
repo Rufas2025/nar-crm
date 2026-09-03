@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Diagnosticar e resolver o blocker técnico que impediu a conclusão da missão de produto-nar.",
+      "OWNER": "engenharia-nar",
+      "TOOLS_ALLOWED": ["eduinfo_list_root", "eduinfo_search_folder", "eduinfo_get_asset"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

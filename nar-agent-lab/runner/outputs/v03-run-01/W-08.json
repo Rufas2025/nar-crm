@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Levantar as escolas com demo agendada para esta semana.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_get_demo_scheduled"],
+      "DEPENDENCIES": [],
+      "NEXT": "T-20260903-002"
+    },
+    {
+      "TASK_ID": "T-20260903-002",
+      "OBJ": "Produzir a peça de comunicação dirigida às escolas com demo agendada nesta semana.",
+      "OWNER": "marketing-nar",
+      "TOOLS_ALLOWED": ["campaign_get_brand_context", "eduinfo_search_folder", "eduinfo_get_asset"],
+      "DEPENDENCIES": ["T-20260903-001"],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

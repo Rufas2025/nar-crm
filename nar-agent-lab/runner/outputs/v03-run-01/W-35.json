@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Levantar as escolas com contato interrompido (sem interação recente) e o histórico/estado de cada uma.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_list_eligible_contacts", "crm_get_contact_context", "crm_get_followups_due"],
+      "DEPENDENCIES": [],
+      "NEXT": "T-20260903-002"
+    },
+    {
+      "TASK_ID": "T-20260903-002",
+      "OBJ": "Montar plano de abordagem de retomada de contato para as escolas levantadas, priorizado por tempo sem interação.",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": ["crm_get_contact_context", "proposal_get_pending"],
+      "DEPENDENCIES": ["T-20260903-001"],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

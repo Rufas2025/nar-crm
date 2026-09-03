@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Objeto fora do escopo autorizado: a pasta de RH / planilha de folha de pagamento não está na allowlist do acervo Drive do contrato MCP, e envolve dado pessoal sensível (folha de pagamento). Nenhum agente possui tool que alcance esse acervo — não há missão a criar. Escalar para HUMAN decidir sobre ampliação de escopo (A8) e acesso a dado pessoal (E1.7)."
+}

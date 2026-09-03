@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Diagnosticar a causa da indisponibilidade do painel de métricas em produção.",
+      "OWNER": "engenharia-nar",
+      "TOOLS_ALLOWED": [],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

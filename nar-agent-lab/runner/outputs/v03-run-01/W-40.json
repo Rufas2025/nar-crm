@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Levantar o posicionamento de marca vigente relevante para a campanha em questão.",
+      "OWNER": "produto-nar",
+      "TOOLS_ALLOWED": ["campaign_get_brand_context"],
+      "DEPENDENCIES": [],
+      "NEXT": "T-20260903-002"
+    },
+    {
+      "TASK_ID": "T-20260903-002",
+      "OBJ": "Ajustar a proposta de valor da campanha para alinhar ao posicionamento de marca levantado.",
+      "OWNER": "marketing-nar",
+      "TOOLS_ALLOWED": ["campaign_get_history"],
+      "DEPENDENCIES": ["T-20260903-001"],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

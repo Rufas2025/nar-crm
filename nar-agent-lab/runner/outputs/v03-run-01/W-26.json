@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Levantar o status do follow-up da escola e o contexto de histórico do contato.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_get_followups_due", "crm_get_contact_context"],
+      "DEPENDENCIES": [],
+      "NEXT": "T-20260903-002"
+    },
+    {
+      "TASK_ID": "T-20260903-002",
+      "OBJ": "Recomendar o próximo passo de relacionamento com a escola com base no status de follow-up levantado.",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": ["crm_get_followups_due", "crm_get_contact_context", "crm_get_demo_scheduled", "proposal_get_pending"],
+      "DEPENDENCIES": ["T-20260903-001"],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

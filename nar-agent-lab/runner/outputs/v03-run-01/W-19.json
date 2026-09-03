@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A intenção pede varredura do 'Drive inteiro', mas o contrato MCP autoriza apenas uma allowlist de pastas do acervo Eduinfo — objeto fora do escopo autorizado. Nenhum agente alcança 'o Drive inteiro'; ampliar esse escopo é decisão humana (exige alterar o contrato). Não há missão executável a criar sem antes o humano definir o subconjunto de pastas autorizado a varrer."
+}

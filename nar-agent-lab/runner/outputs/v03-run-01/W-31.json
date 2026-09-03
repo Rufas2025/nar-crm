@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Enviar mensagem de cobrança a contatos é ação externa e irreversível sobre terceiro (A1/E1.4), sem capability de escrita no contrato MCP 0.1.0; além disso não há tool no registry que levante 'fatura vencida' (proposal_get_pending cobre propostas pendentes, não faturas), o que é capability ausente que muda o resultado (E1.8/CAPABILITY_GAPS: capability faltante 'invoice_get_overdue' ou equivalente, dono crm-nar). Nada é executável antes de decisão humana sobre envio e sobre a capability ausente."
+}

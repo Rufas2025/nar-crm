@@ -249,7 +249,7 @@ const report = {
 fs.mkdirSync(path.join(__dirname, 'results-v03'), { recursive: true });
 fs.writeFileSync(path.join(__dirname, 'results-v03', `run-${RUN}.json`), JSON.stringify(report, null, 2) + '\n');
 
-console.log(`V0.2 RUN_${RUN} — ${N} casos | PASS ${PASS} · PARTIAL ${PARTIAL} · FAIL ${FAIL}`);
+console.log(`V0.3 RUN_${RUN} — ${N} casos | PASS ${PASS} · PARTIAL ${PARTIAL} · FAIL ${FAIL}`);
 for (const [k, v] of Object.entries(metrics)) console.log(`  ${k.padEnd(34)} ${v === null ? 'n/a' : v + '%'}`);
 console.log(`  escalação: tp=${tp} fp=${fp} fn=${fn} tn=${tn}`);
 console.log(`  GATE: ${report.gate_passed ? 'PASSOU' : 'NÃO PASSOU'} — ${Object.entries(GATE).filter(([, v]) => v !== true).map(([k]) => k).join(', ') || 'todos os critérios atendidos'}`);

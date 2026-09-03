@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Ajustar o motor de precificação dinâmica é decisão material de condição comercial (E1.1/A3, sem exceção) e não há capability no registry que alcance essa lógica de precificação (CAPABILITY_GAP: nenhum agente tem tool para motor de precificação — dono provável seria produto-nar/engenharia-nar, mas a decisão de como precificar é comercial, não técnica). 'Implantar a mudança' é alteração de workflow em ambiente compartilhado (A7) e ação irreversível/externa (E1.4), também sujeita a aprovação humana. Como a própria definição do ajuste de precificação já é a decisão material pendente, não há levantamento ou preparo que possa ser destacado como missão executável agora sem primeiro saber o que o humano decidiu sobre a precificação."
+}

@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Levantar as escolas com proposta parada e o contexto de cada contato.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["proposal_get_pending", "crm_get_contact_context"],
+      "DEPENDENCIES": [],
+      "NEXT": "marketing-nar"
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

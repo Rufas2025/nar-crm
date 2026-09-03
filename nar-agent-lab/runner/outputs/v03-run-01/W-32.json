@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Produzir a peça de comunicação anunciando a nova funcionalidade, pronta para aprovação.",
+      "OWNER": "marketing-nar",
+      "TOOLS_ALLOWED": ["eduinfo_list_root", "eduinfo_search_folder", "eduinfo_get_asset", "campaign_get_brand_context"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A2: publicar conteúdo externo exige aprovação humana de marketing; não há capability de escrita/publicação no contrato MCP 0.1.0. O preparo da peça (T-20260903-001) pode prosseguir, mas a publicação em si fica bloqueada até decisão humana."
+}

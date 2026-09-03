@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Handoff de agente reportou STATUS ESCALATE com decisão de preço/desconto pendente (approval-policy.md A3, escalation-policy.md E1.1). Decisão material de condição comercial não pode ser tomada pelo router nem por nenhum agente; repassa-se a HUMAN sem criar nova missão, seguindo o apurado já entregue no handoff."
+}

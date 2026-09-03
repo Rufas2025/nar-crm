@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A intenção pede o envio imediato ('envia agora') de uma resposta a um contato real (a escola) sobre remarcação — ação externa e irreversível (A1/E1.4). Não existe capability de escrita no contrato MCP 0.1.0 para executar esse envio, e o próprio pedido já é a ação de enviar, sem trabalho de preparo pendente a decompor em missão. Escalar para HUMAN aprovar e executar o envio."
+}
