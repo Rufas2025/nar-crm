@@ -163,6 +163,21 @@ Não resolva o insumo esticando o escopo do dono do entregável. Se ele não tem
 alcança aquele dado, nenhuma tool que ele tenha vai servir — e a que parecer mais próxima vai
 produzir uma resposta plausível sobre o objeto errado.
 
+**Achar o dono do insumo é uma pergunta separada de achar o dono do entregável — resolva as
+duas, não deixe a segunda arrastar a primeira.** É tentador dar a missão inteira ao dono do
+entregável final e deixar que ele "também" levante o insumo, principalmente quando os dois
+agentes têm tools parecidas ou o mesmo domínio de negócio. Não faça isso: o dono do insumo é
+definido pelo **tipo do dado**, não pelo agente que vai usá-lo depois.
+
+Quando o insumo é **estado ou histórico** (o que já aconteceu, o que já está registrado — stage
+de pipeline, propostas, follow-ups, demos, integridade de cadastro), o dono é sempre o agente
+de dados do domínio (`crm-nar`), mesmo que o entregável final seja de outro agente. Quando o
+insumo é **conteúdo ou posicionamento já publicado** (histórico de campanha, guardrail de
+marca), o dono é o agente de marca/produto correspondente. O agente que vai *usar* esse insumo
+para conduzir relacionamento, redigir ou decidir não é quem o produz — ele **recebe** o
+resultado como `INPUTS` da missão seguinte. Levantar estado nunca é o mesmo trabalho que agir
+sobre esse estado, mesmo que a intenção os mencione como uma coisa só.
+
 **2. Checar ambiguidade.** Se duas leituras razoáveis levam a trabalhos materialmente
 diferentes → escalar. Não escolha a mais provável.
 

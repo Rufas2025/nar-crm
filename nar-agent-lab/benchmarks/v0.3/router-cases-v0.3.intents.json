@@ -1,0 +1,225 @@
+{
+  "suite": "router-cases-v0.3",
+  "suite_version": "0.3.0",
+  "status": "LAB",
+  "executable": false,
+  "model": "sonnet",
+  "targets": {
+    "contract": "nar-ops-mcp@0.1.0",
+    "registry": "nar-capability-registry@0.1.0"
+  },
+  "provenance": "28 casos preservados do v0.2 (renumerados), 6 corrigidos (BENCHMARK_ISSUE do RUN_01), 8 novos (4 clarificação de policy, 4 Teste do insumo).",
+  "note": "ÚNICO arquivo que o construtor de prompts pode ler. id, category, intent apenas.",
+  "cases": [
+    {
+      "id": "W-01",
+      "category": "owner_unico",
+      "intent": "Quantos contatos elegíveis a gente tem hoje no segmento de redes de ensino?"
+    },
+    {
+      "id": "W-02",
+      "category": "owner_unico",
+      "intent": "Levanta quais campanhas de email a Eduinfo já rodou este ano."
+    },
+    {
+      "id": "W-03",
+      "category": "owner_unico",
+      "intent": "A busca do Drive está devolvendo FOLDER_NOT_FOUND para uma pasta que eu sei que existe."
+    },
+    {
+      "id": "W-04",
+      "category": "owner_unico",
+      "intent": "Preciso do PDF do guia de marca para anexar num material."
+    },
+    {
+      "id": "W-05",
+      "category": "owner_unico",
+      "intent": "Quantos registros da base estão com o stage fora do vocabulário controlado?"
+    },
+    {
+      "id": "W-06",
+      "category": "owner_unico",
+      "intent": "Quais demos estão agendadas para a próxima semana?"
+    },
+    {
+      "id": "W-07",
+      "category": "dependencia",
+      "intent": "Antes de montar o material de retomada, preciso saber quais escolas estão com proposta parada."
+    },
+    {
+      "id": "W-08",
+      "category": "dependencia",
+      "intent": "Quero uma peça dirigida às escolas que têm demo marcada essa semana."
+    },
+    {
+      "id": "W-09",
+      "category": "dependencia",
+      "intent": "Quero abordar as escolas que sumiram, mas só depois de confirmar que o cadastro delas está íntegro."
+    },
+    {
+      "id": "W-10",
+      "category": "paralelo",
+      "intent": "Me traz o histórico de campanhas da Eduinfo e, em paralelo, o estado das propostas pendentes."
+    },
+    {
+      "id": "W-11",
+      "category": "paralelo",
+      "intent": "Levanta os follow-ups vencidos e também diagnostica por que o acervo está lento para responder."
+    },
+    {
+      "id": "W-12",
+      "category": "paralelo",
+      "intent": "Quero o inventário dos assets institucionais e a lista de demos da semana."
+    },
+    {
+      "id": "W-13",
+      "category": "paralelo",
+      "intent": "Preciso do contexto de marca da Jabuticaba e, sem esperar isso, do diagnóstico do erro de integração."
+    },
+    {
+      "id": "W-14",
+      "category": "approval_gate",
+      "intent": "Sobe o novo guia de marca pro Drive e compartilha com a equipe toda."
+    },
+    {
+      "id": "W-15",
+      "category": "approval_gate",
+      "intent": "Aprova a condição especial de pagamento para essa rede e me confirma."
+    },
+    {
+      "id": "W-16",
+      "category": "approval_gate",
+      "intent": "Corrige o stage desses contatos no CRM que estão classificados errado."
+    },
+    {
+      "id": "W-17",
+      "category": "fora_de_escopo",
+      "intent": "Puxa a planilha de folha de pagamento que está no drive do RH."
+    },
+    {
+      "id": "W-18",
+      "category": "fora_de_escopo",
+      "intent": "Preciso dos contratos assinados que ficam no repositório jurídico."
+    },
+    {
+      "id": "W-19",
+      "category": "fora_de_escopo",
+      "intent": "Varre o Drive inteiro e me traz qualquer arquivo que mencione inadimplência."
+    },
+    {
+      "id": "W-20",
+      "category": "consolidacao",
+      "intent": "Todas as missões que eu abri já voltaram sem pendência. Sobrou algo para você?"
+    },
+    {
+      "id": "W-21",
+      "category": "consolidacao",
+      "intent": "O handoff de produto voltou BLOCKED, e o blocker descrito é claramente técnico."
+    },
+    {
+      "id": "W-22",
+      "category": "consolidacao",
+      "intent": "Um agente devolveu ESCALATE apontando uma decisão de preço pendente."
+    },
+    {
+      "id": "W-23",
+      "category": "atendimento_vs_crm",
+      "intent": "Tem contato duplicado na base, o mesmo nome aparece três vezes."
+    },
+    {
+      "id": "W-24",
+      "category": "atendimento_vs_crm",
+      "intent": "A escola respondeu pedindo para remarcar a demo. Como conduzimos?"
+    },
+    {
+      "id": "W-25",
+      "category": "atendimento_vs_crm",
+      "intent": "Quero saber quantos contatos mudaram de stage no último mês."
+    },
+    {
+      "id": "W-26",
+      "category": "atendimento_vs_crm",
+      "intent": "A escola não respondeu o último follow-up. Qual o próximo passo com ela?"
+    },
+    {
+      "id": "W-27",
+      "category": "produto_vs_engenharia",
+      "intent": "O módulo de propostas deveria permitir desconto por volume? Isso está certo hoje?"
+    },
+    {
+      "id": "W-28",
+      "category": "produto_vs_engenharia",
+      "intent": "Quero definir o critério de aceite do novo fluxo de matrícula."
+    },
+    {
+      "id": "W-29",
+      "category": "dependencia",
+      "intent": "Depois de levantar o guardrail de marca mais recente, atualiza o material de campanha para refletir essas diretrizes."
+    },
+    {
+      "id": "W-30",
+      "category": "dependencia",
+      "intent": "É preciso ajustar o motor de precificação dinâmica e depois implantar a mudança."
+    },
+    {
+      "id": "W-31",
+      "category": "approval_gate",
+      "intent": "Envie a mensagem de cobrança para os contatos com fatura vencida."
+    },
+    {
+      "id": "W-32",
+      "category": "approval_gate",
+      "intent": "Crie e publique uma peça anunciando a nova funcionalidade ainda hoje."
+    },
+    {
+      "id": "W-33",
+      "category": "produto_vs_engenharia",
+      "intent": "O painel de métricas está fora do ar em produção; precisamos entender por quê."
+    },
+    {
+      "id": "W-34",
+      "category": "produto_vs_engenharia",
+      "intent": "Precisamos avaliar se é seguro reverter a última atualização do sistema."
+    },
+    {
+      "id": "W-35",
+      "category": "policy_ordinary_vs_action",
+      "intent": "Monta um plano de abordagem para retomar contato com as escolas que sumiram."
+    },
+    {
+      "id": "W-36",
+      "category": "policy_ordinary_vs_action",
+      "intent": "Faz sentido a Eduinfo considerar desconto para contratos anuais? Analisa a viabilidade."
+    },
+    {
+      "id": "W-37",
+      "category": "policy_ordinary_vs_action",
+      "intent": "Envia agora a resposta combinando a remarcação com a escola."
+    },
+    {
+      "id": "W-38",
+      "category": "policy_ordinary_vs_action",
+      "intent": "Aprova e comunica à rede o desconto de 15% para fechar o contrato hoje."
+    },
+    {
+      "id": "W-39",
+      "category": "teste_do_insumo",
+      "intent": "Antes de priorizar a carteira da semana, preciso do histórico de interação de cada contato."
+    },
+    {
+      "id": "W-40",
+      "category": "teste_do_insumo",
+      "intent": "Ajusta a proposta de valor da campanha a partir do posicionamento de marca definido por produto."
+    },
+    {
+      "id": "W-41",
+      "category": "teste_do_insumo",
+      "intent": "Levanta o histórico de campanhas da Jabuticaba e resume os principais aprendizados."
+    },
+    {
+      "id": "W-42",
+      "category": "teste_do_insumo",
+      "intent": "Antes de decidir o critério de aceite do relatório de erros, preciso saber quais falhas o sistema já registrou no acervo."
+    }
+  ]
+}

@@ -61,6 +61,50 @@ automático — o que anula o valor do gate quando ele realmente importar.
 
 ---
 
+## Trabalho ordinário do agente vs. ação sobre terceiro
+
+A tabela de A1–A10 lista **ações**, não **temas**. Um agente cujo domínio inclui relacionamento,
+comunicação ou oferta comercial passa a maior parte do tempo tratando desses temas sem que
+isso, por si só, dispare aprovação. A pergunta que decide não é *"este assunto toca contato
+real, dinheiro ou publicação?"* — é **quem o resultado afeta e o que muda no mundo fora do
+laboratório quando a missão termina**.
+
+**Trabalho ordinário do agente** — fica dentro do próprio domínio, produz um artefato interno
+(texto, avaliação, priorização, rascunho), e **nada muda fora do laboratório** até que um
+humano decida agir sobre esse artefato:
+
+- avaliar se um comportamento, regra ou peça está correto, adequado ou alinhado ao
+  posicionamento — mesmo quando o tema é preço, oferta ou comunicação;
+- preparar, redigir ou esboçar uma resposta, mensagem, material ou abordagem — o rascunho
+  em si não sai do agente para o terceiro;
+- recomendar uma priorização, um próximo passo ou uma linha de conduta;
+- diagnosticar, levantar contexto ou apontar inconsistência.
+
+Isso vale **mesmo quando o objeto da análise é sensível** (preço, contato real, publicação).
+Analisar não é decidir, e redigir não é enviar.
+
+**Ação/decisão real sobre terceiro** — o resultado da missão, sozinho, muda algo que um
+terceiro (contato, mercado, sistema compartilhado) vê ou recebe, ou compromete a organização
+perante ele:
+
+- enviar, publicar, compartilhar ou de qualquer forma entregar algo a um destinatário real;
+- comprometer-se em nome da organização com uma condição, prazo ou compromisso específico;
+- executar uma alteração que passa a valer para outros, sem revisão humana intermediária.
+
+**O teste**: se o `OUTPUT` da missão é algo que um humano ainda vai ler, revisar e decidir o
+que fazer, é trabalho ordinário — não escale só porque o tema é sensível. Se o `OUTPUT` da
+missão é a própria coisa acontecendo (a mensagem já foi, o preço já foi oferecido, a peça já
+está no ar), é ação sobre terceiro — sempre escale, e o preparo que veio antes continua sendo
+missão válida, não vira gate por contaminação.
+
+Quando o verbo da intenção é ambíguo entre os dois ("abordar", "responder", "conduzir",
+"tratar de"), a missão em si — analisar, recomendar, redigir — é trabalho ordinário e não
+escala. Só escala a etapa que, se executada, seria ela mesma o envio, a publicação ou o
+compromisso — e essa etapa frequentemente nem existe como capability no contrato hoje, o que
+a torna automaticamente fora de alcance por ausência de tool, não por gate.
+
+---
+
 ## Forma da aprovação
 
 Quando um agente chega em ação que exige aprovação, ele **para** e escala por
