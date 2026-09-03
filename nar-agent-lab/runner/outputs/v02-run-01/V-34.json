@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Decisão sobre segurança de rollback de deploy é ação técnica irreversível/externa em ambiente compartilhado (E1.4, A7) e nenhuma tool do registry (engenharia-nar só possui eduinfo_list_root, eduinfo_search_folder, eduinfo_get_asset) alcança status de deploy, logs de execução ou histórico de workflow n8n necessários para avaliar segurança do rollback — capability ausente que muda o resultado (E1.8/E2.6). Não há missão executável: nenhum OWNER tem tool para levantar o dado necessário. Escalar a HUMAN de engenharia para decidir e, se aplicável, expandir o contrato MCP."
+}

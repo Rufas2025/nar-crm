@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Levantar o comportamento atual do módulo de propostas quanto a desconto por volume e os guardrails de marca/oferta aplicáveis.",
+      "OWNER": "produto-nar",
+      "TOOLS_ALLOWED": ["proposal_get_pending", "campaign_get_brand_context"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "E1.1 - Decisão material: se o módulo de propostas deve ou não permitir desconto por volume é condição comercial (preço/desconto), que exige aprovação humana comercial (A3, sem exceção). O levantamento do estado atual pode ser preparado por produto-nar, mas a decisão sobre o que é 'certo' fica bloqueada até HUMAN decidir."
+}

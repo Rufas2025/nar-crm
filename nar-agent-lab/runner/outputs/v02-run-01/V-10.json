@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "E1.3/E1.2: a intenção não especifica qual é o ajuste no módulo financeiro nem qual critério de aceite está em jogo — não há dado suficiente para decidir se isso é requisito de produto, mudança técnica de engenharia, ou uma decisão comercial/financeira (condição, valor, regra de cálculo), e as tools do registry não alcançam módulo financeiro nem preenchem essa lacuna. Além disso, 'implementa' aponta para alteração em ambiente compartilhado (A7/A8), ação que por política exige aprovação humana antes de qualquer execução. Sem saber o que é o ajuste, nenhuma missão de preparo pode ser encomendada com segurança a produto-nar ou engenharia-nar sem risco de decidir no lugar do humano o que é material."
+}

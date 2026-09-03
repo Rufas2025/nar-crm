@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Levantar as propostas vencidas das escolas e o contexto de cada contato.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["proposal_get_pending", "crm_get_contact_context"],
+      "DEPENDENCIES": [],
+      "NEXT": "T-20260903-002"
+    },
+    {
+      "TASK_ID": "T-20260903-002",
+      "OBJ": "Preparar o rascunho do email de retomada para cada escola com proposta vencida.",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": ["proposal_get_pending", "crm_get_contact_context"],
+      "DEPENDENCIES": ["T-20260903-001"],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Enviar email a contatos reais é ação externa e irreversível (A1/E1.4); nenhuma capability de escrita/envio existe no contrato MCP 0.1.0. O preparo (levantar propostas vencidas e redigir o rascunho do email) pode prosseguir, mas o envio exige aprovação humana."
+}

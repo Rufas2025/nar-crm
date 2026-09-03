@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Levantar quais contatos do CRM estão com stage classificado de forma inconsistente com seu histórico e contexto.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_list_eligible_contacts", "crm_get_contact_context"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Duas coisas exigem HUMAN: (1) E1.2 ambiguidade real — a intenção diz 'desses contatos' sem que exista um conjunto de contatos definido nesta tarefa, então não há como saber a que grupo ela se refere; (2) mesmo identificado o grupo, alterar stage no CRM é escrita (A5 da approval-policy) e o contrato MCP 0.1.0 não tem nenhuma capability de escrita — nenhum agente pode executar a correção, só diagnosticar e propor. O diagnóstico de inconsistência (missão acima) já pode ser produzido; a correção em si fica bloqueada até aprovação humana e até existir capability de escrita."
+}

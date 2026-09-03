@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Publicar conteúdo externo é ação irreversível que exige aprovação humana (A2 approval-policy.md; E1.4 escalation-policy.md). Nenhuma capability de escrita/publicação existe no contrato MCP 0.1.0. Não há missão de preparo executável agora porque a intenção não identifica qual post, qual peça ou onde ela já existe — sem esse objeto não há trabalho de levantamento/diagnóstico a encomendar; a decisão de publicar hoje é do humano."
+}

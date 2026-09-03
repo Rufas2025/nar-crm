@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Aprovar condição especial de pagamento é decisão material (E1.1 / A3 do approval-policy) — preço/condição comercial exige aprovador humano comercial, sem exceção. Não há preparo executável pelos agentes read-only antes dessa decisão."
+}

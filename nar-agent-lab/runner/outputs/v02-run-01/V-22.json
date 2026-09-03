@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "O objeto da intenção (\"repositório jurídico\" / contratos assinados) não está no escopo autorizado de nenhum agente — não é o acervo Drive (eduinfo_*), nem CRM/propostas, nem campanhas. Não há capability no registry que alcance esse acervo, então nenhuma missão pode ser criada. Escalado por E1.8/E2.6 (capability ausente que muda o resultado) e por estar fora do escopo autorizado do contrato MCP 0.1.0 — ampliar o escopo é decisão humana."
+}

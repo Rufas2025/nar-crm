@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Nao ha capability no registry (0.1.0) que alcance diagnostico de producao: as tools de engenharia-nar (eduinfo_list_root, eduinfo_search_folder, eduinfo_get_asset) sao apenas de acervo/Drive, nenhuma le logs, metricas, timeouts ou estado de execucao de workflow/integracao em producao. Nao ha dado a levantar com as tools existentes sem inventar capability ou simular resultado. CAPABILITY_GAP: decisao bloqueada = diagnosticar a causa do timeout da integracao em producao; capability que faltaria = acesso a logs/metricas/status de execucao do workflow n8n (ou similar) em producao; dono provavel = engenharia-nar. Alem disso, qualquer correcao no workflow em ambiente compartilhado exige aprovacao humana (approval-policy A7). Escala para HUMAN via E1.8."
+}

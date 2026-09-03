@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A intenção pede varredura do 'Drive inteiro', mas o contrato MCP autoriza apenas uma allowlist de pastas — objeto fora do escopo autorizado (fora da allowlist retorna ASSET_OUT_OF_SCOPE). Ampliar o escopo do acervo é decisão humana. Não há missão a criar 'para tentar'; escalar para HUMAN decidir se o escopo pode ser ampliado ou qual subconjunto de pastas autorizadas deve ser varrido."
+}

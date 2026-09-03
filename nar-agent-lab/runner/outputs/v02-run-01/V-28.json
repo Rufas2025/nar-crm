@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Levantar o contexto do contato e o status da demo agendada para preparar a remarcação.",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": ["crm_get_contact_context", "crm_get_demo_scheduled"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Responder à escola confirmando a remarcação da demo é envio de mensagem a contato real (A1/E1.4), ação irreversível que exige aprovação humana antes de acontecer; o levantamento de contexto e proposta de novo horário podem ser preparados sem essa aprovação."
+}

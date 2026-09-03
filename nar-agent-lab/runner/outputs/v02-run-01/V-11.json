@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Levantar as escolas que sumiram e verificar a integridade do cadastro de cada uma.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_list_eligible_contacts", "crm_get_contact_context"],
+      "DEPENDENCIES": [],
+      "NEXT": "T-20260903-002"
+    },
+    {
+      "TASK_ID": "T-20260903-002",
+      "OBJ": "Preparar a retomada comercial para as escolas com cadastro íntegro confirmado pela missão anterior.",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": ["crm_get_contact_context", "crm_get_followups_due"],
+      "DEPENDENCIES": ["T-20260903-001"],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Enviar a mensagem de retomada a contatos reais é ação externa e irreversível (approval-policy A1); o preparo (checagem de cadastro e rascunho de abordagem) pode prosseguir, mas o envio efetivo às escolas exige aprovação humana antes de acontecer."
+}

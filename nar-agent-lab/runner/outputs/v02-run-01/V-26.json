@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Handoff de subagente retornou ESCALATE apontando decisão de preço/desconto/condição comercial pendente (approval-policy A3, escalation-policy E1.1). Decisão material de preço não pode ser tomada pelo router nem por nenhum agente; deve ser encaminhada a HUMAN, seguindo o NEXT_OWNER já indicado pelo handoff. Não há nova missão a criar: o apurado já foi entregue pelo agente que escalou, e reabrir ou reprocessar esse ponto violaria a regra de não reescalar o mesmo ponto duas vezes."
+}

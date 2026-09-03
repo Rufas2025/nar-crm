@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Objeto fora do escopo autorizado: a planilha de folha de pagamento está no drive do RH, um acervo/sistema distinto do Drive Eduinfo coberto pela allowlist de pastas do contrato MCP. Nenhuma tool do registry alcança esse objeto (eduinfo_list_root/eduinfo_search_folder/eduinfo_get_asset operam apenas sobre o acervo autorizado), então nenhuma missão pode ser criada para 'tentar acessar'. Ampliar o escopo autorizado é decisão humana, pois exige alterar o contrato."
+}
