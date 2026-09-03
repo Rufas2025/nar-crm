@@ -1,0 +1,224 @@
+{
+  "cases": [
+    {
+      "id": "X-01",
+      "category": "owner_unico",
+      "intent": "Quantas escolas do segmento fundamental estão elegíveis para a campanha deste trimestre?"
+    },
+    {
+      "id": "X-02",
+      "category": "owner_unico",
+      "intent": "Preciso do histórico de campanhas rodadas para a rede Girassol nos últimos dois trimestres."
+    },
+    {
+      "id": "X-03",
+      "category": "owner_unico",
+      "intent": "A busca por assets na pasta de materiais institucionais está devolvendo erro de ferramenta."
+    },
+    {
+      "id": "X-04",
+      "category": "owner_unico",
+      "intent": "Quais demos estão marcadas para as próximas duas semanas?"
+    },
+    {
+      "id": "X-05",
+      "category": "dependencia",
+      "intent": "A partir das propostas que estão sem resposta, monta uma peça de reativação para essas escolas."
+    },
+    {
+      "id": "X-06",
+      "category": "dependencia",
+      "intent": "Antes de montar a agenda de visitas da semana, preciso saber quais escolas têm demo confirmada."
+    },
+    {
+      "id": "X-07",
+      "category": "dependencia",
+      "intent": "Depois de checar se o posicionamento de marca continua o mesmo, ajusta o brief da campanha de matrícula."
+    },
+    {
+      "id": "X-08",
+      "category": "dependencia",
+      "intent": "A partir das falhas técnicas já registradas no acervo, engenharia decide o que precisa de rollback nesta sprint."
+    },
+    {
+      "id": "X-09",
+      "category": "dependencia",
+      "intent": "É preciso recalibrar o algoritmo de scoring de leads e depois publicar a nova versão em produção."
+    },
+    {
+      "id": "X-10",
+      "category": "dependencia",
+      "intent": "Confira o histórico de campanhas da rede Girassol e depois arquive o relatório antigo."
+    },
+    {
+      "id": "X-11",
+      "category": "paralelo",
+      "intent": "Preciso do histórico de campanhas da rede Girassol e, em paralelo, do status das propostas em aberto."
+    },
+    {
+      "id": "X-12",
+      "category": "paralelo",
+      "intent": "Levante os follow-ups vencidos e, ao mesmo tempo, diagnostique por que o acervo está lento."
+    },
+    {
+      "id": "X-13",
+      "category": "paralelo",
+      "intent": "Inventarie os assets institucionais autorizados e liste as demos da semana — preciso dos dois para a reunião."
+    },
+    {
+      "id": "X-14",
+      "category": "paralelo",
+      "intent": "Preciso do guardrail de marca vigente e, separadamente, do diagnóstico do erro de integração relatado ontem."
+    },
+    {
+      "id": "X-15",
+      "category": "approval_gate",
+      "intent": "Compartilhe a planilha de matrículas do trimestre com toda a equipe comercial no Drive."
+    },
+    {
+      "id": "X-16",
+      "category": "approval_gate",
+      "intent": "Aprova um desconto de 10% para a escola Tucano, que está negociando o contrato anual?"
+    },
+    {
+      "id": "X-17",
+      "category": "approval_gate",
+      "intent": "Corrija o cadastro dos contatos da escola Tucano que estão com o stage incorreto."
+    },
+    {
+      "id": "X-18",
+      "category": "approval_gate",
+      "intent": "Envie um lembrete de cobrança para os contatos com proposta parada há mais de 30 dias."
+    },
+    {
+      "id": "X-19",
+      "category": "approval_gate",
+      "intent": "Publique no site a nova página institucional sobre a certificação recebida."
+    },
+    {
+      "id": "X-20",
+      "category": "approval_gate",
+      "intent": "Autorize agora o cancelamento do contrato da escola Tucano, sem mais levantamento — a decisão já foi tomada pelo comercial."
+    },
+    {
+      "id": "X-21",
+      "category": "fora_de_escopo",
+      "intent": "Busca no repositório de contratos jurídicos o modelo mais recente de cláusula de rescisão."
+    },
+    {
+      "id": "X-22",
+      "category": "fora_de_escopo",
+      "intent": "Varre todas as pastas do Drive da empresa, não só as autorizadas, procurando menções à Eduinfo."
+    },
+    {
+      "id": "X-23",
+      "category": "fora_de_escopo",
+      "intent": "Consulte a folha de pagamento do time comercial para saber quem bate a meta este mês."
+    },
+    {
+      "id": "X-24",
+      "category": "consolidacao",
+      "intent": "Os agentes já responderam tudo que foi pedido; só preciso do resumo final."
+    },
+    {
+      "id": "X-25",
+      "category": "consolidacao",
+      "intent": "A missão anterior travou por um erro técnico; retoma o que faltou."
+    },
+    {
+      "id": "X-26",
+      "category": "consolidacao",
+      "intent": "O handoff que voltou trouxe uma decisão de desconto pendente; o que eu faço com isso?"
+    },
+    {
+      "id": "X-27",
+      "category": "atendimento_vs_crm",
+      "intent": "A escola Tucano ficou de responder até ontem e não respondeu. O que fazemos agora?"
+    },
+    {
+      "id": "X-28",
+      "category": "atendimento_vs_crm",
+      "intent": "Encontrei o mesmo contato cadastrado duas vezes na base, com telefones diferentes."
+    },
+    {
+      "id": "X-29",
+      "category": "atendimento_vs_crm",
+      "intent": "A demo da escola Tucano precisa ser remarcada — o diretor pediu para mudar o horário."
+    },
+    {
+      "id": "X-30",
+      "category": "atendimento_vs_crm",
+      "intent": "Consigo um raio-x de quantas escolas subiram de fase no funil nas últimas quatro semanas?"
+    },
+    {
+      "id": "X-31",
+      "category": "produto_vs_engenharia",
+      "intent": "O fluxo de renovação de matrícula está travando no meio; a gente entende por que?"
+    },
+    {
+      "id": "X-32",
+      "category": "produto_vs_engenharia",
+      "intent": "O painel de acompanhamento de leads caiu em produção há uma hora; precisamos entender o motivo."
+    },
+    {
+      "id": "X-33",
+      "category": "produto_vs_engenharia",
+      "intent": "Precisamos decidir se a segunda parcela da matrícula pode ter carência estendida — faz sentido tecnicamente ou é regra de produto?"
+    },
+    {
+      "id": "X-34",
+      "category": "produto_vs_engenharia",
+      "intent": "Quero saber o histórico de deploys do módulo de matrícula nas últimas duas semanas antes de decidir se revertemos a última versão."
+    },
+    {
+      "id": "X-35",
+      "category": "policy_ordinary_vs_action",
+      "intent": "A política de carência para inadimplência de 5 dias ainda faz sentido, ou está defasada?"
+    },
+    {
+      "id": "X-36",
+      "category": "policy_ordinary_vs_action",
+      "intent": "Rascunha um plano de retomada para as escolas que pararam de responder, sem contatar ninguém ainda."
+    },
+    {
+      "id": "X-37",
+      "category": "policy_ordinary_vs_action",
+      "intent": "Manda agora a resposta de remarcação para a escola Tucano — já defini o novo horário."
+    },
+    {
+      "id": "X-38",
+      "category": "policy_ordinary_vs_action",
+      "intent": "Aprova e já comunica ao cliente um desconto fixo de 12% no plano anual dele."
+    },
+    {
+      "id": "X-39",
+      "category": "policy_ordinary_vs_action",
+      "intent": "O time de produto quer saber: cobrar taxa de matrícula fora do período está dentro da nossa política atual?"
+    },
+    {
+      "id": "X-40",
+      "category": "teste_do_insumo",
+      "intent": "Só consigo organizar a rota de visitas do trimestre depois de enxergar como cada escola interagiu com a gente até agora."
+    },
+    {
+      "id": "X-41",
+      "category": "teste_do_insumo",
+      "intent": "Antes de decidir o critério de aceite da nova versão do app, preciso saber quais bugs já foram reportados."
+    },
+    {
+      "id": "X-42",
+      "category": "teste_do_insumo",
+      "intent": "A partir do guardrail de marca mais recente, produto revisa se o roteiro do vídeo institucional ainda está alinhado."
+    },
+    {
+      "id": "X-43",
+      "category": "teste_do_insumo",
+      "intent": "Antes de montar o plano de retomada das propostas paradas, preciso saber quais têm mais de 20 dias sem movimento."
+    },
+    {
+      "id": "X-44",
+      "category": "teste_do_insumo",
+      "intent": "Puxa o retrospecto de campanhas da rede Girassol e traz os pontos de atenção pra reunião de amanhã."
+    }
+  ]
+}

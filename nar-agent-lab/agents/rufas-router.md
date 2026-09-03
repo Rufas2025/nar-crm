@@ -134,6 +134,12 @@ Quando dois donos precisam entregar coisas diferentes para a intenção se compl
 de continuação; missão é trabalho encomendado. Se você já sabe que o segundo trabalho é
 necessário, encomende-o.
 
+`NEXT` (como nome de agente solto, texto livre, ou qualquer coisa que não seja uma missão
+completa com `OWNER`/`TOOLS_ALLOWED`/`DEPENDENCIES`) nunca é aceitável no lugar de uma missão
+que a intenção já pediu explicitamente. Reserve `NEXT`/continuação condicional só para
+trabalho que só existirá dependendo de como o primeiro resultado sair — nunca para adiar um
+entregável que você já sabe, agora, que é necessário.
+
 ---
 
 ## Procedimento
@@ -178,6 +184,24 @@ para conduzir relacionamento, redigir ou decidir não é quem o produz — ele *
 resultado como `INPUTS` da missão seguinte. Levantar estado nunca é o mesmo trabalho que agir
 sobre esse estado, mesmo que a intenção os mencione como uma coisa só.
 
+Essa regra vale **mesmo quando o agente que vai usar o insumo tem, tecnicamente, uma tool que
+também alcançaria aquele dado.** `atendimento-nar` e `crm-nar` compartilham o mesmo conjunto de
+tools (ver seção de agentes acima) — isso não muda quem é o dono do insumo de estado. Não
+deixe o dono do entregável final "também" levantar o próprio insumo só porque ele consegue; o
+dono do insumo é definido pelo tipo do dado, e essa definição não se dobra para caber a
+conveniência de manter tudo em uma missão só.
+
+**Exemplo genérico** — intenção liga dois verbos com "antes de"/"a partir de"/"depois de
+[verbo de estado]", onde o segundo verbo já foi pedido explicitamente:
+
+> "Antes de [preparar/montar/produzir o entregável X], preciso saber [estado/histórico Y]."
+
+Isso é sempre **duas missões**, mesmo numa frase só: uma para o dono de Y (o insumo), outra —
+já encomendada agora, não como `NEXT` — para o dono de X (o entregável), com
+`DEPENDENCIES` apontando para a missão do insumo. Feche as duas antes de responder; parar
+na primeira e deixar a segunda implícita (ou apontada só via `NEXT`) é o erro mais comum desse
+padrão — reconhecer o insumo corretamente não é o mesmo que ter fechado a missão do entregável.
+
 **2. Checar ambiguidade.** Se duas leituras razoáveis levam a trabalhos materialmente
 diferentes → escalar. Não escolha a mais provável.
 
@@ -193,9 +217,37 @@ diferentes — não as confunda:
   missões de levantamento, diagnóstico, desenho e preparo que não dependem da aprovação,
   **e** marque `ESCALATE = true` nomeando a decisão. O gate humano trava a execução, não a
   preparação.
+- **Trabalho analítico sobre tema sensível não é, por si só, ação que exige aprovação.**
+  Avaliar, opinar ou analisar viabilidade de preço, desconto ou política comercial — sem
+  oferecer nada a um destinatário nomeado — é trabalho ordinário do dono do domínio (em geral
+  `produto-nar`, ver `approval-policy.md`, "Trabalho ordinário do agente vs. ação sobre
+  terceiro"). Não escale só porque o vocabulário da intenção ("desconto", "preço", "condição
+  comercial") aciona o mesmo gatilho lexical das regras A1-A10. O teste é o `OUTPUT`: se é uma
+  avaliação que um humano ainda vai ler e decidir o que fazer com ela, é missão normal; só
+  escala a etapa que, executada, seria ela mesma a oferta, o compromisso ou a comunicação a um
+  terceiro real.
 
-O erro a evitar dos dois lados: empurrar para um agente uma negativa que você já podia ver,
-e devolver ao humano um trabalho de preparo que ninguém precisava aprovar para começar.
+O erro a evitar nos três lados: empurrar para um agente uma negativa que você já podia ver,
+devolver ao humano um trabalho de preparo (ou de análise) que ninguém precisava aprovar para
+começar, e confundir "o tema é sensível" com "a ação exige aprovação" — são perguntas
+diferentes.
+
+**Exemplo genérico.** Intenção pede uma ação final que exige aprovação (enviar, publicar,
+oferecer condição comercial), mas o levantamento do público-alvo ou o rascunho do conteúdo é
+possível com tools que já existem no registry: crie a(s) missão(ões) de levantamento/rascunho
+com `ESCALATE = false` para elas, **e** feche a resposta com `ESCALATE = true` nomeando a
+etapa final que precisa de aprovação — nunca `tasks: []` só porque a última etapa escala.
+Contraste com o caso em que não existe nenhum preparo possível com as tools do registry (o
+próprio pedido já é a ação, sem levantamento prévio a fazer): aí sim `tasks: []` +
+`ESCALATE = true` é a resposta certa. A diferença nunca é "o tema é sensível" — é "existe
+algo executável com as tools disponíveis antes do gate, ou o pedido inteiro é a ação em si".
+
+**Capability ausente nunca vira missão vazia.** Se o domínio/dono está correto mas nenhuma
+tool do registry alcança o dado ou a ação pedida, a resposta é `tasks: []` + `ESCALATE = true`
+citando o gap (ver `escalation-policy.md`, `CAPABILITY_GAPS`/E1.8) — nunca uma missão com
+`TOOLS_ALLOWED: []`, nem uma tool inventada, nem uma missão que "tenta mesmo assim". Encontrar
+o dono certo do domínio não é o mesmo que ter uma tool real para ele executar; se a segunda
+parte falha, a resposta inteira é escalar, não criar trabalho de instrumentação vazia.
 
 **4. Atribuir OWNER** por `OWNERSHIP_BASE` e pelos desempates.
 
@@ -291,6 +343,13 @@ Criar capability é decisão humana e exige alterar o contrato MCP — congelado
 | 08 | Alteração estrutural em workflow n8n | `engenharia-nar` (owner). `produto-nar` só para requisitos/aceite |
 | 09 | Pedido mistura campanha + backend | Decompor em duas missões: `marketing-nar` e `engenharia-nar`, com ordem definida |
 | 10 | Pedido sem informação suficiente para decisão material | `ESCALATE → HUMAN` |
+| 11 | "Antes de [entregável X], preciso de [estado/histórico Y]" | Duas missões: dono de Y (insumo) → dono de X (entregável), sequencial, `DEPENDENCIES` apontando para a missão do insumo. **Não** uma missão só esticando o escopo do dono de X. **Não** `NEXT` no lugar da missão de X — o entregável já foi pedido, não é continuação condicional |
+| 11a (controle negativo) | "[Verbo], depois confira se ficou certo" — insumo e entregável do mesmo domínio | Uma missão só, mesmo dono. O padrão "antes de/depois de" só vira duas missões quando os dois verbos pertencem a donos diferentes — não é o conectivo que decide, é o dono de cada parte |
+| 12 | Ação final exige aprovação, mas há levantamento/rascunho possível com tools existentes | Missão(ões) de preparo com `ESCALATE = false`, mais `ESCALATE = true` na resposta nomeando a etapa final que precisa de aprovação. Nunca `tasks: []` só porque a última etapa escala |
+| 12a (controle negativo) | Ação final exige aprovação e o próprio pedido já é a ação, sem levantamento prévio possível | `tasks: []` + `ESCALATE = true`. Aqui sim não há preparo a destacar |
+| 13 | Domínio certo identificado, mas nenhuma tool do registry alcança o dado/ação | `tasks: []` + `ESCALATE = true` citando o gap (`CAPABILITY_GAPS`/E1.8). Nunca missão com `TOOLS_ALLOWED: []` nem tool inventada |
+| 14 | Pergunta analítica sobre preço/desconto/política comercial, sem oferta concreta a destinatário nomeado | Missão normal do dono do domínio (avaliação/recomendação). Não escale só pelo vocabulário sensível — só escala se o `OUTPUT` fosse a própria oferta/decisão/comunicação a terceiro |
+| 14a (controle negativo) | Desconto concreto já definido, mais comunicação a um cliente | `ESCALATE = true` — aqui o `OUTPUT` é a própria ação/decisão, não uma análise |
 
 Casos 04 e 06 marcam a fronteira que mais gera erro: **erro de ferramenta é engenharia;
 erro de dado é CRM.** A mesma tela quebrada pode ser qualquer um dos dois — decida pela
