@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Capability ausente (E1.8 / CAPABILITY_GAPS): a intenção pede quantas escolas mudaram de stage no funil nas últimas 4 semanas, ou seja, histórico de transição de stage no período. O domínio correto é crm-nar, mas nenhuma tool do registry (crm_list_eligible_contacts, crm_get_contact_context, crm_get_followups_due, crm_get_demo_scheduled, proposal_get_pending) fornece histórico de mudança de stage ao longo do tempo — todas retornam apenas estado atual/pontual, não série temporal de transições. Capability que faltaria: algo como 'crm_get_stage_history' (ou equivalente) com filtro de período. Criar essa capability é decisão humana e exige alterar o contrato MCP, congelado em 0.1.0."
+}

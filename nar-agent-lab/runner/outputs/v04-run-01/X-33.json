@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Avaliar se a carência estendida na segunda parcela da matrícula é viável como regra de produto e recomendar a posição.",
+      "OWNER": "produto-nar",
+      "TOOLS_ALLOWED": [],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A extensão de carência na parcela é condição/prazo contratual (E1.1); a análise de viabilidade é trabalho ordinário de produto-nar, mas a decisão final de conceder a carência exige aprovação humana comercial (A3/A4) antes de valer para qualquer matrícula concreta."
+}

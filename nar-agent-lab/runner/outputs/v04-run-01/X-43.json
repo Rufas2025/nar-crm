@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Levantar as propostas paradas com mais de 20 dias sem movimento.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["proposal_get_pending"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    },
+    {
+      "TASK_ID": "T-20260903-002",
+      "OBJ": "Montar o plano de retomada das propostas paradas identificadas.",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": [],
+      "DEPENDENCIES": ["T-20260903-001"],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

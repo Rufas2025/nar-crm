@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Ação exige aprovação humana e é a própria ação, sem preparo executável: aprovar desconto fixo de 12% (E1.1/A3, decisão material de condição comercial) e comunicar ao cliente (E1.4/A1, envio a contato real). O desconto já vem definido na intenção — não há levantamento ou rascunho a produzir antes do gate; o próprio pedido é a oferta e a comunicação."
+}

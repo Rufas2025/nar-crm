@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Domínio correto seria engenharia-nar (erro de tool/painel/produção é sempre engenharia), mas nenhuma tool do registry alcança logs, status de deploy, métricas de disponibilidade ou causa de queda em produção — o conjunto de engenharia-nar (eduinfo_list_root, eduinfo_search_folder, eduinfo_get_asset) só alcança acervo de Drive, não observabilidade de sistema. CAPABILITY_GAPS: decisão bloqueada = diagnosticar por que o painel de acompanhamento de leads caiu em produção; capability faltante = acesso a logs/monitoramento/status de infraestrutura do painel; dono provável = engenharia-nar, quando essa capability existir no registry (E1.8/E2.6). Sem essa tool, criar missão produziria TOOLS_ALLOWED que não cobre o pedido ou trabalho de instrumentação vazia — não permitido."
+}

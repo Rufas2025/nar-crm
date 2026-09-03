@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Avaliar se cobrar taxa de matrícula fora do período está dentro da política comercial atual.",
+      "OWNER": "produto-nar",
+      "TOOLS_ALLOWED": ["campaign_get_brand_context"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

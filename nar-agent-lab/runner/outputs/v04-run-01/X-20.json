@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Cancelamento de contrato é ação irreversível e material (A4/E1.1/E1.4) — não existe capability de escrita no contrato MCP 0.1.0 para executar cancelamento, e a intenção pede a execução em si ('autorize agora... sem mais levantamento'), não preparo ou análise. Mesmo com a decisão já tomada pelo comercial, a aprovação/execução é humana e vale para o caso concreto, não se auto-executa por relato de decisão prévia. Não há levantamento pendente a destacar como missão, pois o próprio pedido já é a ação."
+}

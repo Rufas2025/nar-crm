@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Levantar o histórico de interação de cada escola com a NAR até o momento (contexto de contato, follow-ups, demos e propostas).",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_list_eligible_contacts", "crm_get_contact_context", "crm_get_followups_due", "crm_get_demo_scheduled", "proposal_get_pending"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "O entregável final (organizar a rota de visitas do trimestre) exige capability de planejamento/roteirização de visitas que não existe no capability registry 0.1.0 — nenhum OWNER possui tool que produza rota geográfica ou cronograma de visitas. Trata-se de CAPABILITY_GAP (E1.8): a missão de levantamento do insumo (histórico por escola, dono crm-nar) é executável agora, mas a montagem da rota em si fica bloqueada até decisão humana sobre como/quem implementaria essa capability."
+}

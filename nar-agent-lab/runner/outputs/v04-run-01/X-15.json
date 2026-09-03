@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Compartilhar arquivo no Drive com terceiros é ação irreversível/externa (A6, E1.4) e não há capability de escrita no contrato MCP 0.1.0; o próprio pedido já é a ação, sem preparo executável antes do gate humano."
+}

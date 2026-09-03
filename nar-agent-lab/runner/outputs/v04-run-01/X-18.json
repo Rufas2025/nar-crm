@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Levantar os contatos com proposta parada há mais de 30 dias, com stage e última interação.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["proposal_get_pending", "crm_get_contact_context"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    },
+    {
+      "TASK_ID": "T-20260903-002",
+      "OBJ": "Redigir o rascunho do lembrete de cobrança para cada contato levantado, sem enviar.",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": [],
+      "DEPENDENCIES": ["T-20260903-001"],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Envio de lembrete de cobrança a contato real é ação irreversível e externa (A1/E1.4) e não há capability de escrita no contrato MCP 0.1.0; a decisão de aprovar e o próprio envio ficam com HUMAN. O levantamento dos contatos e o rascunho do lembrete são preparo executável agora com as tools existentes."
+}

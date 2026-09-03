@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Listar as demos agendadas para os próximos 14 dias a partir de hoje.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_get_demo_scheduled"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

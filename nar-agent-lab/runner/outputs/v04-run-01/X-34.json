@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Nenhuma tool do capability registry alcança histórico de deploys de módulo (engenharia-nar só tem eduinfo_list_root, eduinfo_search_folder, eduinfo_get_asset, restritas ao acervo Drive) — CAPABILITY_GAP: falta capability tipo 'deployment_get_history' para engenharia-nar; sem ela o levantamento pedido não é executável. Além disso, a decisão final de reverter a última versão é decisão material e irreversível sobre workflow (E1.1/E1.4, A7), que exige aprovação humana mesmo se o histórico existisse."
+}

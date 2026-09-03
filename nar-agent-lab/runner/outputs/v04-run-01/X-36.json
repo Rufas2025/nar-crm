@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Levantar as escolas com follow-up/proposta em aberto que pararam de responder e o contexto de cada contato.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_get_followups_due", "proposal_get_pending", "crm_get_contact_context"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    },
+    {
+      "TASK_ID": "T-20260903-002",
+      "OBJ": "Rascunhar um plano de retomada por escola, sem enviar nada a nenhum contato.",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": [],
+      "DEPENDENCIES": ["T-20260903-001"],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

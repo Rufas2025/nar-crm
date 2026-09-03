@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Objeto fora do escopo autorizado: folha de pagamento do time comercial não é um dado alcançável por nenhuma tool do capability registry 0.1.0 (Drive/eduinfo, CRM/propostas, campanhas). Nenhum OWNER possui capability para consultar dados de RH/folha de pagamento. Gap de capability (E1.8/E2.6): decisão de negócio bloqueada é 'identificar quem bate a meta do time comercial este mês'; capability que faltaria seria algo como payroll_get_sales_performance; não há dono claro no registry atual (RH/financeiro não está mapeado a nenhum dos 5 agentes). Escalar para HUMAN."
+}

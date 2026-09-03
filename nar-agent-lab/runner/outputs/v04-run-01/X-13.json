@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Inventariar os assets institucionais autorizados disponíveis no acervo.",
+      "OWNER": "marketing-nar",
+      "TOOLS_ALLOWED": ["eduinfo_list_root", "eduinfo_search_folder", "eduinfo_get_asset"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    },
+    {
+      "TASK_ID": "T-20260903-002",
+      "OBJ": "Listar as demos agendadas para a semana.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_get_demo_scheduled"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

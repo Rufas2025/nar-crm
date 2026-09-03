@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Avaliar se a política de carência de 5 dias para inadimplência ainda é adequada ou está defasada.",
+      "OWNER": "produto-nar",
+      "TOOLS_ALLOWED": [],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

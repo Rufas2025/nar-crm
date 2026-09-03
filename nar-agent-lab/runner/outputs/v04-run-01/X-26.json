@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "O handoff recebido está em STATUS ESCALATE, apontando decisão de desconto/condição comercial pendente (approval-policy.md A3; escalation-policy.md E1.1). O router não decide preço/desconto — apenas repassa a HUMAN com a decisão nomeada, mantendo NEXT_OWNER: HUMAN já indicado pelo agente. Nenhuma nova missão é criada porque a lacuna não é de execução ou preparo adicional, e sim de autoridade para decidir a condição comercial."
+}

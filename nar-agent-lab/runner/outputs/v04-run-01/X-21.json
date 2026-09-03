@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Objeto fora do escopo autorizado: 'repositório de contratos jurídicos' não é um acervo alcançável por nenhuma tool do registry (não é a allowlist de pastas do Drive eduinfo, nem CRM/propostas/campanhas). Nenhum agente possui capability para buscar cláusulas em repositório jurídico. Não há missão a criar — escalar para HUMAN definir se/como esse acervo entra no escopo autorizado (exigiria alterar o contrato MCP, congelado em 0.1.0)."
+}

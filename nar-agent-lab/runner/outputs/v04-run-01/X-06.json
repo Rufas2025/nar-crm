@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Levantar quais escolas têm demo confirmada.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_get_demo_scheduled"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    },
+    {
+      "TASK_ID": "T-20260903-002",
+      "OBJ": "Montar a agenda de visitas da semana com base nas escolas com demo confirmada.",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": ["crm_get_demo_scheduled"],
+      "DEPENDENCIES": ["T-20260903-001"],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

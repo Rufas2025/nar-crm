@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Diagnosticar e resolver o erro de ferramenta ao buscar assets na pasta de materiais institucionais.",
+      "OWNER": "engenharia-nar",
+      "TOOLS_ALLOWED": ["eduinfo_list_root", "eduinfo_search_folder", "eduinfo_get_asset"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

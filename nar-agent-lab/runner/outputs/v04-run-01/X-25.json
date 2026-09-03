@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Intenção não identifica qual missão travou, qual erro técnico ocorreu, nem o que exatamente falta retomar. Sem esses dados não é possível determinar OWNER, TOOLS_ALLOWED ou escopo da missão — informação insuficiente não obtenível pelas tools do registry (E1.3), e mais de uma leitura razoável do que 'o que faltou' significa (E1.2)."
+}

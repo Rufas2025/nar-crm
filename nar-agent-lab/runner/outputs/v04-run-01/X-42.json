@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Verificar se o roteiro do vídeo institucional permanece alinhado ao guardrail de marca mais recente.",
+      "OWNER": "produto-nar",
+      "TOOLS_ALLOWED": ["campaign_get_brand_context", "eduinfo_search_folder", "eduinfo_get_asset"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

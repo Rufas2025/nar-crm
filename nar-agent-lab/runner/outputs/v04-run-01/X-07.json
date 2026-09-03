@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Checar se o posicionamento de marca vigente da campanha de matrícula continua consistente com o histórico e o guardrail de marca.",
+      "OWNER": "produto-nar",
+      "TOOLS_ALLOWED": ["campaign_get_brand_context", "campaign_get_history"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    },
+    {
+      "TASK_ID": "T-20260903-002",
+      "OBJ": "Ajustar o brief da campanha de matrícula conforme o resultado da checagem de posicionamento.",
+      "OWNER": "marketing-nar",
+      "TOOLS_ALLOWED": ["campaign_get_history", "campaign_get_brand_context"],
+      "DEPENDENCIES": ["T-20260903-001"],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

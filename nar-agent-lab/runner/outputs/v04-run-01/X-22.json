@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Objeto fora do escopo autorizado: a intenção pede varrer todas as pastas do Drive, explicitamente incluindo as não autorizadas pela allowlist do contrato MCP. Nenhum agente (marketing-nar, produto-nar, engenharia-nar) alcança pastas fora da allowlist com suas tools (eduinfo_list_root, eduinfo_search_folder, eduinfo_get_asset retornariam ASSET_OUT_OF_SCOPE). Ampliar o escopo autorizado é decisão humana que exige alterar o contrato MCP, congelado em 0.1.0. Não há missão de preparo executável dentro do escopo atual que corresponda ao pedido, pois o próprio pedido é buscar fora do escopo. Escalado a HUMAN."
+}

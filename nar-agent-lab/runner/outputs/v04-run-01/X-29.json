@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Levantar o estado atual da demo agendada da escola Tucano e o contexto do contato responsável.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_get_demo_scheduled", "crm_get_contact_context"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    },
+    {
+      "TASK_ID": "T-20260903-002",
+      "OBJ": "Preparar a proposta de novo horário e a comunicação de remarcação a enviar ao diretor da escola Tucano.",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": ["crm_get_contact_context"],
+      "DEPENDENCIES": ["T-20260903-001"],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Remarcar a demo é uma alteração de compromisso com contato real (agenda/CRM) e não há nenhuma capability de escrita no contrato MCP 0.1.0 para efetivá-la; o levantamento do estado atual (T-20260903-001) e o rascunho da comunicação de remarcação (T-20260903-002) podem prosseguir, mas a confirmação do novo horário e o envio ao diretor exigem aprovação humana (approval-policy A1/A5)."
+}

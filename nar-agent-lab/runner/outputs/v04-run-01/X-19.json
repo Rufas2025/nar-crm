@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260903-001",
+      "OBJ": "Produzir o rascunho da página institucional sobre a certificação recebida, usando assets e guardrails de marca existentes.",
+      "OWNER": "marketing-nar",
+      "TOOLS_ALLOWED": ["eduinfo_search_folder", "eduinfo_get_asset", "campaign_get_brand_context"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Publicar conteúdo no site é ação externa e irreversível (A2 — publicar campanha ou conteúdo externo), exige aprovação humana de marketing antes de ir ao ar. O rascunho da página pode ser preparado agora; a publicação em si fica bloqueada até aprovação (E1.4)."
+}

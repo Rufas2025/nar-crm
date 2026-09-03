@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Recalibrar o algoritmo de scoring de leads não é uma capability existente no registry (nenhuma tool de nenhum agente lê ou ajusta parâmetros de scoring) e publicar a nova versão em produção é ação irreversível sobre ambiente compartilhado (A7/A8) que exige aprovação humana de engenharia + produto. Não há preparo executável com as tools atuais (CAPABILITY_GAPS: falta capability de scoring, dono provável engenharia-nar/produto-nar) e o próprio pedido já é a ação de recalibrar+publicar — não uma análise sobre a qual o humano decidiria depois. Portanto tasks:[] + ESCALATE:true, sem missão inventada e sem tool simulada."
+}

@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Objeto da intenção ('fluxo de renovação de matrícula travando no meio') não é alcançado por nenhuma tool do registry 0.1.0: não há capability que inspecione workflow de renovação de matrícula, nem que distinga se a causa é erro técnico (engenharia-nar) ou problema de dado/estado no CRM (crm-nar). Sem essa capability, a causa é ambígua (E1.2) e o gap muda o resultado (E1.8) — CAPABILITY_GAPS: decisão bloqueada = diagnosticar onde e por que o fluxo trava; capability faltante = ferramenta de diagnóstico/observabilidade do fluxo de renovação de matrícula (workflow n8n e/ou stage de pipeline associado); dono provável = engenharia-nar (se causa técnica) ou crm-nar (se causa de dado), a definir após a capability existir ou após decisão humana apontando a causa."
+}

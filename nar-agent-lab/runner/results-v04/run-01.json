@@ -1,0 +1,1565 @@
+{
+  "run": "v04-01",
+  "suite": "router-cases-v0.4",
+  "model": "sonnet",
+  "execution": "real — uma invocação isolada de subagente por caso, sem acesso ao gabarito",
+  "cases_executed": 44,
+  "PASS": 31,
+  "PARTIAL": 2,
+  "FAIL": 11,
+  "total_tasks": 39,
+  "metrics": {
+    "ROUTING_ACCURACY": 72.7,
+    "OWNER_ACCURACY": 79.5,
+    "TASK_DECOMPOSITION_ACCURACY": 79.5,
+    "CROSS_OWNER_DEPENDENCY_ACCURACY": 75,
+    "UNNECESSARY_DELEGATION_RATE": 5.1,
+    "DUPLICATE_WORK_RATE": 4.5,
+    "TOOL_POLICY_COMPLIANCE": 100,
+    "ESCALATION_PRECISION": 65.2,
+    "ESCALATION_RECALL": 100,
+    "ESCALATION_ACCURACY": 81.8,
+    "CONTEXT_MINIMALITY_PROXY": 100,
+    "STOP_CONDITION_COMPLIANCE": 100
+  },
+  "counts": {
+    "escalation": {
+      "tp": 15,
+      "fp": 8,
+      "fn": 0,
+      "tn": 21
+    },
+    "conform_tasks": 39,
+    "total_tasks": 39
+  },
+  "gate": {
+    "ROUTING_ACCURACY": false,
+    "OWNER_ACCURACY": false,
+    "CROSS_OWNER_DEPENDENCY_ACCURACY": false,
+    "TOOL_POLICY_COMPLIANCE": true,
+    "ESCALATION_ACCURACY": false
+  },
+  "gate_passed": false,
+  "breakdowns": {
+    "lua_vs_nathi": {
+      "pair": "atendimento-nar vs crm-nar",
+      "cases": 16,
+      "errors": 4,
+      "rows": [
+        {
+          "id": "X-01",
+          "expected": "crm-nar",
+          "got": "crm-nar",
+          "ok": true
+        },
+        {
+          "id": "X-04",
+          "expected": "crm-nar",
+          "got": "crm-nar",
+          "ok": true
+        },
+        {
+          "id": "X-05",
+          "expected": "crm-nar",
+          "got": "crm-nar",
+          "ok": true
+        },
+        {
+          "id": "X-06",
+          "expected": "atendimento-nar+crm-nar",
+          "got": "atendimento-nar+crm-nar",
+          "ok": true
+        },
+        {
+          "id": "X-11",
+          "expected": "crm-nar",
+          "got": "crm-nar",
+          "ok": true
+        },
+        {
+          "id": "X-12",
+          "expected": "crm-nar",
+          "got": "crm-nar",
+          "ok": true
+        },
+        {
+          "id": "X-13",
+          "expected": "crm-nar",
+          "got": "crm-nar",
+          "ok": true
+        },
+        {
+          "id": "X-17",
+          "expected": "crm-nar",
+          "got": "crm-nar",
+          "ok": true
+        },
+        {
+          "id": "X-18",
+          "expected": "atendimento-nar+crm-nar",
+          "got": "atendimento-nar+crm-nar",
+          "ok": true
+        },
+        {
+          "id": "X-27",
+          "expected": "atendimento-nar",
+          "got": "atendimento-nar+crm-nar",
+          "ok": false
+        },
+        {
+          "id": "X-28",
+          "expected": "crm-nar",
+          "got": "crm-nar",
+          "ok": true
+        },
+        {
+          "id": "X-29",
+          "expected": "atendimento-nar",
+          "got": "atendimento-nar+crm-nar",
+          "ok": false
+        },
+        {
+          "id": "X-30",
+          "expected": "crm-nar",
+          "got": "(nenhum)",
+          "ok": false
+        },
+        {
+          "id": "X-36",
+          "expected": "atendimento-nar+crm-nar",
+          "got": "atendimento-nar+crm-nar",
+          "ok": true
+        },
+        {
+          "id": "X-40",
+          "expected": "atendimento-nar+crm-nar",
+          "got": "crm-nar",
+          "ok": false
+        },
+        {
+          "id": "X-43",
+          "expected": "atendimento-nar+crm-nar",
+          "got": "atendimento-nar+crm-nar",
+          "ok": true
+        }
+      ]
+    },
+    "ragnar_vs_pandora": {
+      "pair": "produto-nar vs engenharia-nar",
+      "cases": 12,
+      "errors": 5,
+      "rows": [
+        {
+          "id": "X-03",
+          "expected": "engenharia-nar",
+          "got": "engenharia-nar",
+          "ok": true
+        },
+        {
+          "id": "X-07",
+          "expected": "produto-nar",
+          "got": "produto-nar",
+          "ok": true
+        },
+        {
+          "id": "X-08",
+          "expected": "produto-nar+engenharia-nar",
+          "got": "engenharia-nar",
+          "ok": false
+        },
+        {
+          "id": "X-12",
+          "expected": "engenharia-nar",
+          "got": "engenharia-nar",
+          "ok": true
+        },
+        {
+          "id": "X-14",
+          "expected": "produto-nar+engenharia-nar",
+          "got": "engenharia-nar+produto-nar",
+          "ok": true
+        },
+        {
+          "id": "X-25",
+          "expected": "engenharia-nar",
+          "got": "(nenhum)",
+          "ok": false
+        },
+        {
+          "id": "X-31",
+          "expected": "engenharia-nar",
+          "got": "(nenhum)",
+          "ok": false
+        },
+        {
+          "id": "X-33",
+          "expected": "produto-nar",
+          "got": "produto-nar",
+          "ok": true
+        },
+        {
+          "id": "X-35",
+          "expected": "produto-nar",
+          "got": "produto-nar",
+          "ok": true
+        },
+        {
+          "id": "X-39",
+          "expected": "produto-nar",
+          "got": "produto-nar",
+          "ok": true
+        },
+        {
+          "id": "X-41",
+          "expected": "produto-nar+engenharia-nar",
+          "got": "(nenhum)",
+          "ok": false
+        },
+        {
+          "id": "X-42",
+          "expected": "produto-nar",
+          "got": "produto-nar",
+          "ok": false
+        }
+      ]
+    },
+    "dependencia": {
+      "n": 6,
+      "PASS": 2,
+      "PARTIAL": 2,
+      "FAIL": 2,
+      "accuracy": 50,
+      "ids": [
+        "X-05",
+        "X-06",
+        "X-07",
+        "X-08",
+        "X-09",
+        "X-10"
+      ]
+    },
+    "approval_gate": {
+      "n": 6,
+      "PASS": 6,
+      "PARTIAL": 0,
+      "FAIL": 0,
+      "accuracy": 100,
+      "ids": [
+        "X-15",
+        "X-16",
+        "X-17",
+        "X-18",
+        "X-19",
+        "X-20"
+      ]
+    },
+    "fora_de_escopo": {
+      "n": 3,
+      "PASS": 3,
+      "PARTIAL": 0,
+      "FAIL": 0,
+      "accuracy": 100,
+      "ids": [
+        "X-21",
+        "X-22",
+        "X-23"
+      ]
+    },
+    "consolidacao": {
+      "n": 3,
+      "PASS": 2,
+      "PARTIAL": 0,
+      "FAIL": 1,
+      "accuracy": 66.7,
+      "ids": [
+        "X-24",
+        "X-25",
+        "X-26"
+      ]
+    },
+    "owner_unico": {
+      "n": 4,
+      "PASS": 4,
+      "PARTIAL": 0,
+      "FAIL": 0,
+      "accuracy": 100,
+      "ids": [
+        "X-01",
+        "X-02",
+        "X-03",
+        "X-04"
+      ]
+    },
+    "paralelo": {
+      "n": 4,
+      "PASS": 4,
+      "PARTIAL": 0,
+      "FAIL": 0,
+      "accuracy": 100,
+      "ids": [
+        "X-11",
+        "X-12",
+        "X-13",
+        "X-14"
+      ]
+    },
+    "atendimento_vs_crm": {
+      "n": 4,
+      "PASS": 1,
+      "PARTIAL": 0,
+      "FAIL": 3,
+      "accuracy": 25,
+      "ids": [
+        "X-27",
+        "X-28",
+        "X-29",
+        "X-30"
+      ]
+    },
+    "produto_vs_engenharia": {
+      "n": 4,
+      "PASS": 2,
+      "PARTIAL": 0,
+      "FAIL": 2,
+      "accuracy": 50,
+      "ids": [
+        "X-31",
+        "X-32",
+        "X-33",
+        "X-34"
+      ]
+    },
+    "policy_ordinary_vs_action": {
+      "n": 5,
+      "PASS": 5,
+      "PARTIAL": 0,
+      "FAIL": 0,
+      "accuracy": 100,
+      "ids": [
+        "X-35",
+        "X-36",
+        "X-37",
+        "X-38",
+        "X-39"
+      ]
+    },
+    "teste_do_insumo": {
+      "n": 5,
+      "PASS": 2,
+      "PARTIAL": 0,
+      "FAIL": 3,
+      "accuracy": 40,
+      "ids": [
+        "X-40",
+        "X-41",
+        "X-42",
+        "X-43",
+        "X-44"
+      ]
+    }
+  },
+  "cases": [
+    {
+      "id": "X-01",
+      "category": "owner_unico",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [
+        "crm-nar"
+      ],
+      "required": [
+        "crm-nar"
+      ],
+      "tasks": 1,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-02",
+      "category": "owner_unico",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [
+        "marketing-nar"
+      ],
+      "required": [
+        "marketing-nar"
+      ],
+      "tasks": 1,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-03",
+      "category": "owner_unico",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [
+        "engenharia-nar"
+      ],
+      "required": [
+        "engenharia-nar"
+      ],
+      "tasks": 1,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-04",
+      "category": "owner_unico",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [
+        "crm-nar"
+      ],
+      "required": [
+        "crm-nar"
+      ],
+      "tasks": 1,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-05",
+      "category": "dependencia",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": true,
+      "emitted": [
+        "crm-nar",
+        "marketing-nar"
+      ],
+      "required": [
+        "crm-nar",
+        "marketing-nar"
+      ],
+      "tasks": 2,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-06",
+      "category": "dependencia",
+      "verdict": "PARTIAL",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": true,
+      "emitted": [
+        "crm-nar",
+        "atendimento-nar"
+      ],
+      "required": [
+        "crm-nar",
+        "atendimento-nar"
+      ],
+      "tasks": 2,
+      "extraTasks": 0,
+      "duplicate": true,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": [
+        "trabalho potencialmente duplicado entre missões"
+      ]
+    },
+    {
+      "id": "X-07",
+      "category": "dependencia",
+      "verdict": "PARTIAL",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": true,
+      "emitted": [
+        "produto-nar",
+        "marketing-nar"
+      ],
+      "required": [
+        "produto-nar",
+        "marketing-nar"
+      ],
+      "tasks": 2,
+      "extraTasks": 0,
+      "duplicate": true,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": [
+        "trabalho potencialmente duplicado entre missões"
+      ]
+    },
+    {
+      "id": "X-08",
+      "category": "dependencia",
+      "verdict": "FAIL",
+      "owner_ok": false,
+      "decomp_ok": false,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": false,
+      "emitted": [
+        "engenharia-nar"
+      ],
+      "required": [
+        "engenharia-nar",
+        "produto-nar"
+      ],
+      "tasks": 1,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": [
+        "owner faltando: produto-nar",
+        "decomposição 1 vs 2 esperada",
+        "cadeia de dependência entre owners não respeitada"
+      ]
+    },
+    {
+      "id": "X-09",
+      "category": "dependencia",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [],
+      "required": [],
+      "tasks": 0,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-10",
+      "category": "dependencia",
+      "verdict": "FAIL",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": false,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [
+        "marketing-nar"
+      ],
+      "required": [
+        "marketing-nar"
+      ],
+      "tasks": 1,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": [
+        "escalou indevidamente"
+      ]
+    },
+    {
+      "id": "X-11",
+      "category": "paralelo",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [
+        "marketing-nar",
+        "crm-nar"
+      ],
+      "required": [
+        "marketing-nar",
+        "crm-nar"
+      ],
+      "tasks": 2,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-12",
+      "category": "paralelo",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [
+        "crm-nar",
+        "engenharia-nar"
+      ],
+      "required": [
+        "crm-nar",
+        "engenharia-nar"
+      ],
+      "tasks": 2,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-13",
+      "category": "paralelo",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [
+        "marketing-nar",
+        "crm-nar"
+      ],
+      "required": [
+        "marketing-nar",
+        "crm-nar"
+      ],
+      "tasks": 2,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-14",
+      "category": "paralelo",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [
+        "produto-nar",
+        "engenharia-nar"
+      ],
+      "required": [
+        "produto-nar",
+        "engenharia-nar"
+      ],
+      "tasks": 2,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-15",
+      "category": "approval_gate",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [],
+      "required": [],
+      "tasks": 0,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-16",
+      "category": "approval_gate",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [],
+      "required": [],
+      "tasks": 0,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-17",
+      "category": "approval_gate",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [
+        "crm-nar"
+      ],
+      "required": [
+        "crm-nar"
+      ],
+      "tasks": 1,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-18",
+      "category": "approval_gate",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [
+        "crm-nar",
+        "atendimento-nar"
+      ],
+      "required": [
+        "crm-nar",
+        "atendimento-nar"
+      ],
+      "tasks": 2,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-19",
+      "category": "approval_gate",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [
+        "marketing-nar"
+      ],
+      "required": [
+        "marketing-nar"
+      ],
+      "tasks": 1,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-20",
+      "category": "approval_gate",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [],
+      "required": [],
+      "tasks": 0,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-21",
+      "category": "fora_de_escopo",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [],
+      "required": [],
+      "tasks": 0,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-22",
+      "category": "fora_de_escopo",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [],
+      "required": [],
+      "tasks": 0,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-23",
+      "category": "fora_de_escopo",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [],
+      "required": [],
+      "tasks": 0,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-24",
+      "category": "consolidacao",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [],
+      "required": [],
+      "tasks": 0,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-25",
+      "category": "consolidacao",
+      "verdict": "FAIL",
+      "owner_ok": false,
+      "decomp_ok": false,
+      "dep_ok": true,
+      "esc_ok": false,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [],
+      "required": [
+        "engenharia-nar"
+      ],
+      "tasks": 0,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": [
+        "owner faltando: engenharia-nar",
+        "decomposição 0 vs 1 esperada",
+        "escalou indevidamente"
+      ]
+    },
+    {
+      "id": "X-26",
+      "category": "consolidacao",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [],
+      "required": [],
+      "tasks": 0,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-27",
+      "category": "atendimento_vs_crm",
+      "verdict": "FAIL",
+      "owner_ok": false,
+      "decomp_ok": false,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [
+        "crm-nar",
+        "atendimento-nar"
+      ],
+      "required": [
+        "atendimento-nar"
+      ],
+      "tasks": 2,
+      "extraTasks": 1,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [
+        "crm-nar"
+      ],
+      "displayNameUsed": [],
+      "notes": [
+        "owner indevido: crm-nar",
+        "owner proibido: crm-nar",
+        "decomposição 2 vs 1 esperada"
+      ]
+    },
+    {
+      "id": "X-28",
+      "category": "atendimento_vs_crm",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [
+        "crm-nar"
+      ],
+      "required": [
+        "crm-nar"
+      ],
+      "tasks": 1,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-29",
+      "category": "atendimento_vs_crm",
+      "verdict": "FAIL",
+      "owner_ok": false,
+      "decomp_ok": false,
+      "dep_ok": true,
+      "esc_ok": false,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [
+        "crm-nar",
+        "atendimento-nar"
+      ],
+      "required": [
+        "atendimento-nar"
+      ],
+      "tasks": 2,
+      "extraTasks": 1,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [
+        "crm-nar"
+      ],
+      "displayNameUsed": [],
+      "notes": [
+        "owner indevido: crm-nar",
+        "owner proibido: crm-nar",
+        "decomposição 2 vs 1 esperada",
+        "escalou indevidamente"
+      ]
+    },
+    {
+      "id": "X-30",
+      "category": "atendimento_vs_crm",
+      "verdict": "FAIL",
+      "owner_ok": false,
+      "decomp_ok": false,
+      "dep_ok": true,
+      "esc_ok": false,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [],
+      "required": [
+        "crm-nar"
+      ],
+      "tasks": 0,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": [
+        "owner faltando: crm-nar",
+        "decomposição 0 vs 1 esperada",
+        "escalou indevidamente"
+      ]
+    },
+    {
+      "id": "X-31",
+      "category": "produto_vs_engenharia",
+      "verdict": "FAIL",
+      "owner_ok": false,
+      "decomp_ok": false,
+      "dep_ok": true,
+      "esc_ok": false,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [],
+      "required": [
+        "engenharia-nar"
+      ],
+      "tasks": 0,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": [
+        "owner faltando: engenharia-nar",
+        "decomposição 0 vs 1 esperada",
+        "escalou indevidamente"
+      ]
+    },
+    {
+      "id": "X-32",
+      "category": "produto_vs_engenharia",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [],
+      "required": [],
+      "tasks": 0,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-33",
+      "category": "produto_vs_engenharia",
+      "verdict": "FAIL",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": false,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [
+        "produto-nar"
+      ],
+      "required": [
+        "produto-nar"
+      ],
+      "tasks": 1,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": [
+        "escalou indevidamente"
+      ]
+    },
+    {
+      "id": "X-34",
+      "category": "produto_vs_engenharia",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [],
+      "required": [],
+      "tasks": 0,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-35",
+      "category": "policy_ordinary_vs_action",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [
+        "produto-nar"
+      ],
+      "required": [
+        "produto-nar"
+      ],
+      "tasks": 1,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-36",
+      "category": "policy_ordinary_vs_action",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [
+        "crm-nar",
+        "atendimento-nar"
+      ],
+      "required": [
+        "crm-nar",
+        "atendimento-nar"
+      ],
+      "tasks": 2,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-37",
+      "category": "policy_ordinary_vs_action",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [],
+      "required": [],
+      "tasks": 0,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-38",
+      "category": "policy_ordinary_vs_action",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [],
+      "required": [],
+      "tasks": 0,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-39",
+      "category": "policy_ordinary_vs_action",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [
+        "produto-nar"
+      ],
+      "required": [
+        "produto-nar"
+      ],
+      "tasks": 1,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-40",
+      "category": "teste_do_insumo",
+      "verdict": "FAIL",
+      "owner_ok": false,
+      "decomp_ok": false,
+      "dep_ok": true,
+      "esc_ok": false,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [
+        "crm-nar"
+      ],
+      "required": [
+        "crm-nar",
+        "atendimento-nar"
+      ],
+      "tasks": 1,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": [
+        "owner faltando: atendimento-nar",
+        "decomposição 1 vs 2 esperada",
+        "escalou indevidamente"
+      ]
+    },
+    {
+      "id": "X-41",
+      "category": "teste_do_insumo",
+      "verdict": "FAIL",
+      "owner_ok": false,
+      "decomp_ok": false,
+      "dep_ok": true,
+      "esc_ok": false,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [],
+      "required": [
+        "engenharia-nar",
+        "produto-nar"
+      ],
+      "tasks": 0,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": [
+        "owner faltando: engenharia-nar, produto-nar",
+        "decomposição 0 vs 2 esperada",
+        "escalou indevidamente"
+      ]
+    },
+    {
+      "id": "X-42",
+      "category": "teste_do_insumo",
+      "verdict": "FAIL",
+      "owner_ok": false,
+      "decomp_ok": false,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [
+        "produto-nar"
+      ],
+      "required": [
+        "marketing-nar",
+        "produto-nar"
+      ],
+      "tasks": 1,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": [
+        "owner faltando: marketing-nar",
+        "decomposição 1 vs 2 esperada"
+      ]
+    },
+    {
+      "id": "X-43",
+      "category": "teste_do_insumo",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [
+        "crm-nar",
+        "atendimento-nar"
+      ],
+      "required": [
+        "crm-nar",
+        "atendimento-nar"
+      ],
+      "tasks": 2,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    },
+    {
+      "id": "X-44",
+      "category": "teste_do_insumo",
+      "verdict": "PASS",
+      "owner_ok": true,
+      "decomp_ok": true,
+      "dep_ok": true,
+      "esc_ok": true,
+      "tool_ok": true,
+      "stop_ok": true,
+      "cross_owner_dep_ok": null,
+      "emitted": [
+        "marketing-nar"
+      ],
+      "required": [
+        "marketing-nar"
+      ],
+      "tasks": 1,
+      "extraTasks": 0,
+      "duplicate": false,
+      "verboseTasks": 0,
+      "badTools": [],
+      "inventedTools": [],
+      "forbiddenUsed": [],
+      "displayNameUsed": [],
+      "notes": []
+    }
+  ]
+}
