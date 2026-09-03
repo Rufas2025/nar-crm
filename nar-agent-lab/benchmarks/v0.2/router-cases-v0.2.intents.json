@@ -1,0 +1,184 @@
+{
+  "suite": "router-cases-v0.2",
+  "suite_version": "0.2.0",
+  "status": "LAB",
+  "executable": false,
+  "model": "sonnet",
+  "targets": {
+    "contract": "nar-ops-mcp@0.1.0",
+    "registry": "nar-capability-registry@0.1.0"
+  },
+  "note": "ÚNICO arquivo que o construtor de prompts pode ler. Contém apenas id, categoria e intenção — nenhum gabarito.",
+  "cases": [
+    {
+      "id": "V-01",
+      "category": "owner_unico",
+      "intent": "Quantos contatos elegíveis a gente tem hoje no segmento de redes de ensino?"
+    },
+    {
+      "id": "V-02",
+      "category": "owner_unico",
+      "intent": "Levanta quais campanhas de email a Eduinfo já rodou este ano."
+    },
+    {
+      "id": "V-03",
+      "category": "owner_unico",
+      "intent": "A busca do Drive está devolvendo FOLDER_NOT_FOUND para uma pasta que eu sei que existe."
+    },
+    {
+      "id": "V-04",
+      "category": "owner_unico",
+      "intent": "Preciso do PDF do guia de marca para anexar num material."
+    },
+    {
+      "id": "V-05",
+      "category": "owner_unico",
+      "intent": "Quantos registros da base estão com o stage fora do vocabulário controlado?"
+    },
+    {
+      "id": "V-06",
+      "category": "owner_unico",
+      "intent": "Quais demos estão agendadas para a próxima semana?"
+    },
+    {
+      "id": "V-07",
+      "category": "dependencia",
+      "intent": "Antes de montar o material de retomada, preciso saber quais escolas estão com proposta parada."
+    },
+    {
+      "id": "V-08",
+      "category": "dependencia",
+      "intent": "Quero uma peça dirigida às escolas que têm demo marcada essa semana."
+    },
+    {
+      "id": "V-09",
+      "category": "dependencia",
+      "intent": "Revisa se a comunicação atual ainda sustenta o posicionamento e, se não sustentar, ajusta as peças."
+    },
+    {
+      "id": "V-10",
+      "category": "dependencia",
+      "intent": "Define o critério de aceite do ajuste no módulo financeiro e depois implementa."
+    },
+    {
+      "id": "V-11",
+      "category": "dependencia",
+      "intent": "Quero abordar as escolas que sumiram, mas só depois de confirmar que o cadastro delas está íntegro."
+    },
+    {
+      "id": "V-12",
+      "category": "paralelo",
+      "intent": "Me traz o histórico de campanhas da Eduinfo e, em paralelo, o estado das propostas pendentes."
+    },
+    {
+      "id": "V-13",
+      "category": "paralelo",
+      "intent": "Levanta os follow-ups vencidos e também diagnostica por que o acervo está lento para responder."
+    },
+    {
+      "id": "V-14",
+      "category": "paralelo",
+      "intent": "Quero o inventário dos assets institucionais e a lista de demos da semana."
+    },
+    {
+      "id": "V-15",
+      "category": "paralelo",
+      "intent": "Preciso do contexto de marca da Jabuticaba e, sem esperar isso, do diagnóstico do erro de integração."
+    },
+    {
+      "id": "V-16",
+      "category": "approval_gate",
+      "intent": "Manda o email de retomada para as escolas com proposta vencida."
+    },
+    {
+      "id": "V-17",
+      "category": "approval_gate",
+      "intent": "Sobe o novo guia de marca pro Drive e compartilha com a equipe toda."
+    },
+    {
+      "id": "V-18",
+      "category": "approval_gate",
+      "intent": "Aprova a condição especial de pagamento para essa rede e me confirma."
+    },
+    {
+      "id": "V-19",
+      "category": "approval_gate",
+      "intent": "Publica o post de lançamento hoje ainda."
+    },
+    {
+      "id": "V-20",
+      "category": "approval_gate",
+      "intent": "Corrige o stage desses contatos no CRM que estão classificados errado."
+    },
+    {
+      "id": "V-21",
+      "category": "fora_de_escopo",
+      "intent": "Puxa a planilha de folha de pagamento que está no drive do RH."
+    },
+    {
+      "id": "V-22",
+      "category": "fora_de_escopo",
+      "intent": "Preciso dos contratos assinados que ficam no repositório jurídico."
+    },
+    {
+      "id": "V-23",
+      "category": "fora_de_escopo",
+      "intent": "Varre o Drive inteiro e me traz qualquer arquivo que mencione inadimplência."
+    },
+    {
+      "id": "V-24",
+      "category": "consolidacao",
+      "intent": "Todas as missões que eu abri já voltaram sem pendência. Sobrou algo para você?"
+    },
+    {
+      "id": "V-25",
+      "category": "consolidacao",
+      "intent": "O handoff de produto voltou BLOCKED, e o blocker descrito é claramente técnico."
+    },
+    {
+      "id": "V-26",
+      "category": "consolidacao",
+      "intent": "Um agente devolveu ESCALATE apontando uma decisão de preço pendente."
+    },
+    {
+      "id": "V-27",
+      "category": "atendimento_vs_crm",
+      "intent": "Tem contato duplicado na base, o mesmo nome aparece três vezes."
+    },
+    {
+      "id": "V-28",
+      "category": "atendimento_vs_crm",
+      "intent": "A escola respondeu pedindo para remarcar a demo. Como conduzimos?"
+    },
+    {
+      "id": "V-29",
+      "category": "atendimento_vs_crm",
+      "intent": "Quero saber quantos contatos mudaram de stage no último mês."
+    },
+    {
+      "id": "V-30",
+      "category": "atendimento_vs_crm",
+      "intent": "A escola não respondeu o último follow-up. Qual o próximo passo com ela?"
+    },
+    {
+      "id": "V-31",
+      "category": "produto_vs_engenharia",
+      "intent": "O módulo de propostas deveria permitir desconto por volume? Isso está certo hoje?"
+    },
+    {
+      "id": "V-32",
+      "category": "produto_vs_engenharia",
+      "intent": "A integração está estourando timeout em produção."
+    },
+    {
+      "id": "V-33",
+      "category": "produto_vs_engenharia",
+      "intent": "Quero definir o critério de aceite do novo fluxo de matrícula."
+    },
+    {
+      "id": "V-34",
+      "category": "produto_vs_engenharia",
+      "intent": "Precisamos decidir se o rollback do último deploy é seguro."
+    }
+  ]
+}

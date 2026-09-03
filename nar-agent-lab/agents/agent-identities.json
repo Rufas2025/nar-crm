@@ -1,0 +1,17 @@
+{
+  "identities_version": "0.1.0",
+  "purpose": "Nomes de exibição dos agentes NAR. Camada puramente de apresentação.",
+  "rules": [
+    "Os IDs técnicos são imutáveis e continuam sendo a única chave usada em capability-registry.json, nar-ops-mcp-contract.json, task-contract, handoff-contract e em todo output de benchmark.",
+    "Nenhum display name pode aparecer como OWNER, agent_id ou chave em qualquer artefato executável.",
+    "Este arquivo não é lido pelo runner e não entra em nenhum prompt: adicioná-lo não altera o artefato sob teste."
+  ],
+  "identities": [
+    { "id": "rufas-router",    "display_name": "Rufas Boss",       "short_name": "Rufas Boss", "role": "orquestrador" },
+    { "id": "marketing-nar",   "display_name": "Penny Mkt",        "short_name": "Penny",      "role": "campanhas, templates, briefs, conteúdo, mensagem, marca" },
+    { "id": "atendimento-nar", "display_name": "Lua",              "short_name": "Lua",        "role": "cadência, follow-up, respostas, demos, propostas pendentes, interação comercial" },
+    { "id": "crm-nar",         "display_name": "Nathi",            "short_name": "Nathi",      "role": "dados, pipeline, stages, elegibilidade, tracking, consistência, histórico" },
+    { "id": "produto-nar",     "display_name": "Ragnar Produtos",  "short_name": "Ragnar",     "role": "experiência, oferta, guardrails, posicionamento, qualidade funcional, aceite" },
+    { "id": "engenharia-nar",  "display_name": "Pandora",          "short_name": "Pandora",    "role": "MCP, n8n, backend, workflow, integração, API, assets técnicos, troubleshooting, segurança, testes, rollback" }
+  ]
+}

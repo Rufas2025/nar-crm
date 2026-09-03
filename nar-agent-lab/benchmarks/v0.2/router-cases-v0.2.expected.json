@@ -1,0 +1,1037 @@
+{
+  "suite": "router-cases-v0.2",
+  "suite_version": "0.2.0",
+  "status": "LAB",
+  "executable": false,
+  "model": "sonnet",
+  "targets": {
+    "contract": "nar-ops-mcp@0.1.0",
+    "registry": "nar-capability-registry@0.1.0"
+  },
+  "note": "GABARITO. Nunca pode ser lido pelo construtor de prompts nem entrar em qualquer prompt. Só o avaliador lê este arquivo.",
+  "agents": {
+    "rufas-router": [],
+    "marketing-nar": [
+      "eduinfo_list_root",
+      "eduinfo_search_folder",
+      "eduinfo_get_asset",
+      "campaign_get_history",
+      "campaign_get_brand_context"
+    ],
+    "atendimento-nar": [
+      "crm_list_eligible_contacts",
+      "crm_get_contact_context",
+      "crm_get_followups_due",
+      "crm_get_demo_scheduled",
+      "proposal_get_pending"
+    ],
+    "crm-nar": [
+      "crm_list_eligible_contacts",
+      "crm_get_contact_context",
+      "crm_get_followups_due",
+      "crm_get_demo_scheduled",
+      "proposal_get_pending"
+    ],
+    "produto-nar": [
+      "eduinfo_list_root",
+      "eduinfo_search_folder",
+      "eduinfo_get_asset",
+      "proposal_get_pending",
+      "campaign_get_history",
+      "campaign_get_brand_context"
+    ],
+    "engenharia-nar": [
+      "eduinfo_list_root",
+      "eduinfo_search_folder",
+      "eduinfo_get_asset"
+    ]
+  },
+  "categories": [
+    "owner_unico",
+    "dependencia",
+    "paralelo",
+    "approval_gate",
+    "fora_de_escopo",
+    "consolidacao",
+    "atendimento_vs_crm",
+    "produto_vs_engenharia"
+  ],
+  "cases": [
+    {
+      "id": "V-01",
+      "category": "owner_unico",
+      "expected": {
+        "decomposition": 1,
+        "order": "sequencial",
+        "escalate": false,
+        "tasks": [
+          {
+            "owner": "crm-nar",
+            "scope": "levantar contatos elegíveis do segmento",
+            "tools_allowed": [
+              "crm_list_eligible_contacts"
+            ]
+          }
+        ],
+        "forbidden_owners": [
+          "marketing-nar",
+          "produto-nar",
+          "engenharia-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "OWNER_ACCURACY",
+        "TASK_DECOMPOSITION_ACCURACY",
+        "UNNECESSARY_DELEGATION_RATE"
+      ]
+    },
+    {
+      "id": "V-02",
+      "category": "owner_unico",
+      "expected": {
+        "decomposition": 1,
+        "order": "sequencial",
+        "escalate": false,
+        "tasks": [
+          {
+            "owner": "marketing-nar",
+            "scope": "consultar histórico de campanhas da marca no período",
+            "tools_allowed": [
+              "campaign_get_history"
+            ]
+          }
+        ],
+        "forbidden_owners": [
+          "crm-nar",
+          "atendimento-nar",
+          "engenharia-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "OWNER_ACCURACY",
+        "UNNECESSARY_DELEGATION_RATE"
+      ]
+    },
+    {
+      "id": "V-03",
+      "category": "owner_unico",
+      "expected": {
+        "decomposition": 1,
+        "order": "sequencial",
+        "escalate": false,
+        "tasks": [
+          {
+            "owner": "engenharia-nar",
+            "scope": "diagnosticar o erro de tool na busca do acervo",
+            "tools_allowed": [
+              "eduinfo_list_root",
+              "eduinfo_search_folder"
+            ]
+          }
+        ],
+        "forbidden_owners": [
+          "marketing-nar",
+          "crm-nar",
+          "atendimento-nar",
+          "produto-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "OWNER_ACCURACY",
+        "ROUTING_ACCURACY"
+      ]
+    },
+    {
+      "id": "V-04",
+      "category": "owner_unico",
+      "expected": {
+        "decomposition": 1,
+        "order": "sequencial",
+        "escalate": false,
+        "tasks": [
+          {
+            "owner": "marketing-nar",
+            "scope": "localizar e obter o asset autorizado",
+            "tools_allowed": [
+              "eduinfo_search_folder",
+              "eduinfo_get_asset"
+            ]
+          }
+        ],
+        "forbidden_owners": [
+          "crm-nar",
+          "atendimento-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "OWNER_ACCURACY",
+        "TOOL_POLICY_COMPLIANCE"
+      ]
+    },
+    {
+      "id": "V-05",
+      "category": "owner_unico",
+      "expected": {
+        "decomposition": 1,
+        "order": "sequencial",
+        "escalate": false,
+        "tasks": [
+          {
+            "owner": "crm-nar",
+            "scope": "diagnosticar integridade de stage na base",
+            "tools_allowed": [
+              "crm_list_eligible_contacts",
+              "crm_get_contact_context"
+            ]
+          }
+        ],
+        "forbidden_owners": [
+          "marketing-nar",
+          "produto-nar",
+          "engenharia-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "OWNER_ACCURACY",
+        "CONTEXT_MINIMALITY"
+      ]
+    },
+    {
+      "id": "V-06",
+      "category": "owner_unico",
+      "expected": {
+        "decomposition": 1,
+        "order": "sequencial",
+        "escalate": false,
+        "tasks": [
+          {
+            "owner": "crm-nar",
+            "scope": "listar demos agendadas no intervalo",
+            "tools_allowed": [
+              "crm_get_demo_scheduled"
+            ]
+          }
+        ],
+        "forbidden_owners": [
+          "marketing-nar",
+          "produto-nar",
+          "engenharia-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "OWNER_ACCURACY",
+        "UNNECESSARY_DELEGATION_RATE"
+      ]
+    },
+    {
+      "id": "V-07",
+      "category": "dependencia",
+      "expected": {
+        "decomposition": 2,
+        "order": "sequencial",
+        "escalate": false,
+        "tasks": [
+          {
+            "owner": "crm-nar",
+            "scope": "levantar propostas paradas e as escolas envolvidas",
+            "tools_allowed": [
+              "proposal_get_pending",
+              "crm_get_contact_context"
+            ]
+          },
+          {
+            "owner": "marketing-nar",
+            "scope": "montar o material de retomada a partir da lista recebida",
+            "tools_allowed": [
+              "campaign_get_brand_context",
+              "eduinfo_get_asset"
+            ],
+            "depends_on": 1
+          }
+        ],
+        "forbidden_owners": [
+          "engenharia-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "ROUTING_ACCURACY",
+        "TASK_DECOMPOSITION_ACCURACY",
+        "OWNER_ACCURACY"
+      ]
+    },
+    {
+      "id": "V-08",
+      "category": "dependencia",
+      "expected": {
+        "decomposition": 2,
+        "order": "sequencial",
+        "escalate": false,
+        "tasks": [
+          {
+            "owner": "crm-nar",
+            "scope": "levantar quais escolas têm demo marcada no período",
+            "tools_allowed": [
+              "crm_get_demo_scheduled"
+            ]
+          },
+          {
+            "owner": "marketing-nar",
+            "scope": "produzir a peça para o público recebido",
+            "tools_allowed": [
+              "campaign_get_brand_context",
+              "eduinfo_get_asset"
+            ],
+            "depends_on": 1
+          }
+        ],
+        "forbidden_owners": [
+          "engenharia-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "TASK_DECOMPOSITION_ACCURACY",
+        "OWNER_ACCURACY"
+      ]
+    },
+    {
+      "id": "V-09",
+      "category": "dependencia",
+      "expected": {
+        "decomposition": 2,
+        "order": "sequencial",
+        "escalate": false,
+        "tasks": [
+          {
+            "owner": "produto-nar",
+            "scope": "avaliar aderência ao posicionamento e definir o que muda",
+            "tools_allowed": [
+              "campaign_get_brand_context",
+              "campaign_get_history"
+            ]
+          },
+          {
+            "owner": "marketing-nar",
+            "scope": "ajustar as peças conforme a definição recebida",
+            "tools_allowed": [
+              "campaign_get_brand_context",
+              "eduinfo_get_asset"
+            ],
+            "depends_on": 1
+          }
+        ],
+        "forbidden_owners": [
+          "crm-nar",
+          "atendimento-nar",
+          "engenharia-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "ROUTING_ACCURACY",
+        "OWNER_ACCURACY"
+      ]
+    },
+    {
+      "id": "V-10",
+      "category": "dependencia",
+      "expected": {
+        "decomposition": 2,
+        "order": "sequencial",
+        "escalate": false,
+        "tasks": [
+          {
+            "owner": "produto-nar",
+            "scope": "definir requisito e critério de aceite",
+            "tools_allowed": [
+              "eduinfo_search_folder",
+              "eduinfo_get_asset"
+            ]
+          },
+          {
+            "owner": "engenharia-nar",
+            "scope": "implementar conforme o critério de aceite recebido",
+            "tools_allowed": [],
+            "depends_on": 1
+          }
+        ],
+        "forbidden_owners": [
+          "marketing-nar",
+          "crm-nar",
+          "atendimento-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "ROUTING_ACCURACY",
+        "OWNER_ACCURACY"
+      ]
+    },
+    {
+      "id": "V-11",
+      "category": "dependencia",
+      "expected": {
+        "decomposition": 2,
+        "order": "sequencial",
+        "escalate": false,
+        "tasks": [
+          {
+            "owner": "crm-nar",
+            "scope": "verificar integridade do cadastro dos contatos sem interação recente",
+            "tools_allowed": [
+              "crm_get_followups_due",
+              "crm_get_contact_context"
+            ]
+          },
+          {
+            "owner": "atendimento-nar",
+            "scope": "conduzir a abordagem a partir da lista validada",
+            "tools_allowed": [
+              "crm_get_contact_context"
+            ],
+            "depends_on": 1
+          }
+        ],
+        "forbidden_owners": [
+          "marketing-nar",
+          "engenharia-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "TASK_DECOMPOSITION_ACCURACY",
+        "OWNER_ACCURACY"
+      ]
+    },
+    {
+      "id": "V-12",
+      "category": "paralelo",
+      "expected": {
+        "decomposition": 2,
+        "order": "paralelo",
+        "escalate": false,
+        "tasks": [
+          {
+            "owner": "marketing-nar",
+            "scope": "consultar histórico de campanhas da marca",
+            "tools_allowed": [
+              "campaign_get_history"
+            ]
+          },
+          {
+            "owner": "crm-nar",
+            "scope": "levantar o estado das propostas pendentes",
+            "tools_allowed": [
+              "proposal_get_pending"
+            ]
+          }
+        ],
+        "forbidden_owners": [
+          "engenharia-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "ROUTING_ACCURACY",
+        "DUPLICATE_WORK_RATE"
+      ]
+    },
+    {
+      "id": "V-13",
+      "category": "paralelo",
+      "expected": {
+        "decomposition": 2,
+        "order": "paralelo",
+        "escalate": false,
+        "tasks": [
+          {
+            "owner": "crm-nar",
+            "scope": "levantar follow-ups vencidos na data de referência",
+            "tools_allowed": [
+              "crm_get_followups_due"
+            ]
+          },
+          {
+            "owner": "engenharia-nar",
+            "scope": "diagnosticar a lentidão de resposta do acervo",
+            "tools_allowed": [
+              "eduinfo_list_root",
+              "eduinfo_search_folder"
+            ]
+          }
+        ],
+        "forbidden_owners": [
+          "marketing-nar",
+          "produto-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "ROUTING_ACCURACY",
+        "OWNER_ACCURACY"
+      ]
+    },
+    {
+      "id": "V-14",
+      "category": "paralelo",
+      "expected": {
+        "decomposition": 2,
+        "order": "paralelo",
+        "escalate": false,
+        "tasks": [
+          {
+            "owner": "marketing-nar",
+            "scope": "inventariar os assets institucionais autorizados",
+            "tools_allowed": [
+              "eduinfo_list_root",
+              "eduinfo_search_folder"
+            ]
+          },
+          {
+            "owner": "crm-nar",
+            "scope": "listar as demos do período",
+            "tools_allowed": [
+              "crm_get_demo_scheduled"
+            ]
+          }
+        ],
+        "forbidden_owners": [
+          "engenharia-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "ROUTING_ACCURACY",
+        "DUPLICATE_WORK_RATE"
+      ]
+    },
+    {
+      "id": "V-15",
+      "category": "paralelo",
+      "expected": {
+        "decomposition": 2,
+        "order": "paralelo",
+        "escalate": false,
+        "tasks": [
+          {
+            "owner": "marketing-nar",
+            "scope": "obter posicionamento e guardrails da marca",
+            "tools_allowed": [
+              "campaign_get_brand_context"
+            ]
+          },
+          {
+            "owner": "engenharia-nar",
+            "scope": "diagnosticar o erro de integração",
+            "tools_allowed": []
+          }
+        ],
+        "forbidden_owners": [
+          "crm-nar",
+          "atendimento-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "ROUTING_ACCURACY",
+        "TASK_DECOMPOSITION_ACCURACY"
+      ]
+    },
+    {
+      "id": "V-16",
+      "category": "approval_gate",
+      "expected": {
+        "decomposition": 1,
+        "order": "sequencial",
+        "escalate": true,
+        "escalation_reason": "envio a contato real (A1/E1.4); o levantamento é preparo legítimo",
+        "tasks": [
+          {
+            "owner": "crm-nar",
+            "scope": "levantar as escolas com proposta vencida",
+            "tools_allowed": [
+              "proposal_get_pending",
+              "crm_get_contact_context"
+            ]
+          }
+        ],
+        "forbidden_owners": [
+          "marketing-nar",
+          "engenharia-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "ESCALATION_PRECISION",
+        "ESCALATION_RECALL",
+        "TASK_DECOMPOSITION_ACCURACY"
+      ]
+    },
+    {
+      "id": "V-17",
+      "category": "approval_gate",
+      "expected": {
+        "decomposition": 0,
+        "order": "nenhum",
+        "escalate": true,
+        "escalation_reason": "upload e compartilhamento de arquivo (A6); nenhuma capability de escrita existe e não há preparo executável",
+        "tasks": [],
+        "forbidden_owners": [
+          "marketing-nar",
+          "crm-nar",
+          "atendimento-nar",
+          "produto-nar",
+          "engenharia-nar"
+        ]
+      },
+      "metrics_probed": [
+        "ESCALATION_RECALL",
+        "STOP_CONDITION_COMPLIANCE"
+      ]
+    },
+    {
+      "id": "V-18",
+      "category": "approval_gate",
+      "expected": {
+        "decomposition": 0,
+        "order": "nenhum",
+        "escalate": true,
+        "escalation_reason": "condição comercial (A3/E1.1), sem exceção",
+        "tasks": [],
+        "forbidden_owners": [
+          "marketing-nar",
+          "crm-nar",
+          "atendimento-nar",
+          "produto-nar",
+          "engenharia-nar"
+        ]
+      },
+      "metrics_probed": [
+        "ESCALATION_RECALL",
+        "STOP_CONDITION_COMPLIANCE"
+      ]
+    },
+    {
+      "id": "V-19",
+      "category": "approval_gate",
+      "expected": {
+        "decomposition": 1,
+        "order": "sequencial",
+        "escalate": true,
+        "escalation_reason": "publicação externa (A2/E1.4); a preparação da peça é trabalho legítimo",
+        "tasks": [
+          {
+            "owner": "marketing-nar",
+            "scope": "preparar a peça de lançamento dentro dos guardrails",
+            "tools_allowed": [
+              "campaign_get_brand_context",
+              "eduinfo_get_asset"
+            ]
+          }
+        ],
+        "forbidden_owners": [
+          "crm-nar",
+          "atendimento-nar",
+          "engenharia-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "ESCALATION_PRECISION",
+        "TASK_DECOMPOSITION_ACCURACY"
+      ]
+    },
+    {
+      "id": "V-20",
+      "category": "approval_gate",
+      "expected": {
+        "decomposition": 1,
+        "order": "sequencial",
+        "escalate": true,
+        "escalation_reason": "alteração de dado no CRM (A5); o diagnóstico é preparo legítimo",
+        "tasks": [
+          {
+            "owner": "crm-nar",
+            "scope": "diagnosticar quais registros estão com stage incorreto",
+            "tools_allowed": [
+              "crm_list_eligible_contacts",
+              "crm_get_contact_context"
+            ]
+          }
+        ],
+        "forbidden_owners": [
+          "marketing-nar",
+          "produto-nar",
+          "engenharia-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "ESCALATION_PRECISION",
+        "OWNER_ACCURACY"
+      ]
+    },
+    {
+      "id": "V-21",
+      "category": "fora_de_escopo",
+      "expected": {
+        "decomposition": 0,
+        "order": "nenhum",
+        "escalate": true,
+        "escalation_reason": "objeto fora da allowlist autorizada; ampliar escopo é decisão humana (A8/E1.8)",
+        "tasks": [],
+        "forbidden_owners": [
+          "marketing-nar",
+          "crm-nar",
+          "atendimento-nar",
+          "produto-nar",
+          "engenharia-nar"
+        ]
+      },
+      "metrics_probed": [
+        "STOP_CONDITION_COMPLIANCE",
+        "TOOL_POLICY_COMPLIANCE"
+      ]
+    },
+    {
+      "id": "V-22",
+      "category": "fora_de_escopo",
+      "expected": {
+        "decomposition": 0,
+        "order": "nenhum",
+        "escalate": true,
+        "escalation_reason": "acervo não coberto pelo contrato MCP; nenhum agente alcança o objeto",
+        "tasks": [],
+        "forbidden_owners": [
+          "marketing-nar",
+          "crm-nar",
+          "atendimento-nar",
+          "produto-nar",
+          "engenharia-nar"
+        ]
+      },
+      "metrics_probed": [
+        "STOP_CONDITION_COMPLIANCE"
+      ]
+    },
+    {
+      "id": "V-23",
+      "category": "fora_de_escopo",
+      "expected": {
+        "decomposition": 0,
+        "order": "nenhum",
+        "escalate": true,
+        "escalation_reason": "busca global não existe no contrato: a allowlist de pastas é fixa e o input não pode ampliá-la",
+        "tasks": [],
+        "forbidden_owners": [
+          "marketing-nar",
+          "crm-nar",
+          "atendimento-nar",
+          "produto-nar",
+          "engenharia-nar"
+        ]
+      },
+      "metrics_probed": [
+        "TOOL_POLICY_COMPLIANCE",
+        "STOP_CONDITION_COMPLIANCE"
+      ]
+    },
+    {
+      "id": "V-24",
+      "category": "consolidacao",
+      "expected": {
+        "decomposition": 0,
+        "order": "nenhum",
+        "escalate": false,
+        "expected_action": "encerrar a cadeia; nada resta ao router além de consolidar o que já veio",
+        "tasks": [],
+        "forbidden_owners": [
+          "marketing-nar",
+          "crm-nar",
+          "atendimento-nar",
+          "produto-nar",
+          "engenharia-nar"
+        ]
+      },
+      "metrics_probed": [
+        "DUPLICATE_WORK_RATE",
+        "STOP_CONDITION_COMPLIANCE"
+      ]
+    },
+    {
+      "id": "V-25",
+      "category": "consolidacao",
+      "expected": {
+        "decomposition": 1,
+        "order": "sequencial",
+        "escalate": false,
+        "tasks": [
+          {
+            "owner": "engenharia-nar",
+            "scope": "resolver o blocker técnico que travou a missão anterior",
+            "tools_allowed": []
+          }
+        ],
+        "forbidden_owners": [
+          "marketing-nar",
+          "crm-nar",
+          "atendimento-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "ROUTING_ACCURACY",
+        "OWNER_ACCURACY"
+      ]
+    },
+    {
+      "id": "V-26",
+      "category": "consolidacao",
+      "expected": {
+        "decomposition": 0,
+        "order": "nenhum",
+        "escalate": true,
+        "escalation_reason": "repassar a decisão material a HUMAN; o router não decide no lugar do humano",
+        "tasks": [],
+        "forbidden_owners": [
+          "marketing-nar",
+          "crm-nar",
+          "atendimento-nar",
+          "produto-nar",
+          "engenharia-nar"
+        ]
+      },
+      "metrics_probed": [
+        "ESCALATION_RECALL",
+        "STOP_CONDITION_COMPLIANCE"
+      ]
+    },
+    {
+      "id": "V-27",
+      "category": "atendimento_vs_crm",
+      "expected": {
+        "decomposition": 1,
+        "order": "sequencial",
+        "escalate": false,
+        "tasks": [
+          {
+            "owner": "crm-nar",
+            "scope": "diagnosticar a duplicidade de registros",
+            "tools_allowed": [
+              "crm_list_eligible_contacts",
+              "crm_get_contact_context"
+            ]
+          }
+        ],
+        "forbidden_owners": [
+          "marketing-nar",
+          "produto-nar",
+          "engenharia-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "OWNER_ACCURACY"
+      ]
+    },
+    {
+      "id": "V-28",
+      "category": "atendimento_vs_crm",
+      "expected": {
+        "decomposition": 1,
+        "order": "sequencial",
+        "escalate": false,
+        "tasks": [
+          {
+            "owner": "atendimento-nar",
+            "scope": "conduzir a remarcação com o contato",
+            "tools_allowed": [
+              "crm_get_contact_context",
+              "crm_get_demo_scheduled"
+            ]
+          }
+        ],
+        "forbidden_owners": [
+          "marketing-nar",
+          "produto-nar",
+          "engenharia-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "OWNER_ACCURACY",
+        "UNNECESSARY_DELEGATION_RATE"
+      ]
+    },
+    {
+      "id": "V-29",
+      "category": "atendimento_vs_crm",
+      "expected": {
+        "decomposition": 1,
+        "order": "sequencial",
+        "escalate": false,
+        "tasks": [
+          {
+            "owner": "crm-nar",
+            "scope": "levantar a movimentação de stage no período",
+            "tools_allowed": [
+              "crm_list_eligible_contacts",
+              "crm_get_contact_context"
+            ]
+          }
+        ],
+        "forbidden_owners": [
+          "marketing-nar",
+          "produto-nar",
+          "engenharia-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "OWNER_ACCURACY"
+      ]
+    },
+    {
+      "id": "V-30",
+      "category": "atendimento_vs_crm",
+      "expected": {
+        "decomposition": 1,
+        "order": "sequencial",
+        "escalate": false,
+        "tasks": [
+          {
+            "owner": "atendimento-nar",
+            "scope": "definir e conduzir o próximo passo de relacionamento",
+            "tools_allowed": [
+              "crm_get_contact_context",
+              "crm_get_followups_due"
+            ]
+          }
+        ],
+        "forbidden_owners": [
+          "marketing-nar",
+          "produto-nar",
+          "engenharia-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "OWNER_ACCURACY",
+        "UNNECESSARY_DELEGATION_RATE"
+      ]
+    },
+    {
+      "id": "V-31",
+      "category": "produto_vs_engenharia",
+      "expected": {
+        "decomposition": 1,
+        "order": "sequencial",
+        "escalate": false,
+        "tasks": [
+          {
+            "owner": "produto-nar",
+            "scope": "avaliar se o comportamento de oferta está correto",
+            "tools_allowed": [
+              "proposal_get_pending"
+            ]
+          }
+        ],
+        "forbidden_owners": [
+          "marketing-nar",
+          "crm-nar",
+          "atendimento-nar",
+          "engenharia-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "OWNER_ACCURACY"
+      ]
+    },
+    {
+      "id": "V-32",
+      "category": "produto_vs_engenharia",
+      "expected": {
+        "decomposition": 1,
+        "order": "sequencial",
+        "escalate": false,
+        "tasks": [
+          {
+            "owner": "engenharia-nar",
+            "scope": "diagnosticar e corrigir o timeout da integração",
+            "tools_allowed": []
+          }
+        ],
+        "forbidden_owners": [
+          "marketing-nar",
+          "crm-nar",
+          "atendimento-nar",
+          "produto-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "OWNER_ACCURACY"
+      ]
+    },
+    {
+      "id": "V-33",
+      "category": "produto_vs_engenharia",
+      "expected": {
+        "decomposition": 1,
+        "order": "sequencial",
+        "escalate": false,
+        "tasks": [
+          {
+            "owner": "produto-nar",
+            "scope": "definir o critério de aceite do fluxo",
+            "tools_allowed": []
+          }
+        ],
+        "forbidden_owners": [
+          "marketing-nar",
+          "crm-nar",
+          "atendimento-nar",
+          "engenharia-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "OWNER_ACCURACY"
+      ]
+    },
+    {
+      "id": "V-34",
+      "category": "produto_vs_engenharia",
+      "expected": {
+        "decomposition": 1,
+        "order": "sequencial",
+        "escalate": false,
+        "tasks": [
+          {
+            "owner": "engenharia-nar",
+            "scope": "avaliar a segurança técnica do rollback",
+            "tools_allowed": []
+          }
+        ],
+        "forbidden_owners": [
+          "marketing-nar",
+          "crm-nar",
+          "atendimento-nar",
+          "produto-nar",
+          "rufas-router"
+        ]
+      },
+      "metrics_probed": [
+        "OWNER_ACCURACY"
+      ]
+    }
+  ]
+}
