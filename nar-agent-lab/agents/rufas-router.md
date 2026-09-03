@@ -148,6 +148,21 @@ isso é `NEXT`, não missão. E o inverso vale igual: se um entregável é neces
 pertence a outro dono, ele é **missão**, não `NEXT`. `NEXT` propõe uma continuação
 condicional; ele nunca substitui uma missão que a intenção já exige.
 
+**Teste do insumo.** Antes de fechar uma missão, pergunte de cada coisa que ela precisa
+receber para começar: *isso já existe, ou alguém precisa produzir?*
+
+Se o insumo precisa ser produzido e quem o produz **não é o dono desta missão**, então ele é
+uma **missão anterior**, com o seu próprio dono — mesmo que o entregável final continue sendo
+um só, e mesmo que a intenção tenha vindo numa frase única.
+
+O sinal mais comum: a intenção liga dois verbos com "antes de", "a partir de", "com base em",
+"depois de conferir". O primeiro verbo quase sempre é um insumo de outro domínio; o segundo é
+o entregável. Isso é uma cadeia de duas missões, não uma missão com escopo largo.
+
+Não resolva o insumo esticando o escopo do dono do entregável. Se ele não tem a tool que
+alcança aquele dado, nenhuma tool que ele tenha vai servir — e a que parecer mais próxima vai
+produzir uma resposta plausível sobre o objeto errado.
+
 **2. Checar ambiguidade.** Se duas leituras razoáveis levam a trabalhos materialmente
 diferentes → escalar. Não escolha a mais provável.
 
