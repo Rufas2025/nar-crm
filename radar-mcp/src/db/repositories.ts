@@ -50,6 +50,22 @@ function unwrap<T>(result: { data: T | null; error: unknown }, context: string):
   return result.data;
 }
 
+interface Cursor { created_at: string; id: string }
+
+function encodeCursor(c: Cursor): string {
+  return Buffer.from(JSON.stringify(c), 'utf8').toString('base64url');
+}
+
+function decodeCursor(raw: string): Cursor | null {
+  try {
+    const parsed = JSON.parse(Buffer.from(raw, 'base64url').toString('utf8'));
+    if (typeof parsed?.created_at === 'string' && typeof parsed?.id === 'string') return parsed;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export interface MatchOutcome<T> {
   record: T | null;
   matchedBy: DedupeKey | null;
@@ -256,6 +272,19 @@ export class RadarRepository {
     return unwrap(res, 'createAssessment') as ConstructionAssessment;
   }
 
+  /** Todas as avaliações dos sinais, mais recentes primeiro. */
+  async assessmentsForSignals(signalIds: string[]): Promise<ConstructionAssessment[]> {
+    if (signalIds.length === 0) return [];
+    const { data, error } = await this.db
+      .from('radar_construction_assessments')
+      .select('*')
+      .eq('user_id', this.userId)
+      .in('signal_id', signalIds)
+      .order('created_at', { ascending: false });
+    if (error) throw new RepositoryError(`assessmentsForSignals: ${error.message}`, error);
+    return (data as ConstructionAssessment[]) ?? [];
+  }
+
   async latestAssessmentForSignals(signalIds: string[]): Promise<ConstructionAssessment | null> {
     if (signalIds.length === 0) return null;
     const { data, error } = await this.db
@@ -369,23 +398,45 @@ export class RadarRepository {
     return (data as Opportunity) ?? null;
   }
 
+  /**
+   * Paginação keyset (created_at, id) — não offset: estável sob inserção
+   * concorrente e sem custo crescente por página.
+   */
   async listOpportunities(opts: {
     status?: OpportunityStatus;
     minScore?: number;
+    createdAfter?: string;
     limit?: number;
-  }): Promise<Opportunity[]> {
+    cursor?: string;
+  }): Promise<{ items: Opportunity[]; nextCursor: string | null }> {
+    const limit = Math.min(opts.limit ?? 25, 100);
     let query = this.db
       .from('radar_opportunities')
       .select('*')
       .eq('user_id', this.userId)
-      .order('score', { ascending: false, nullsFirst: false })
-      .limit(Math.min(opts.limit ?? 25, 100));
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .limit(limit + 1);
+
     if (opts.status) query = query.eq('status', opts.status);
     if (typeof opts.minScore === 'number') query = query.gte('score', opts.minScore);
+    if (opts.createdAfter) query = query.gte('created_at', opts.createdAfter);
+    if (opts.cursor) {
+      const decoded = decodeCursor(opts.cursor);
+      if (decoded) query = query.lt('created_at', decoded.created_at);
+    }
 
     const { data, error } = await query;
     if (error) throw new RepositoryError(`listOpportunities: ${error.message}`, error);
-    return (data as Opportunity[]) ?? [];
+
+    const rows = (data as Opportunity[]) ?? [];
+    const hasMore = rows.length > limit;
+    const items = hasMore ? rows.slice(0, limit) : rows;
+    const last = items[items.length - 1];
+    return {
+      items,
+      nextCursor: hasMore && last ? encodeCursor({ created_at: last.created_at, id: last.id }) : null,
+    };
   }
 
   async signalsForInstitution(institutionId: string): Promise<Signal[]> {
@@ -456,6 +507,17 @@ export class RadarRepository {
       .select('id, status')
       .single();
     return unwrap(res, 'createOutreachDraft') as { id: string; status: string };
+  }
+
+  async listOutreach(opportunityId: string) {
+    const { data, error } = await this.db
+      .from('radar_outreach')
+      .select('*')
+      .eq('user_id', this.userId)
+      .eq('opportunity_id', opportunityId)
+      .order('created_at', { ascending: false });
+    if (error) throw new RepositoryError(`listOutreach: ${error.message}`, error);
+    return data ?? [];
   }
 
   // ------------------------------------------------------------------- jobs

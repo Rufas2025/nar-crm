@@ -47,7 +47,16 @@ async function startHttp(): Promise<void> {
 
     // Stateless: uma instância de servidor e transporte por requisição.
     const token = extractBearer(req.headers.authorization);
-    const server = buildServer({ config, token });
+    const server = buildServer({
+      config,
+      token,
+      // Log mínimo e seguro: nome, duração, status. Nunca token/header/PII.
+      observe: (e) =>
+        log(
+          'info',
+          `tool=${e.tool_name} status=${e.result_status} duration_ms=${e.duration_ms} request_id=${e.request_id}${e.error_code ? ` error_code=${e.error_code}` : ''}`,
+        ),
+    });
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
       enableJsonResponse: true,

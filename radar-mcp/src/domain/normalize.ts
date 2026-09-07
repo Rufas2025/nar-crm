@@ -119,3 +119,26 @@ export function normalizeCity(city: string | null | undefined): string | null {
   const out = foldText(city).replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
   return out || null;
 }
+
+/**
+ * Valida uma URL de PROVENIÊNCIA (source_url).
+ *
+ * Mais estrito que normalizeUrl de propósito: normalizeUrl aceita "nao-e-url"
+ * porque prefixa https:// automaticamente, o que é aceitável para tolerância de
+ * entrada mas NÃO para atestar a origem de um dado factual. Aqui exigimos
+ * esquema http/https explícito e um host com TLD plausível.
+ */
+export function isValidSourceUrl(input: string | null | undefined): boolean {
+  if (!input) return false;
+  const raw = input.trim();
+  if (!/^https?:\/\//i.test(raw)) return false;
+  try {
+    const { hostname, protocol } = new URL(raw);
+    if (protocol !== 'http:' && protocol !== 'https:') return false;
+    if (hostname === 'localhost') return true;
+    // Exige ao menos um ponto e um TLD alfabético de 2+ caracteres.
+    return /^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/i.test(hostname);
+  } catch {
+    return false;
+  }
+}

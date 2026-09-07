@@ -8,7 +8,8 @@
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { isSupabaseConfigured, type RadarConfig } from './config.js';
-import { getUserContext, type UserContext } from './db/client.js';
+import { buildAuthContext, type AuthContext } from './auth.js';
+import { getUserContext } from './db/client.js';
 import { RadarRepository } from './db/repositories.js';
 import { registerRadarTools } from './tools/index.js';
 
@@ -19,6 +20,14 @@ export interface BuildServerOptions {
   config: RadarConfig;
   /** Token do chamador (Bearer). Null em stdio sem auth configurada. */
   token: string | null;
+  /** Log estruturado; nunca recebe token, header ou dado pessoal. */
+  observe?: (event: {
+    tool_name: string;
+    duration_ms: number;
+    result_status: 'ok' | 'error';
+    request_id: string;
+    error_code?: string;
+  }) => void;
 }
 
 /**
@@ -26,7 +35,7 @@ export interface BuildServerOptions {
  * O contexto de usuário é resolvido preguiçosamente: tools read-only como
  * radar_get_capabilities funcionam sem JWT.
  */
-export function buildServer({ config, token }: BuildServerOptions): McpServer {
+export function buildServer({ config, token, observe }: BuildServerOptions): McpServer {
   const server = new McpServer(
     { name: SERVER_NAME, version: SERVER_VERSION },
     {
@@ -39,13 +48,20 @@ export function buildServer({ config, token }: BuildServerOptions): McpServer {
     },
   );
 
-  let cached: UserContext | null = null;
+  // AuthContext é produzido AQUI, pela camada de auth — nunca dentro da tool.
+  // A tool recebe um repositório já vinculado ao user_id confiável.
+  let session: { auth: AuthContext; client: import('@supabase/supabase-js').SupabaseClient } | null = null;
 
   registerRadarTools(server, {
     supabaseConfigured: isSupabaseConfigured(config),
+    observe,
     async getRepository() {
-      if (!cached) cached = await getUserContext(config, token);
-      return new RadarRepository(cached.client, cached.userId);
+      if (!session) {
+        const ctx = await getUserContext(config, token);
+        session = { auth: buildAuthContext(ctx.userId, 'supabase_jwt'), client: ctx.client };
+      }
+      // user_id vem EXCLUSIVAMENTE do AuthContext.
+      return new RadarRepository(session.client, session.auth.user_id);
     },
   });
 
