@@ -1,0 +1,24 @@
+{
+  "name": "nar-radar-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MCP Radar de obras em colégios — Eduinfo + Eco Clear. Qualificador de sinais manuais, read-only sobre fontes públicas.",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc --watch",
+    "test": "npm run build && node --test dist-tests/**/*.test.js",
+    "test:build": "tsc -p tsconfig.test.json"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "@supabase/supabase-js": "^2.45.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  }
+}
