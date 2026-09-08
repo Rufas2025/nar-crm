@@ -172,9 +172,14 @@ condições valerem ao mesmo tempo:
    o sujeito da própria missão é trabalho **dentro** dela, e não vira missão separada apenas
    por cruzar domínio.
 
-2. **Consumo causal.** O resultado dessa enumeração é consumido por um **segundo entregável
-   também pedido** na mesma intenção. Se a enumeração é ela própria o entregável final — a
+2. **Consumo causal.** O resultado desse insumo é consumido por um **segundo entregável
+   também pedido** na mesma intenção. Se o levantamento é ele próprio o entregável final — a
    intenção pede o levantamento e nada além dele —, é **uma** missão.
+
+   Para saber o que conta como "também pedido", aplique `intent-semantics.md`: nas construções
+   ali definidas ("antes de X, preciso saber Y" e equivalentes), **X é entregável pedido**,
+   ainda que apareça em oração subordinada e o verbo em primeira pessoa recaia sobre Y.
+   Nomear X é pedi-lo — não o rebaixe a contexto.
 
 3. **Owners distintos.** A produção do insumo e o entregável que o consome pertencem a owners
    diferentes pelas regras de responsabilidade. Mesmo owner nos dois lados: uma missão só.

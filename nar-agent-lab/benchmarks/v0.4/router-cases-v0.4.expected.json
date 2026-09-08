@@ -456,7 +456,7 @@
         "escalate": false,
         "tasks": [
           {
-            "owner": "produto-nar",
+            "owner": "marketing-nar",
             "scope": "obter o guardrail de marca vigente",
             "tools_allowed": [
               "campaign_get_brand_context"
@@ -469,11 +469,12 @@
           }
         ],
         "forbidden_owners": [
-          "marketing-nar",
           "atendimento-nar",
           "crm-nar",
-          "rufas-router"
-        ]
+          "rufas-router",
+          "produto-nar"
+        ],
+        "note": "Owner do guardrail alinhado ao OWNER canonico de campaign_get_brand_context no registry (marketing-nar). produto-nar e consumidor permitido da tool, nao dono do insumo."
       }
     },
     {
@@ -839,26 +840,20 @@
       "source": "new",
       "category": "atendimento_vs_crm",
       "expected": {
-        "decomposition": 1,
-        "order": "sequencial",
-        "escalate": false,
-        "tasks": [
-          {
-            "owner": "crm-nar",
-            "scope": "mapear o avanço de fase das escolas no funil no período recente",
-            "tools_allowed": [
-              "crm_list_eligible_contacts",
-              "crm_get_contact_context"
-            ]
-          }
-        ],
+        "decomposition": 0,
+        "order": "nenhum",
+        "escalate": true,
+        "escalation_reason": "capability ausente: nenhuma tool observa transicao de stage ao longo do tempo; crm_get_contact_context expoe stage como valor unico do estado atual e history como interacoes datadas, nao mudancas de fase (E1.8)",
+        "tasks": [],
         "forbidden_owners": [
           "marketing-nar",
           "atendimento-nar",
+          "crm-nar",
           "produto-nar",
           "engenharia-nar",
           "rufas-router"
-        ]
+        ],
+        "note": "Alinhado ao registry v0.2: NOT_OBSERVED_BY_ANY_TOOL declara que serie historica de stage nao existe no contrato. O gabarito anterior pedia uma inferencia que o OUTPUT_SCHEMA nao sustenta."
       }
     },
     {
@@ -965,10 +960,7 @@
           {
             "owner": "produto-nar",
             "scope": "avaliar se a política de carência de 5 dias ainda faz sentido",
-            "tools_allowed": [
-              "proposal_get_pending",
-              "campaign_get_brand_context"
-            ]
+            "tools_allowed": []
           }
         ],
         "forbidden_owners": [
@@ -978,7 +970,7 @@
           "engenharia-nar",
           "rufas-router"
         ],
-        "note": "Trabalho ordinário: pergunta de avaliação de política, não concessão de carência a um cliente específico."
+        "note": "O fato necessario (carencia de 5 dias) esta no proprio enunciado; a missao restante e avaliacao por expertise. As tools antes nomeadas (proposal_get_pending, campaign_get_brand_context) nao observam politica de inadimplencia — ver OBSERVES no registry v0.2."
       }
     },
     {

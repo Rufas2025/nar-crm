@@ -13,6 +13,8 @@ handoff está mal formado.
 
 ```
 STATUS:      PASS | PARTIAL | BLOCKED | ESCALATE
+TASK_ID:     <id da missão que produziu este handoff>
+OWNER:       <agent_id que executou a missão>
 SUMMARY:     <máximo 3 frases>
 OUTPUT:      <estrutura definida em EXPECTED_OUTPUT da missão>
 ASSUMPTIONS: <apenas quando necessário>
@@ -21,9 +23,30 @@ NEXT_OWNER:  <agent_id | HUMAN | nenhum>
 EVIDENCE:    <quando aplicável>
 ```
 
-`STATUS`, `SUMMARY`, `OUTPUT` e `NEXT_OWNER` são sempre obrigatórios.
+`STATUS`, `TASK_ID`, `OWNER`, `SUMMARY`, `OUTPUT` e `NEXT_OWNER` são sempre obrigatórios.
 `ASSUMPTIONS`, `BLOCKERS` e `EVIDENCE` são condicionais — ausentes quando não se aplicam,
-nunca preenchidos com texto vazio de conteúdo.
+nunca preenchidos com texto vazio de conteúdo. `BLOCKERS` passa a ser obrigatório quando
+`STATUS` é `BLOCKED` ou `PARTIAL`.
+
+---
+
+## Payload mínimo entregue ao router
+
+Uma intenção que se refere a uma execução anterior ("a missão anterior travou", "o handoff
+que voltou", "retoma o que faltou") **não é auto-suficiente**: o router não tem memória da
+execução passada e não pode reconstruí-la por inferência. Nesses casos o payload real do
+handoff é entregue junto da intenção, com os seis campos obrigatórios acima mais `BLOCKERS`
+quando aplicável.
+
+O router lê esse payload como **fato disponível no contexto** — é ele que responde "qual
+missão", "que erro", "quem executava" e "o que ficou por fazer". Sem o payload, essas
+perguntas não têm resposta no enunciado e a intenção é genuinamente indecidível; com ele,
+a decisão de rotear ou escalar passa a depender só das regras normais.
+
+O payload descreve o que **já aconteceu**. Ele nunca prescreve o que o router deve decidir:
+`NEXT_OWNER` continua sendo uma proposta do agente anterior (ver abaixo), e o router pode
+divergir dela. Um payload que nomeasse a decisão do router deixaria de ser handoff e viraria
+instrução.
 
 ---
 

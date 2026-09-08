@@ -24,7 +24,9 @@ const INTENTS = 'benchmarks/v0.4/router-cases-v0.4.intents.json';
 const EXPECTED = 'benchmarks/v0.4/router-cases-v0.4.expected.json'; // só para --check
 
 const intents = J(INTENTS);
-const registry = J('capabilities/capability-registry.json');
+// nar-ops-mcp@0.2.0: acrescenta OBSERVES por tool e a declaração de mundo fechado. A 0.1.0
+// (capability-registry.json) permanece congelada e não é lida por este builder.
+const registry = J('capabilities/capability-registry-v0.2.json');
 const schema = R('runner/output-schema.json');
 const OUT = path.join(__dirname, 'prompts-v04');
 
@@ -33,12 +35,50 @@ const toolTable = registry.agents
   .map(a => `| \`${a.id}\` | ${a.allowed_tools.map(t => '`' + t + '`').join(', ') || '**nenhuma**'} |`)
   .join('\n');
 
+// Domínio observacional: o que cada tool efetivamente observa. Sem isto o router só vê nomes
+// de tool e é forçado a inferir capability gap por semelhança lexical.
+const bullets = a => (a || []).map(x => `  - ${x}`).join('\n');
+const observesBlock = registry.capabilities.map(c => {
+  const o = c.OBSERVES;
+  return [
+    `#### \`${c.TOOL_NAME}\``,
+    ``,
+    `- **entidade:** ${o.entity} · **temporalidade:** ${o.temporality}`,
+    `- **observa:**`,
+    bullets(o.facts),
+    `- **não observa:**`,
+    bullets(o.not_observed),
+    o.observable_by_use ? `- **observável ao exercitar a tool:**\n${bullets(o.observable_by_use)}` : null,
+  ].filter(Boolean).join('\n');
+}).join('\n\n');
+
+const closedWorld = bullets(registry.NOT_OBSERVED_BY_ANY_TOOL);
+const undetermined = (registry.UNDETERMINED_BY_CONTRACT || [])
+  .map(u => `  - ${u.question}\n    ${u.why}`).join('\n');
+
 // Casos de consolidação continuam recebendo o handoff-contract, como no v0.2.
 const CONSOLIDATION_CATEGORY = 'consolidacao';
 function contractsFor(c) {
-  const l = ['contracts/task-contract.md', 'contracts/escalation-policy.md', 'contracts/approval-policy.md'];
+  const l = [
+    'contracts/task-contract.md',
+    'contracts/escalation-policy.md',
+    'contracts/approval-policy.md',
+    'contracts/intent-semantics.md',
+  ];
   if (c.category === CONSOLIDATION_CATEGORY) l.push('contracts/handoff-contract.md');
   return l;
+}
+
+// Payload real de handoff, entregue junto da intenção quando o caso depende de uma execução
+// anterior (handoff-contract.md, "Payload mínimo entregue ao router"). É INPUT, não gabarito:
+// descreve o que já aconteceu e nunca nomeia a decisão que o router deve tomar.
+const HANDOFF_FIELDS = ['STATUS', 'TASK_ID', 'OWNER', 'SUMMARY', 'OUTPUT', 'BLOCKERS', 'NEXT_OWNER'];
+function handoffBlock(c) {
+  if (!c.prior_handoff) return '';
+  const h = c.prior_handoff;
+  const body = HANDOFF_FIELDS.filter(k => h[k] !== undefined)
+    .map(k => `${(k + ':').padEnd(13)}${h[k]}`).join('\n');
+  return `\n\n## Handoff recebido da execução anterior\n\n\`\`\`\n${body}\n\`\`\`\n`;
 }
 
 function buildPrompt(c) {
@@ -62,12 +102,33 @@ ${contracts}
 
 ---
 
-## Tools por agente (capability registry ${registry.registry_version}, congelado)
+## Tools por agente (capability registry ${registry.registry_version})
 
 | Agente | Tools autorizadas |
 |---|---|
 ${toolTable}
 | \`rufas-router\` | **nenhuma** |
+
+### Domínio observacional de cada tool
+
+O que decide se uma missão é possível não é o nome da tool, é o que ela observa. Use este
+bloco — não a semelhança entre o substantivo do pedido e o nome da tool.
+
+${observesBlock}
+
+### Não observado por nenhuma tool
+
+Declaração de mundo fechado: nada no contrato ${registry.describes_contract} observa os itens
+abaixo. Uma intenção que dependa de um deles é capability gap genuíno.
+
+${closedWorld}
+
+### Indeterminado pelo contrato
+
+O contrato não afirma nem nega os pontos abaixo. Não os trate como gap confirmado nem como
+capability disponível:
+
+${undetermined}
 
 ---
 
@@ -93,7 +154,7 @@ Regras do formato:
 Caso \`${c.id}\`:
 
 > ${c.intent}
-
+${handoffBlock(c)}
 Produza agora o JSON.`;
 }
 
@@ -122,10 +183,61 @@ if (process.argv.includes('--check')) {
     if (!txt.includes(c.intent)) flag(`${c.id}: intenção ausente do prompt`);
   }
 
-  // 2. ancoragem: nenhuma intenção v0.4 pode estar no spec do router
+  // 2. ancoragem: nenhuma intenção v0.4 pode estar no spec do router nem em contrato nenhum.
+  // Contratos entram aqui porque o intent-semantics.md descreve a MESMA construção linguística
+  // que vários casos usam — precisa descrevê-la genericamente, nunca citar um caso.
+  const anchorSources = [['rufas-router.md', routerSpec]];
+  for (const f of fs.readdirSync(path.join(LAB, 'contracts')).filter(f => f.endsWith('.md')))
+    anchorSources.push([f, R('contracts/' + f)]);
+  const norm6 = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9 ]/g, ' ').split(/\s+/).filter(Boolean);
   for (const c of intents.cases) {
-    if (routerSpec.includes(c.intent) || (c.intent.length > 25 && routerSpec.includes(c.intent.slice(0, 25))))
-      flag(`${c.id}: intenção ancorada no rufas-router.md`);
+    const w = norm6(c.intent);
+    for (const [name, txt] of anchorSources) {
+      if (txt.includes(c.intent)) { flag(`${c.id}: intenção literal em ${name}`); continue; }
+      const hay = norm6(txt).join(' ');
+      for (let i = 0; i + 6 <= w.length; i++) {
+        if (hay.includes(w.slice(i, i + 6).join(' '))) {
+          flag(`${c.id}: eco de 6 palavras da intenção em ${name}: "${w.slice(i, i + 6).join(' ')}"`);
+          break;
+        }
+      }
+    }
+  }
+
+  // 2b. domínio observacional precisa CHEGAR ao prompt (senão o registry v0.2 é inerte)
+  for (const c of intents.cases) {
+    const p = path.join(OUT, `${c.id}.md`);
+    if (!fs.existsSync(p)) continue;
+    const txt = fs.readFileSync(p, 'utf8');
+    if (!txt.includes('Domínio observacional de cada tool')) flag(`${c.id}: bloco OBSERVES ausente do prompt`);
+    if (!txt.includes('Não observado por nenhuma tool')) flag(`${c.id}: declaração de mundo fechado ausente do prompt`);
+    for (const cap of registry.capabilities)
+      if (!txt.includes(cap.OBSERVES.entity)) flag(`${c.id}: entidade observada de ${cap.TOOL_NAME} ausente do prompt`);
+    if (!txt.includes('Intent Semantics Contract')) flag(`${c.id}: contrato de semântica de intenção ausente do prompt`);
+  }
+
+  // 2c. handoff real: presente quando o caso declara prior_handoff, e sem vazar gabarito.
+  // O payload descreve o que já aconteceu; se nomear o owner esperado, deixa de ser input e
+  // vira resposta.
+  for (const c of intents.cases) {
+    const p = path.join(OUT, `${c.id}.md`);
+    if (!fs.existsSync(p)) continue;
+    const txt = fs.readFileSync(p, 'utf8');
+    const e = exp.cases.find(x => x.id === c.id).expected;
+    if (!c.prior_handoff) {
+      if (txt.includes('Handoff recebido da execução anterior')) flag(`${c.id}: handoff injetado sem prior_handoff declarado`);
+      continue;
+    }
+    if (!txt.includes('Handoff recebido da execução anterior')) flag(`${c.id}: prior_handoff declarado mas ausente do prompt`);
+    for (const k of ['STATUS', 'TASK_ID', 'OWNER', 'SUMMARY', 'OUTPUT', 'NEXT_OWNER'])
+      if (c.prior_handoff[k] === undefined) flag(`${c.id}: handoff sem campo obrigatório ${k}`);
+    if (['BLOCKED', 'PARTIAL'].includes(c.prior_handoff.STATUS) && !c.prior_handoff.BLOCKERS)
+      flag(`${c.id}: handoff ${c.prior_handoff.STATUS} sem BLOCKERS`);
+    const payload = JSON.stringify(c.prior_handoff);
+    for (const t of (e.tasks || []))
+      if (payload.includes(t.owner)) flag(`${c.id}: handoff vaza o owner esperado (${t.owner})`);
+    if (e.escalate && payload.includes('HUMAN')) flag(`${c.id}: handoff vaza a escalação esperada`);
   }
 
   // 3. originalidade contra v0.1, v0.2 e v0.3 INTEIROS (todos os 44 casos são "new" no

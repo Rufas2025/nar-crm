@@ -123,7 +123,16 @@
     {
       "id": "X-25",
       "category": "consolidacao",
-      "intent": "A missão anterior travou por um erro técnico; retoma o que faltou."
+      "intent": "A missão anterior travou por um erro técnico; retoma o que faltou.",
+      "prior_handoff": {
+        "STATUS": "BLOCKED",
+        "TASK_ID": "T-20260907-003",
+        "OWNER": "marketing-nar",
+        "SUMMARY": "O inventario dos assets da campanha de matricula parou na metade. A tool de acervo passou a retornar erro ao abrir a pasta institucional e o erro se repetiu em nova tentativa. Nenhuma alternativa foi tentada.",
+        "OUTPUT": "{ assets_inventariados: 4, assets_pendentes: 9 }",
+        "BLOCKERS": "- eduinfo_get_asset retornou MCP_TOOL_ERROR ao abrir o Folder_ID institucional autorizado; o erro se repete e impede concluir o inventario dos 9 assets restantes. Desbloqueio depende de resolver a falha da tool, nao de nova tentativa.",
+        "NEXT_OWNER": "rufas-router"
+      }
     },
     {
       "id": "X-26",
