@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Capability gap genuíno (E1.8 / CAPABILITY_GAPS): a intenção depende do histórico de deploys do módulo de matrícula, e 'histórico de deploy, versões publicadas ou rollback aplicado' está explicitamente listado como não observado por nenhuma tool do contrato nar-ops-mcp@0.2.0. Nenhuma tool de nenhum agente (eduinfo_*, crm_*, proposal_get_pending, campaign_*) tem domínio observacional sobre deploys de sistema. Além disso, a decisão final de reverter a versão é decisão material e irreversível (E1.1/E1.4) que exige aprovação humana. Como o próprio insumo necessário (histórico de deploy) não é observável por nenhuma tool declarada, não há nenhuma missão de levantamento ou preparo executável com as capabilities existentes — o pedido inteiro fica bloqueado na ausência dessa capability. Dono que teria essa capability, se existisse: engenharia-nar (erro de tool/infra é sempre engenharia)."
+}

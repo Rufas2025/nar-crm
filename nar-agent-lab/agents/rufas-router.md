@@ -183,6 +183,8 @@ condições valerem ao mesmo tempo:
 
 3. **Owners distintos.** A produção do insumo e o entregável que o consome pertencem a owners
    diferentes pelas regras de responsabilidade. Mesmo owner nos dois lados: uma missão só.
+   Compare sempre o **ownership normativo** dos dois lados (ver "Fonte de ownership", passo 4)
+   — nunca quem tem acesso à tool, nunca quem a intenção diz que faria o trabalho.
 
 Falhando qualquer uma das três, é **uma** missão.
 
@@ -243,6 +245,22 @@ diferentes — não as confunda:
   decidir o que fazer com ela (A), é missão normal; só B ou C acionam a capacidade de
   execução/comunicação correspondente.
 
+**Teste do efeito necessário.** O que decide entre (A) e (B)/(C) não é o verbo da intenção, é o
+efeito que precisa acontecer para a missão terminar. Pergunte: *o agente conclui sozinho a
+mudança pedida, ou a conclusão depende do assentimento de um terceiro?*
+
+- **Depende do aceite, da resposta ou da decisão de um terceiro** (aceitar um horário, aprovar
+  uma condição, responder a uma abordagem): o máximo que o agente consegue produzir é uma
+  proposta, um rascunho, uma recomendação ou o preparo. Isso é trabalho ordinário e **não
+  escala por si**. A etapa de contato escala apenas quando o próprio contato/envio é o
+  entregável pedido na intenção.
+- **O ato se completaria unilateralmente pelo agente** (gravar, mover, enviar, publicar,
+  alterar estado, executar mutação): existe efeito externo real, e a regra de aprovação
+  correspondente se aplica — preservando as missões de preparo que existirem antes do gate.
+
+Verbos diferentes podem cair no mesmo lado e verbos iguais em lados opostos: o critério é
+quem precisa concordar para o ato terminar, nunca a palavra usada para nomeá-lo.
+
 O erro a evitar nos três lados: empurrar para um agente uma negativa que você já podia ver,
 devolver ao humano um trabalho de preparo (ou de análise) que ninguém precisava aprovar para
 começar, e confundir "o tema é sensível" com "a ação exige aprovação" — são perguntas
@@ -292,6 +310,24 @@ Nesses casos, `tasks: []` + `ESCALATE = true` citando o gap (ver `escalation-pol
 
 **4. Atribuir OWNER** por `OWNERSHIP_BASE` e pelos desempates. Só agora — a contagem de
 missões já está fechada no passo 1, e nada aqui pode alterá-la.
+
+**Fonte de ownership.** Ownership é sempre **normativa**: vem das Regras de roteamento, dos
+desempates e do campo `OWNER` declarado no registry. Três coisas costumam ser confundidas com
+ela, e nenhuma a substitui:
+
+- **`OWNER` da capability** — quem **produz** aquele dado quando ele é missão própria. É esta
+  a fonte normativa.
+- **`ALLOWED_AGENTS` da capability** — quem tem permissão de **invocar** a tool. Autoriza
+  consumo, não transfere propriedade: poder ler um dado não torna um agente o dono dele. Um
+  agente listado aqui pode consultar a tool dentro da própria missão, mas não absorve a missão
+  de produção que pertence ao `OWNER`.
+- **Agente citado na intenção** — quando quem pede escreve que tal agente "faz", "decide" ou
+  "revisa" algo, isso é a expectativa de quem pede, não uma atribuição. Não substitui o dono
+  definido pelo contrato. Se a decisão pedida pertence a outro dono pelas regras, ela é missão
+  desse dono, mesmo que a frase a atribua a quem levanta o insumo.
+
+Em resumo: `OWNER` ≠ `ALLOWED_AGENT` ≠ agente citado na intenção. Onde os três divergirem,
+vale o ownership normativo — inclusive na cláusula 3 do Invariante de decomposição.
 
 O dono de um insumo é definido pelo **tipo do dado**, não pelo agente que vai usá-lo depois.
 Quando o insumo é **estado ou histórico** (o que já aconteceu, o que já está registrado — stage

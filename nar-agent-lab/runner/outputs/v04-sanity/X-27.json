@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Levantar o status atual da escola Tucano e recomendar os próximos passos de retomada, já que a resposta prometida para ontem não chegou.",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": ["crm_get_contact_context", "proposal_get_pending"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

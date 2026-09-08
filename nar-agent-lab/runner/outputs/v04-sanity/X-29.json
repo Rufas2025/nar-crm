@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Levantar o agendamento atual da demo da escola Tucano e o contexto do contato responsável, incluindo o pedido de mudança de horário feito pelo diretor.",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": ["crm_get_demo_scheduled", "crm_get_contact_context"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Remarcar a demo é uma alteração de estado que passaria a valer para a escola Tucano (novo horário comprometido com o diretor) e não existe nenhuma capability de escrita no contrato MCP 0.1.0/0.2.0 para alterar o agendamento da demo ou confirmar o novo horário ao contato. O levantamento do agendamento atual e do contexto do contato é preparo executável agora (missão acima), mas a execução da remarcação em si depende de decisão/ação humana (A5 - alterar dado de contato/stage no CRM, e A1 - comunicar ao contato real)."
+}

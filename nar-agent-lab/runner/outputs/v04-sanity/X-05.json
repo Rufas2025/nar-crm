@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Levantar as propostas pendentes sem resposta e os dados das escolas correspondentes.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["proposal_get_pending"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    },
+    {
+      "TASK_ID": "T-20260908-002",
+      "OBJ": "Produzir rascunho de peça de reativação dirigida às escolas com proposta pendente sem resposta.",
+      "OWNER": "marketing-nar",
+      "TOOLS_ALLOWED": ["campaign_get_brand_context"],
+      "DEPENDENCIES": ["T-20260908-001"],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

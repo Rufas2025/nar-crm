@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Levantar o histórico de campanhas da rede Girassol.",
+      "OWNER": "marketing-nar",
+      "TOOLS_ALLOWED": ["campaign_get_history"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Arquivar o relatório antigo é uma ação de escrita sobre arquivo do Drive (mover/arquivar, regra A6 de approval-policy.md) que exige aprovação humana e, além disso, não existe nenhuma capability de escrita no registry (0 capabilities de escrita, nar-ops-mcp@0.1.0) — capability gap genuíno (E1.8/E2.6). O levantamento do histórico de campanhas (marketing-nar, campaign_get_history) já pode prosseguir como missão de preparo; o arquivamento fica bloqueado aguardando decisão humana."
+}
