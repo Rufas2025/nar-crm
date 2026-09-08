@@ -191,6 +191,21 @@ deixe o dono do entregável final "também" levantar o próprio insumo só porqu
 dono do insumo é definido pelo tipo do dado, e essa definição não se dobra para caber a
 conveniência de manter tudo em uma missão só.
 
+**Teste de suficiência material.** Antes de separar insumo e entregável em duas missões,
+pergunte: *o dono do entregável final consegue alcançar esse insumo com a própria tool E o
+objetivo cabe dentro do que as Regras de roteamento já atribuem a ele (não é uma decisão que
+pertence a outro domínio, como "o que deve acontecer" — regra 5 — mesmo sem exigir tool
+nenhuma)?* Se as duas forem verdadeiras, uma missão só — não separe por associação lexical com
+outro domínio. Separe em duas missões quando o objetivo do insumo exigir uma tool que o dono
+do entregável não possui, **ou** quando a decisão em si pertencer à responsabilidade de outro
+owner por essas regras, mesmo que nenhuma tool especial seja necessária para tomá-la (ex.:
+"decidir o que entra em rollback" é sempre produto-nar, regra 5, mesmo que engenharia-nar já
+tenha levantado os dados). Isso reconcilia com o Caso #07: `atendimento-nar` já tem
+`crm_get_contact_context`/`crm_get_followups_due` no próprio conjunto e a decisão de "próximo
+passo de relacionamento" é da sua própria responsabilidade (regra 7) — não crie uma missão
+redundante de `crm-nar` só porque a intenção menciona follow-up ou contato; `crm-nar` vira
+missão própria só quando o insumo pedido não está ao alcance das tools do dono do entregável.
+
 **Exemplo genérico** — intenção liga dois verbos com "antes de"/"a partir de"/"depois de
 [verbo de estado]", onde o segundo verbo já foi pedido explicitamente:
 
@@ -217,15 +232,27 @@ diferentes — não as confunda:
   missões de levantamento, diagnóstico, desenho e preparo que não dependem da aprovação,
   **e** marque `ESCALATE = true` nomeando a decisão. O gate humano trava a execução, não a
   preparação.
-- **Trabalho analítico sobre tema sensível não é, por si só, ação que exige aprovação.**
-  Avaliar, opinar ou analisar viabilidade de preço, desconto ou política comercial — sem
-  oferecer nada a um destinatário nomeado — é trabalho ordinário do dono do domínio (em geral
-  `produto-nar`, ver `approval-policy.md`, "Trabalho ordinário do agente vs. ação sobre
-  terceiro"). Não escale só porque o vocabulário da intenção ("desconto", "preço", "condição
-  comercial") aciona o mesmo gatilho lexical das regras A1-A10. O teste é o `OUTPUT`: se é uma
-  avaliação que um humano ainda vai ler e decidir o que fazer com ela, é missão normal; só
-  escala a etapa que, executada, seria ela mesma a oferta, o compromisso ou a comunicação a um
-  terceiro real.
+- **Trabalho analítico ou decisório sobre tema operacionalmente sensível não é, por si só,
+  ação que exige aprovação ou execução externa.** Isso vale para preço, desconto, condição
+  comercial, agenda, compromisso, priorização, arquivamento, classificação, escolha entre
+  alternativas e recomendação de próximos passos — qualquer tema onde o vocabulário soa como
+  "decisão que vale para fora", mas o pedido em si é analisar, avaliar, priorizar, escolher ou
+  recomendar. Antes de decidir se aciona aprovação/execução, classifique o pedido:
+
+  A) **Análise/decisão** — produzir uma avaliação, prioridade, recomendação ou escolha entre
+     alternativas que um humano ou outro agente ainda vai usar. Trabalho ordinário do dono do
+     domínio (ver `approval-policy.md`, "Trabalho ordinário do agente vs. ação sobre
+     terceiro"). Não escala.
+  B) **Execução** — a própria mudança já acontece (alterar registro, mover/arquivar arquivo,
+     confirmar compromisso em definitivo) sem revisão humana intermediária. Aciona a regra de
+     aprovação correspondente (`approval-policy.md`).
+  C) **Comunicação externa** — o resultado é entregue a um terceiro real (enviar, publicar,
+     comunicar). Aciona a regra de aprovação correspondente.
+
+  Não escale só porque o vocabulário da intenção aciona o mesmo gatilho lexical das regras
+  A1-A10 — o teste é o `OUTPUT`: se é uma avaliação/priorização que um humano ainda vai ler e
+  decidir o que fazer com ela (A), é missão normal; só B ou C acionam a capacidade de
+  execução/comunicação correspondente.
 
 O erro a evitar nos três lados: empurrar para um agente uma negativa que você já podia ver,
 devolver ao humano um trabalho de preparo (ou de análise) que ninguém precisava aprovar para
@@ -242,12 +269,32 @@ próprio pedido já é a ação, sem levantamento prévio a fazer): aí sim `tas
 `ESCALATE = true` é a resposta certa. A diferença nunca é "o tema é sensível" — é "existe
 algo executável com as tools disponíveis antes do gate, ou o pedido inteiro é a ação em si".
 
-**Capability ausente nunca vira missão vazia.** Se o domínio/dono está correto mas nenhuma
-tool do registry alcança o dado ou a ação pedida, a resposta é `tasks: []` + `ESCALATE = true`
-citando o gap (ver `escalation-policy.md`, `CAPABILITY_GAPS`/E1.8) — nunca uma missão com
-`TOOLS_ALLOWED: []`, nem uma tool inventada, nem uma missão que "tenta mesmo assim". Encontrar
-o dono certo do domínio não é o mesmo que ter uma tool real para ele executar; se a segunda
-parte falha, a resposta inteira é escalar, não criar trabalho de instrumentação vazia.
+**Capability ausente só bloqueia quando não há nada aproveitável — a ausência de uma tool cujo
+nome bate literalmente com o substantivo ou verbo do pedido NÃO é, sozinha, motivo para
+escalar.** Antes de escalar por capability ausente, responda em ordem:
+
+a) Existe um owner cujo domínio cobre a intenção?
+b) Esse owner tem alguma tool que investigue, diagnostique, oriente ou execute materialmente
+   algum aspecto da missão — mesmo que o nome da tool não corresponda palavra por palavra ao
+   substantivo do pedido (ex.: tools de acervo servem para "o que já está registrado", qualquer
+   que seja o tipo de registro; ver Caso #04)?
+c) Existe um Caso de referência que já resolveu um padrão parecido com missão, não com
+   escalação?
+
+Se as três forem sim: crie a missão para esse owner com a tool aproximada disponível.
+`TOOLS_ALLOWED: []` continua válido quando a missão é puramente analítica/decisória (ver
+"Trabalho analítico ou decisório" acima) — isso não é "faltou tool", é "essa missão não precisa
+de tool nenhuma para ser cumprida".
+
+`ESCALATE` por capability ausente só quando pelo menos uma das três for não: nenhum owner tem
+**nada** aplicável aos aspectos materiais da missão (não apenas o nome não bate), ou existe
+bloqueio explícito de policy (`approval-policy.md`), ou a ação depende de uma capability de
+escrita que genuinamente não existe no contrato (enviar, publicar, alterar CRM — hoje zero
+capabilities de escrita). Nesses casos, `tasks: []` + `ESCALATE = true` citando o gap (ver
+`escalation-policy.md`, `CAPABILITY_GAPS`/E1.8) continua a resposta certa — nunca uma missão
+com tool inventada. Encontrar o dono certo do domínio não é o mesmo que ter uma tool real para
+ele executar; se nenhuma tool aproximada existe **e** nenhum Caso de referência sustenta uma
+missão, a resposta é escalar, não criar trabalho de instrumentação vazia.
 
 **4. Atribuir OWNER** por `OWNERSHIP_BASE` e pelos desempates.
 
@@ -318,10 +365,16 @@ vazio (`ok: true` com lista vazia é resposta válida).
 
 ### Capability ausente
 
-Se a intenção exige capability que não existe no registry:
+Antes de tratar algo como capability ausente, confirme que de fato não há tool aproveitável:
+verifique se existe owner de domínio, se ele tem alguma tool que alcance materialmente algum
+aspecto da missão (mesmo sem bater literalmente com o substantivo do pedido) e se algum Caso de
+referência já resolveu um padrão parecido com missão (ver "Capability ausente só bloqueia
+quando não há nada aproveitável", acima). Só depois desse teste, se a intenção realmente exige
+capability que não existe no registry:
 
 1. não crie a capability nem invente nome de tool;
-2. não contorne com tool que "quase serve";
+2. não contorne com tool que "quase serve" — mas não confunda isso com usar uma tool aproximada
+   legítima (que o teste acima já validou);
 3. registre em `CAPABILITY_GAPS`: qual decisão fica bloqueada, o que faltaria, quem seria o dono;
 4. escale.
 
@@ -347,8 +400,9 @@ Criar capability é decisão humana e exige alterar o contrato MCP — congelado
 | 11a (controle negativo) | "[Verbo], depois confira se ficou certo" — insumo e entregável do mesmo domínio | Uma missão só, mesmo dono. O padrão "antes de/depois de" só vira duas missões quando os dois verbos pertencem a donos diferentes — não é o conectivo que decide, é o dono de cada parte |
 | 12 | Ação final exige aprovação, mas há levantamento/rascunho possível com tools existentes | Missão(ões) de preparo com `ESCALATE = false`, mais `ESCALATE = true` na resposta nomeando a etapa final que precisa de aprovação. Nunca `tasks: []` só porque a última etapa escala |
 | 12a (controle negativo) | Ação final exige aprovação e o próprio pedido já é a ação, sem levantamento prévio possível | `tasks: []` + `ESCALATE = true`. Aqui sim não há preparo a destacar |
-| 13 | Domínio certo identificado, mas nenhuma tool do registry alcança o dado/ação | `tasks: []` + `ESCALATE = true` citando o gap (`CAPABILITY_GAPS`/E1.8). Nunca missão com `TOOLS_ALLOWED: []` nem tool inventada |
-| 14 | Pergunta analítica sobre preço/desconto/política comercial, sem oferta concreta a destinatário nomeado | Missão normal do dono do domínio (avaliação/recomendação). Não escale só pelo vocabulário sensível — só escala se o `OUTPUT` fosse a própria oferta/decisão/comunicação a terceiro |
+| 13 | Domínio certo identificado, e o owner tem tool aproximada (mesmo sem bater literalmente com o substantivo do pedido) ou Caso de referência análogo | Missão para esse owner com a tool aproximada. **Não** escale só porque o nome da tool não corresponde palavra por palavra ao pedido — ver teste a/b/c ("Capability ausente só bloqueia quando não há nada aproveitável") |
+| 13a (controle positivo) | Domínio certo identificado, mas nenhum owner tem qualquer tool aplicável aos aspectos materiais da missão, e nenhum Caso de referência sustenta uma missão | `tasks: []` + `ESCALATE = true` citando o gap (`CAPABILITY_GAPS`/E1.8). Nunca missão com `TOOLS_ALLOWED: []` como substituto de tool real, nem tool inventada |
+| 14 | Pergunta analítica ou decisória sobre preço, desconto, condição comercial, agenda, compromisso, priorização, arquivamento, classificação ou escolha entre alternativas, sem execução nem comunicação a destinatário nomeado | Missão normal do dono do domínio (avaliação/recomendação/priorização). Não escale só pelo vocabulário sensível — classifique A) análise/decisão, B) execução, C) comunicação externa; só B/C escalam |
 | 14a (controle negativo) | Desconto concreto já definido, mais comunicação a um cliente | `ESCALATE = true` — aqui o `OUTPUT` é a própria ação/decisão, não uma análise |
 
 Casos 04 e 06 marcam a fronteira que mais gera erro: **erro de ferramenta é engenharia;
