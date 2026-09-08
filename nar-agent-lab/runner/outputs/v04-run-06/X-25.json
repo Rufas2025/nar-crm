@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Diagnosticar e resolver o MCP_TOOL_ERROR de eduinfo_get_asset ao abrir o Folder_ID institucional autorizado.",
+      "OWNER": "engenharia-nar",
+      "TOOLS_ALLOWED": ["eduinfo_get_asset", "eduinfo_search_folder", "eduinfo_list_root"],
+      "DEPENDENCIES": [],
+      "NEXT": "marketing-nar"
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

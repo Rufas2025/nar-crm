@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Capability ausente (E1.8/CAPABILITY_GAPS): a intenção pede a contagem de escolas que mudaram de fase no funil nas últimas quatro semanas, ou seja, transição de stage ao longo do tempo. Nenhuma tool do registry observa essa série histórica — crm_get_contact_context e crm_list_eligible_contacts só expõem o stage ATUAL (valor único), e o histórico de interação registrado é data/canal/resumo, não mudança de fase. Isso está explicitamente listado em 'Não observado por nenhuma tool' do contrato nar-ops-mcp@0.2.0. Nenhuma missão pode ser criada sem inventar o dado; a decisão de negócio que fica bloqueada é o próprio raio-x de progressão de funil por período, que exigiria uma capability nova (ex.: série histórica de stage), cujo dono seria crm-nar."
+}

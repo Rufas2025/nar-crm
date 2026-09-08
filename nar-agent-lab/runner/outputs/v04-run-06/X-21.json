@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Capability ausente (E1.8): a intenção exige buscar o modelo mais recente de cláusula de rescisão no repositório de contratos jurídicos. O contrato nar-ops-mcp@0.1.0/0.2.0 declara explicitamente que nenhuma tool observa o repositório de contratos jurídicos (ver 'Não observado por nenhuma tool'). Nenhum agente possui capability cujo domínio observacional cubra esse acervo — as tools eduinfo_* observam apenas o acervo Drive autorizado, não o repositório jurídico. Não há tool que 'quase serve' a ser usada como substituto. CAPABILITY_GAPS: decisão bloqueada = localizar/consultar cláusula de rescisão vigente; capability que faltaria = acesso de leitura ao repositório de contratos jurídicos (ex.: legal_contracts_search/get_asset); dono provável = engenharia-nar (acervo) ou produto-nar (governança de conteúdo jurídico), a definir por decisão humana ao ampliar o registry."
+}

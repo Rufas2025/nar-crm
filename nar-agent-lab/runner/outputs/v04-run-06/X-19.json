@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A ação pedida é publicar conteúdo em site institucional externo — comunicação/publicação externa (approval-policy A2), ação irreversível e externa (escalation-policy E1.4). Nenhuma capability de escrita ou publicação existe no contrato nar-ops-mcp@0.1.0/0.2.0 (zero capabilities de escrita, ver approval-policy.md e intent-semantics 'Não observado por nenhuma tool'), e 'site institucional' não é um objeto observável por nenhuma tool do registry (as tools eduinfo_* alcançam apenas o acervo Drive autorizado, não um site publicado). O próprio pedido já é a ação de publicar, sem levantamento ou rascunho prévio pedido nesta intenção — não há missão de preparo a destacar. Decisão humana necessária antes de qualquer trabalho, tanto pela ausência de capability (CAPABILITY_GAPS/E1.8) quanto pelo gate de aprovação A2."
+}

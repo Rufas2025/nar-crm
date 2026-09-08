@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Capability gap genuíno e ação de escrita fora do contrato: (1) 'recalibrar o algoritmo de scoring de leads' depende de algoritmo de scoring, sua configuração e desempenho — item listado explicitamente em 'Não observado por nenhuma tool' do capability registry 0.2.0, nenhum OWNER possui tool com domínio observacional sobre isso; (2) 'publicar a nova versão em produção' é ação de escrita/alteração de ambiente compartilhado (A7/A8 de approval-policy.md), e nenhuma capability de escrita existe no contrato MCP 0.1.0/0.2.0. Não há levantamento ou preparo executável com as tools do registry para nenhuma das duas partes — o próprio pedido já é a ação/capability inexistente, sem insumo prévio a enumerar. Registrar em CAPABILITY_GAPS (E1.8): decisão de negócio bloqueada = recalibração e publicação do scoring; capability que faltaria = observação/gestão de algoritmo de scoring de leads + capability de escrita para deploy/publicação em produção; dono seria engenharia-nar (técnico) e produto-nar (critério de negócio do scoring), mas nenhum dos dois possui a tool necessária hoje."
+}

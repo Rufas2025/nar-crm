@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A intenção pede varrer todas as pastas do Drive da empresa, explicitamente 'não só as autorizadas'. O contrato MCP delimita o acervo do Drive a uma allowlist de pastas autorizadas; qualquer objeto fora dela retorna ASSET_OUT_OF_SCOPE. Ampliar esse escopo é decisão humana, pois exige alterar o contrato. Não há missão a criar para nenhum agente, já que nenhum alcança pastas fora do escopo autorizado, e delegar para 'tentar acessar' apenas transferiria a negativa. Escala para HUMAN por objeto fora do escopo autorizado (equivalente a E2.2/E1.8 combinado com a regra de Escopo autorizado do rufas-router)."
+}

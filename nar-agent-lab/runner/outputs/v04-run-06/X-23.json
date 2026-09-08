@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A intenção exige consultar a folha de pagamento do time comercial, e esse dado está explicitamente listado como não observado por nenhuma tool do contrato nar-ops-mcp@0.2.0 ('folha de pagamento, dados financeiros de RH'). É capability gap genuíno (E1.8): nenhuma tool declarada tem domínio observacional sobre dados de RH/folha de pagamento, e o cumprimento da meta comercial não é derivável de nenhuma tool de CRM, proposta, campanha ou acervo existente. Não há missão de preparo possível, pois o próprio insumo necessário (folha de pagamento) é inacessível a qualquer agente do registry. CAPABILITY_GAPS: decisão bloqueada = identificar quem bate a meta comercial este mês; capability faltante = acesso a dados de folha de pagamento/RH; dono provável = nenhum agente do registry atual (fora do domínio de todos os agentes existentes)."
+}

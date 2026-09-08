@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Levantar o histórico de campanhas da rede Girassol.",
+      "OWNER": "marketing-nar",
+      "TOOLS_ALLOWED": ["campaign_get_history"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Arquivar o relatório é uma alteração de arquivo no Drive (ação A6 de approval-policy.md: compartilhar, mover ou subir arquivo), e nenhuma capability de escrita existe no contrato MCP 0.1.0/0.2.0 para executar isso. A ação em si (arquivamento) precisa de decisão e execução humana; o preparo possível (conferir o histórico de campanhas) já foi emitido como missão."
+}

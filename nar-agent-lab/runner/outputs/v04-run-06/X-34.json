@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Capability gap genuíno (E1.8/CAPABILITY_GAPS): histórico de deploys, versões publicadas ou rollback aplicado não é observado por nenhuma tool do registry (nar-ops-mcp@0.2.0) — está explicitamente listado como 'Não observado por nenhuma tool'. Nenhuma tool de eduinfo_*, crm_*, proposal_* ou campaign_* cobre esse domínio observacional (deploy/versão técnica de sistema). Além disso, a decisão de reverter a última versão é ação técnica irreversível sobre ambiente compartilhado (A7 da approval-policy: alterar workflow/versão em ambiente compartilhado exige aprovação humana de engenharia, com rollback definido). Como o próprio fato-base (histórico de deploy) não é observável por nenhuma tool declarada, não há preparo executável com o registry atual — não é caso de emitir missão com TOOLS_ALLOWED:[] como substituto, nem de inventar tool. Decisão fica bloqueada: quem teria domínio observacional seria engenharia-nar, mas a capability de observar histórico de deploy/versões não existe no contrato hoje."
+}

@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A ação pedida é compartilhar um arquivo no Drive com a equipe comercial — ação irreversível/externa sobre acervo compartilhado (approval-policy.md A6), e não existe nenhuma capability de escrita/compartilhamento no contrato MCP 0.2.0 (todas as tools eduinfo_* são read-only). O próprio pedido já é a ação em si, sem levantamento prévio distinto solicitado, então não há missão de preparo a destacar (caso 12a). Escala E1.4 para HUMAN: humano responsável pelo acervo deve decidir e executar o compartilhamento da planilha de matrículas do trimestre com a equipe comercial."
+}

@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Levantar as propostas paradas há mais de 30 dias e o contexto de cada contato associado.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["proposal_get_pending", "crm_get_contact_context"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    },
+    {
+      "TASK_ID": "T-20260908-002",
+      "OBJ": "Preparar o rascunho do lembrete de cobrança para cada contato identificado, pronto para aprovação.",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": [],
+      "DEPENDENCIES": ["T-20260908-001"],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Enviar o lembrete de cobrança a contatos reais é ação irreversível e externa (A1/E1.4) e exige aprovação humana antes do disparo; o levantamento das propostas paradas e o rascunho da mensagem podem prosseguir como preparo, mas o envio em si fica bloqueado até decisão humana."
+}

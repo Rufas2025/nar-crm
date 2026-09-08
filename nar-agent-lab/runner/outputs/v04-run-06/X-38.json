@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A intenção pede diretamente duas ações que exigem aprovação humana, sem nenhum preparo/levantamento intermediário a executar: (1) aprovar um desconto fixo de 12% no plano anual do cliente é decisão comercial material (E1.1 / approval-policy A3 — sem exceção, nem 'só desta vez'); (2) comunicar esse desconto ao cliente é ação externa e irreversível (E1.4 / A1). O desconto já vem definido no próprio enunciado (12%, fixo), então não há análise, comparação ou recomendação a produzir antes do gate — o pedido inteiro já é a ação/decisão em si (caso 14a / exemplo do approval-policy: OUTPUT é a própria ação, não uma avaliação que um humano ainda vai revisar). Por isso tasks:[] em vez de missão de preparo (contraste com caso 12)."
+}

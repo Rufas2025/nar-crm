@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "O pedido é a própria decisão de conceder desconto comercial (10%) para a escola Tucano — decisão material de condição comercial (E1.1 / approval-policy A3, sem exceção). Não há levantamento ou preparo separado a executar: aprovar ou não o desconto é integralmente a ação que exige decisão humana comercial, então não há missão executável antes do gate."
+}

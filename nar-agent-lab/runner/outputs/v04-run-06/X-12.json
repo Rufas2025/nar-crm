@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Levantar os follow-ups vencidos.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_get_followups_due"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Diagnosticar por que o acervo está lento exige telemetria, logs, latência ou uptime de sistema em produção — nenhuma tool do registry observa esse fato (eduinfo_list_root, eduinfo_search_folder e eduinfo_get_asset observam disponibilidade/autorização e existência de item, nunca performance ou causa de lentidão). Capability gap genuíno (E1.8 / CAPABILITY_GAPS): decisão bloqueada é o diagnóstico de causa de lentidão do acervo; capability que faltaria é observação de telemetria/latência de sistema; dono seria engenharia-nar caso essa capability existisse."
+}

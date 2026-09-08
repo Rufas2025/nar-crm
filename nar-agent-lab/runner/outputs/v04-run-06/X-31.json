@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Diagnosticar por que o fluxo de renovação de matrícula está travando no meio exige observar telemetria, logs, comportamento de execução ou histórico de deploy do sistema/workflow em produção — nenhuma tool do registry (nar-ops-mcp@0.2.0) observa esse fato: as tools de CRM expõem apenas estado atual e histórico de interação (não transição de stage nem execução de workflow), e as tools de acervo (eduinfo_*) expõem apenas metadados de arquivo, não telemetria de sistema. 'Telemetria, logs, latência, uptime ou métricas de sistema em produção' e 'histórico de deploy, versões publicadas ou rollback aplicado' estão explicitamente listados como não observados por nenhuma tool (mundo fechado). Isso é capability gap genuíno (E1.8/E2.6, CAPABILITY_GAPS): a decisão de negócio (corrigir o fluxo) fica bloqueada sem esse dado, faltaria uma capability de observabilidade de workflow/sistema (dono provável: engenharia-nar, quando essa capability existir), e nenhuma missão pode ser encomendada hoje sem inventar tool ou simular o resultado."
+}

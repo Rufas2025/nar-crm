@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A intenção pede um julgamento sobre condição comercial (política de carência para inadimplência) — se ainda faz sentido ou está defasada. Isso é decisão material (E1.1, regra A3 de approval-policy.md: condição comercial) que cabe a um humano comercial, não a um agente do laboratório. Além disso, o contrato nar-ops-mcp@0.1.0 declara explicitamente 'políticas operacionais fora do escopo de marca (carência, inadimplência, prazos contratuais)' como não observado por campaign_get_brand_context, e nenhuma outra tool no registry observa política de carência, prazos contratuais ou regras de inadimplência — é capability gap genuíno (E1.8/E2.6, CAPABILITY_GAPS). Não há nenhum insumo, dado ou parâmetro no enunciado que permita levantamento prévio com as tools existentes: o próprio pedido já é a decisão em si, sem preparo executável possível. Portanto tasks: [] + ESCALATE: true, sem missão de preparo a destacar."
+}

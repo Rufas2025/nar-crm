@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Levantar os contatos da escola Tucano cujo stage atual está incorreto, com o stage vigente e o histórico que evidencia a divergência.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_list_eligible_contacts", "crm_get_contact_context"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Corrigir o stage é alterar dado de contato no CRM (A5, approval-policy.md), ação que não é reversível pelo agente e para a qual não existe capability de escrita no contrato nar-ops-mcp@0.1.0/0.2.0 — nenhuma tool grava CRM. O levantamento diagnóstico (quais contatos da escola Tucano estão com stage incorreto) é preparo executável agora com crm-nar e virou missão; a correção em si fica bloqueada aguardando decisão/execução humana."
+}

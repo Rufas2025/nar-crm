@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A1 — enviar mensagem a contato real (resposta de remarcação para a escola Tucano) é ação externa e irreversível, sem capability de escrita no contrato MCP 0.1.0. O pedido já é a própria ação (o novo horário já foi definido pelo usuário, não há levantamento ou rascunho prévio a preparar), então não há missão executável antes da aprovação humana."
+}

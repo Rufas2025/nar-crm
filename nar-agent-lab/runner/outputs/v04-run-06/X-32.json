@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Diagnosticar a queda em produção do painel de acompanhamento de leads exige observar telemetria, logs, latência ou uptime de sistema em produção. Nenhuma tool do registry 0.2.0 observa esse fato — nem eduinfo_* (acervo Drive/documentos estáticos), nem as tools de crm-nar/atendimento-nar (estado de contato, followup, demo, proposta) — e o próprio contrato declara 'telemetria, logs, latencia, uptime ou metricas de sistema em producao' como não observado por nenhuma tool. Isso é capability gap genuíno (E1.8/CAPABILITY_GAPS), não um erro de tool MCP do acervo (que seria engenharia-nar via ACCESS_DENIED/UNKNOWN_TOOL), e não deriva por raciocínio a partir do enunciado. Decisão de negócio bloqueada: causa da queda do painel em produção. Capability que faltaria: observabilidade/telemetria de sistema em produção (logs, métricas, uptime). Dono provável se a capability existisse: engenharia-nar."
+}

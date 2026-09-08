@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Levantar os dados atuais da demo agendada da escola Tucano (contato, data/hora agendada, stage).",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_get_demo_scheduled"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Remarcar a demo é uma ação externa que compromete um novo horário perante um terceiro real (o diretor da escola Tucano) — não é apenas um rascunho ou análise interna, é a própria mudança de compromisso já acontecendo. Não existe nenhuma capability de escrita no contrato MCP 0.1.0/0.2.0 para alterar um agendamento, e mesmo que existisse, alterar compromisso externo é ação irreversível/externa (E1.4) que exige aprovação humana (approval-policy.md, ação análoga a A1/A4/A5). O levantamento do agendamento atual (missão acima) é o único preparo possível com as tools do registry; a definição do novo horário e sua confirmação com o diretor ficam bloqueadas até decisão humana."
+}
