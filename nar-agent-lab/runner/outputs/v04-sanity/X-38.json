@@ -1,5 +1,0 @@
-{
-  "tasks": [],
-  "ESCALATE": true,
-  "ESCALATION_REASON": "A intenção pede a própria ação de aprovar e comunicar um desconto de 12% no plano anual do cliente — não uma análise ou recomendação. Isso é decisão material (E1.1 / A3: oferecer preço, desconto ou condição comercial) somada a ação irreversível/externa (E1.4 / A1: enviar comunicação a contato real), sem exceção mesmo que o percentual já esteja definido pelo solicitante. Não há capability de escrita no contrato (0 capabilities de escrita) para aprovar desconto ou enviar comunicação, e o próprio pedido já é a ação, sem levantamento ou rascunho prévio a preparar com as tools existentes. Portanto tasks:[] + ESCALATE:true, conforme casos 12a/14a: aprovação humana comercial (A3) e do responsável pela conta (A1) é necessária antes de qualquer execução."
-}

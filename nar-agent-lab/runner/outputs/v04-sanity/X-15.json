@@ -1,5 +1,0 @@
-{
-  "tasks": [],
-  "ESCALATE": true,
-  "ESCALATION_REASON": "Compartilhar um arquivo no Drive com a equipe comercial é uma ação de escrita/comunicação externa (approval-policy.md A6) e o contrato MCP 0.2.0 não possui nenhuma capability de escrita (compartilhar, publicar, mover arquivo) — nenhuma tool no registry executa ou prepara esse compartilhamento, e a lista de 'não observado por nenhuma tool' cita explicitamente qualquer capability de escrita como capability gap genuíno (E1.8). Não há missão de preparo segura a destacar: não existe tool cujo domínio observacional cubra a busca ou identificação confiável dessa planilha específica de matrículas dentro do acervo autorizado, então criar uma missão de levantamento arriscaria aproximar um dado de outro domínio. Decisão pendente para HUMAN: aprovar e executar manualmente o compartilhamento da planilha de matrículas do trimestre com a equipe comercial no Drive."
-}

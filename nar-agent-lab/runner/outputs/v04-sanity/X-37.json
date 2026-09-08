@@ -1,5 +1,0 @@
-{
-  "tasks": [],
-  "ESCALATE": true,
-  "ESCALATION_REASON": "Ação A1/E1.4: enviar mensagem de remarcação a um contato real (escola Tucano) é ação irreversível e externa, sem capability de escrita no contrato MCP 0.1/0.2. O horário já foi definido pelo usuário, então não há levantamento ou rascunho pendente a destacar como missão de preparo — o pedido inteiro é o próprio envio, que exige aprovação humana (approval-policy.md, A1) antes de acontecer."
-}

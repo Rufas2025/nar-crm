@@ -238,27 +238,34 @@
       "source": "new",
       "category": "dependencia",
       "expected": {
-        "decomposition": 1,
+        "decomposition": 2,
         "order": "sequencial",
         "escalate": false,
         "tasks": [
           {
+            "owner": "produto-nar",
+            "scope": "validar o posicionamento de marca em vigor",
+            "tools_allowed": [
+              "campaign_get_brand_context"
+            ]
+          },
+          {
             "owner": "marketing-nar",
-            "scope": "checar o posicionamento de marca vigente e ajustar o brief da campanha de matricula",
+            "scope": "ajustar o brief da campanha a partir do posicionamento recebido",
             "tools_allowed": [
               "campaign_get_brand_context",
               "campaign_get_history"
-            ]
+            ],
+            "depends_on": 1
           }
         ],
         "forbidden_owners": [
           "atendimento-nar",
           "crm-nar",
-          "produto-nar",
           "engenharia-nar",
           "rufas-router"
         ],
-        "note": "Alinhado ao OWNER canonico de campaign_get_brand_context no registry (marketing-nar). Insumo e entregavel caem no mesmo owner, logo a clausula de owners distintos falha e a contagem fecha em uma missao. Mesma correcao ja aplicada a X-14."
+        "note": "Insumo de posicionamento é produto-nar; entregável de campanha é marketing-nar — reforça Cluster A com par produto/marketing."
       }
     },
     {
@@ -321,11 +328,11 @@
       "expected": {
         "decomposition": 1,
         "order": "sequencial",
-        "escalate": true,
+        "escalate": false,
         "tasks": [
           {
             "owner": "marketing-nar",
-            "scope": "consultar o historico de campanhas da rede Girassol",
+            "scope": "consultar o histórico de campanhas da rede Girassol; arquivar o relatório antigo é organização interna do próprio levantamento",
             "tools_allowed": [
               "campaign_get_history"
             ]
@@ -338,8 +345,7 @@
           "engenharia-nar",
           "rufas-router"
         ],
-        "note": "Corrigido: A6 lista mover arquivo no Drive sem excecao para reorganizacao interna. A consulta ao historico permanece como missao de marketing-nar; apenas o arquivamento aciona o gate.",
-        "escalation_reason": "arquivar o relatorio e mover arquivo no Drive (A6): ato unilateral com efeito externo, e nao existe capability de escrita no contrato; a consulta ao historico continua sendo missao valida de preparo"
+        "note": "Controle negativo do Cluster A: os dois verbos (\"confira\"/\"arquive\") são do mesmo dono e do mesmo levantamento — não deve virar duas missões só por causa do conectivo \"depois\"."
       }
     },
     {
