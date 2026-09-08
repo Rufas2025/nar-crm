@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Fato/diagnóstico: a intenção pede quantas escolas mudaram de stage no funil nas últimas quatro semanas, o que exige histórico de progressão de stage ao longo do tempo (snapshots/deltas por período). Nenhuma tool do registry cobre esse domínio de dados — crm_list_eligible_contacts, crm_get_contact_context, crm_get_followups_due, crm_get_demo_scheduled e proposal_get_pending expõem apenas o estado atual do contato/proposta, não uma série histórica de mudança de stage por período. Isso é tool gap genuíno (E1.8/E2.6, CAPABILITY_GAPS), não falta de nome parecido: nenhuma tool disponível alcança 'quantas mudaram de fase entre duas datas'. CAPABILITY_GAPS: decisão bloqueada = quantificar evolução de funil (escolas que subiram de fase) nas últimas 4 semanas; capability faltante = consulta de histórico/série temporal de stage por contato (ex.: crm_get_stage_history ou equivalente); dono provável = crm-nar. Não há missão de preparo executável com as tools atuais, pois todas retornariam apenas o estado presente, não a comparação temporal pedida."
+}

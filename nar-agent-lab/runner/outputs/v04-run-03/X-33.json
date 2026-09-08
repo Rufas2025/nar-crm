@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Avaliar se estender a carência da segunda parcela da matrícula é uma questão de viabilidade técnica ou de regra/política de produto, e produzir recomendação sobre qual dono decide.",
+      "OWNER": "produto-nar",
+      "TOOLS_ALLOWED": [],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A decisão final de conceder carência estendida na segunda parcela é condição comercial/prazo (E1.1, A3/A4 de approval-policy.md) e exige aprovação de humano comercial; a análise/recomendação de produto-nar sobre se isso é viável e se é regra de produto pode prosseguir como preparo, mas a concessão em si não pode ser decidida pelos agentes."
+}

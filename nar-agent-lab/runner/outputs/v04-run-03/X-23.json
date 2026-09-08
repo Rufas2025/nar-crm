@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Folha de pagamento do time comercial e desempenho de meta individual não são dados cobertos por nenhuma tool do capability registry (marketing/produto/engenharia têm apenas acervo Drive e histórico de campanha; atendimento/crm têm apenas contatos, follow-ups, demos e propostas — nenhum expõe remuneração ou apuração de meta por pessoa). Não há tool que 'quase sirva': é dado de RH/financeiro, fora do escopo autorizado de qualquer agente disponível, e também dado pessoal sensível (E1.7) além do necessário para qualquer missão do registry. Tool gap genuíno (E1.8/E2.6) — não crie missão aproximando com outra tool. Escalar para HUMAN citando o gap: capability de consulta a folha de pagamento/apuração de meta comercial não existe no contrato MCP 0.1.0; dono provável seria um futuro agente de RH/financeiro, hoje inexistente."
+}

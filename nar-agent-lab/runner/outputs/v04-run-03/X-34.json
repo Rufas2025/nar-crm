@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Missão de fato/diagnóstico (histórico de deploys do módulo de matrícula nas últimas duas semanas). Nenhuma tool do registry cobre esse domínio de dados: engenharia-nar só tem eduinfo_list_root, eduinfo_search_folder, eduinfo_get_asset (acervo Drive), sem acesso a log/histórico de deploy ou workflow. Isso é tool gap genuíno (E2.6/E1.8, CAPABILITY_GAPS) — nenhuma tool 'quase serve' deve ser usada como substituto. Além disso, a decisão final de reverter a última versão é decisão material e irreversível-condicionada (E1.1/E1.4, aplica-se A7 de approval-policy.md), portanto também exige HUMAN mesmo que o histórico estivesse disponível. CAPABILITY_GAPS: decisão bloqueada = confirmar se a última versão deve ser revertida; capability faltante = consulta a histórico/log de deploys de workflow (ex.: deploy_get_history ou equivalente), hoje inexistente no registry; dono provável = engenharia-nar."
+}

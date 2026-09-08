@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "O entregável (definir o critério de aceite da nova versão do app) depende de um insumo de estado/histórico — bugs já reportados — que é do tipo fato/diagnóstico. Nenhuma tool declarada em nenhum OWNER do registry cobre o domínio de bug tracking/relatos de bugs (as tools existentes cobrem apenas acervo Drive, histórico/contexto de campanha, e dados de CRM/propostas/contatos). Isso é um tool gap genuíno (CAPABILITY_GAPS/E1.8): não há dono capaz de levantar o insumo com as tools do contrato 0.1.0, então a missão do entregável de aceite também não pode ser encomendada agora, pois ficaria sem o insumo que a intenção mesma definiu como pré-requisito. Decisão bloqueada: qual é o critério de aceite da nova versão do app. O que faltaria: uma capability de leitura de bugs/issues reportados (ex.: bug_tracker_get_reports ou equivalente). Dono provável dessa capability, se criada: engenharia-nar (erro/qualidade técnica) ou produto-nar (aceite de produto) — decisão de a quem atribuir e de criar a capability é humana, pois exige alterar o contrato MCP congelado em 0.1.0."
+}

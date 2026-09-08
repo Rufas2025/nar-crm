@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Objeto fora do escopo autorizado: a intenção pede varredura de todas as pastas do Drive, explicitamente incluindo as não autorizadas, enquanto o contrato MCP só cobre a allowlist de pastas autorizadas. Ampliar o escopo é decisão humana (exige alterar o contrato). Nenhuma missão foi criada porque não há entregável executável dentro do escopo autorizado que corresponda ao que foi pedido (varredura completa) — escalar para HUMAN a decisão de ampliar o escopo de acesso ao Drive."
+}

@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Recalibrar o algoritmo de scoring de leads.",
+      "OWNER": "engenharia-nar",
+      "TOOLS_ALLOWED": [],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Publicar a nova versão do algoritmo de scoring em produção é alteração de workflow/sistema em ambiente compartilhado (A7), ação irreversível/externa (E1.4) que exige aprovação humana de engenharia antes de executar. A recalibração em si é preparo por expertise do owner (engenharia-nar) e não depende dessa aprovação para acontecer."
+}

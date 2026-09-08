@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Diagnosticar a queda em produção do painel de acompanhamento de leads é missão de fato/diagnóstico: exige observar o estado real do sistema em produção (erro, causa, logs, disponibilidade). Nenhuma tool declarada no registry cobre esse domínio de dados — engenharia-nar só possui eduinfo_list_root, eduinfo_search_folder, eduinfo_get_asset (acervo Drive), que não alcançam observabilidade de sistema em produção. Isso é tool gap genuíno (caso #13a / E1.8, CAPABILITY_GAPS), não ausência de missão possível: não há preparo, levantamento ou diagnóstico executável com as tools atuais, então tasks:[] é a resposta. CAPABILITY_GAPS: decisão bloqueada = identificar a causa raiz da queda do painel em produção; capability faltante = ferramenta de observabilidade/monitoramento/logs de sistema em produção (ex.: consulta de status de serviço, logs de erro, métricas de disponibilidade); dono provável = engenharia-nar, uma vez que a capability exista no registry."
+}

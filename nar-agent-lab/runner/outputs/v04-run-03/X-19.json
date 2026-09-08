@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Ação de publicação externa (A2/A6 approval-policy.md): publicar página institucional no site é comunicação/ação irreversível que exige aprovação humana, e nenhuma capability de escrita ou publicação existe no registry (0.1.0, read-only). O pedido em si já é a ação (publicar), sem etapa de preparo distinta e executável pelas tools disponíveis (não há tool de criação/edição de página de site em nenhum OWNER) — não há missão a criar; escalar a HUMAN."
+}

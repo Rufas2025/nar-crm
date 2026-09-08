@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Informação insuficiente para decisão material (E1.3/E1.2): a intenção não identifica qual missão anterior travou, qual erro técnico ocorreu, qual OWNER a executava, nem o que exatamente 'faltou'. Sem esses dados, não é possível determinar o domínio correto (pode ser erro de tool/engenharia, ou pode não ser erro de tool de fato) nem montar uma missão de retomada com INPUTS e CONTEXT mínimos válidos — inventar esses dados seria decidir algo que não é do router para decidir. Nenhuma tool do registry permite descobrir qual foi a missão anterior ou seu erro; esse dado não é obtenível pelas tools existentes."
+}

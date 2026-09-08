@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Cancelar o contrato da escola Tucano é execução direta de ação irreversível e externa (A4/E1.4): não existe capability de escrita no registry 0.1.0 para alterar ou cancelar proposta/contrato, e o próprio pedido já é a ação em si, sem levantamento prévio a fazer (explicitamente 'sem mais levantamento'). Mesmo com a decisão já tomada pelo comercial, a execução exige aprovação/ação humana direta — aprovação vale para o caso concreto, não se acumula em permissão permanente (A3/A9 análogo em A4)."
+}

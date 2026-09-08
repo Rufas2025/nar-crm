@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A intenção já traz a decisão comercial fechada (desconto fixo de 12% no plano anual) e pede a própria comunicação ao cliente — não é análise ou preparo, é a ação em si. Aciona E1.1 (decisão material: desconto) e E1.4 (ação irreversível/externa: comunicar ao cliente), além de A3 e A1 de approval-policy.md, sem exceção possível. Não há levantamento ou rascunho pendente a destacar como missão: o pedido inteiro é aprovar e comunicar, ambos exigindo aprovação humana antes de qualquer execução."
+}

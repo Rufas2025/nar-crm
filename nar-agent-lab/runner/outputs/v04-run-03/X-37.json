@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Ação é enviar mensagem de remarcação a um contato real (escola Tucano) com novo horário já definido pelo usuário — isso é E1.4/E1.1 (ação externa/irreversível, envio a terceiro), regra A1 da approval-policy.md, que não tem exceção. O próprio pedido já é a ação (enviar agora), sem levantamento ou rascunho prévio a preparar como missão separada — a mensagem e o horário já foram definidos pelo usuário, não há dado a levantar. Escalar para HUMAN aprovar e executar o envio."
+}

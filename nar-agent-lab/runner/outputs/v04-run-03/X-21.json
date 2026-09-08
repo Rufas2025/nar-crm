@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Objeto fora do escopo autorizado: nenhum agente do registry tem tool que alcance um 'repositório de contratos jurídicos' — as tools de acervo disponíveis (eduinfo_list_root, eduinfo_search_folder, eduinfo_get_asset) cobrem o acervo Eduinfo com allowlist própria, não outro sistema ou pasta de contratos jurídicos. Não há missão a criar para 'tentar acessar'; ampliar o escopo é decisão humana que exige alterar o contrato MCP (congelado em 0.1.0)."
+}

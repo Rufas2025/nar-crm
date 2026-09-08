@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Compartilhar arquivo no Drive é ação irreversível/externa (A6) sem capability de escrita no contrato MCP 0.1.0 — nenhuma tool de compartilhamento existe no registry. O pedido inteiro já é a própria ação de compartilhar, sem levantamento ou preparo prévio a destacar como missão. Escala a HUMAN (E1.4 / E1.8, CAPABILITY_GAPS: compartilhamento de arquivo no Drive, dono engenharia-nar)."
+}
