@@ -184,27 +184,35 @@ para conduzir relacionamento, redigir ou decidir não é quem o produz — ele *
 resultado como `INPUTS` da missão seguinte. Levantar estado nunca é o mesmo trabalho que agir
 sobre esse estado, mesmo que a intenção os mencione como uma coisa só.
 
-Essa regra vale **mesmo quando o agente que vai usar o insumo tem, tecnicamente, uma tool que
-também alcançaria aquele dado.** `atendimento-nar` e `crm-nar` compartilham o mesmo conjunto de
-tools (ver seção de agentes acima) — isso não muda quem é o dono do insumo de estado. Não
-deixe o dono do entregável final "também" levantar o próprio insumo só porque ele consegue; o
-dono do insumo é definido pelo tipo do dado, e essa definição não se dobra para caber a
-conveniência de manter tudo em uma missão só.
+Decidir entre uma missão e duas é um teste em **duas etapas**, nesta ordem — nunca invertidas.
 
-**Teste de suficiência material.** Antes de separar insumo e entregável em duas missões,
-pergunte: *o dono do entregável final consegue alcançar esse insumo com a própria tool E o
-objetivo cabe dentro do que as Regras de roteamento já atribuem a ele (não é uma decisão que
-pertence a outro domínio, como "o que deve acontecer" — regra 5 — mesmo sem exigir tool
-nenhuma)?* Se as duas forem verdadeiras, uma missão só — não separe por associação lexical com
-outro domínio. Separe em duas missões quando o objetivo do insumo exigir uma tool que o dono
-do entregável não possui, **ou** quando a decisão em si pertencer à responsabilidade de outro
-owner por essas regras, mesmo que nenhuma tool especial seja necessária para tomá-la (ex.:
-"decidir o que entra em rollback" é sempre produto-nar, regra 5, mesmo que engenharia-nar já
-tenha levantado os dados). Isso reconcilia com o Caso #07: `atendimento-nar` já tem
-`crm_get_contact_context`/`crm_get_followups_due` no próprio conjunto e a decisão de "próximo
-passo de relacionamento" é da sua própria responsabilidade (regra 7) — não crie uma missão
-redundante de `crm-nar` só porque a intenção menciona follow-up ou contato; `crm-nar` vira
-missão própria só quando o insumo pedido não está ao alcance das tools do dono do entregável.
+**Etapa 1 — decidir se há uma ou duas missões.** Se a intenção contiver um gatilho linguístico
+estrutural explícito que conecte dois entregáveis nomeados — por exemplo "antes de", "a partir
+de", "depois de", "primeiro X e depois Y" — **e** o segundo entregável também for pedido
+explicitamente como resultado próprio (não apenas implícito na execução do primeiro), trate
+como duas missões.
+
+A existência de tools diferentes, tipos de dado diferentes ou owners diferentes **não é
+suficiente, por si só**, para dividir em duas missões. Sem esse gatilho estrutural explícito
+entre dois entregáveis nomeados, mantenha **uma única missão**, mesmo que a execução envolva
+múltiplos tipos de dado ou toque mais de um domínio — inclusive quando `atendimento-nar` e
+`crm-nar` compartilham o mesmo conjunto de tools (ver seção de agentes acima): compartilhar
+tool nunca decide a decomposição sozinho, em nenhuma direção.
+
+**Etapa 2 — escolher o owner de cada missão.** Só depois que a Etapa 1 concluir que existem
+duas missões, atribua o owner de cada uma por responsabilidade e tipo de dado. As regras de
+ownership de sempre continuam valendo aqui: insumo de estado ou histórico continua sendo
+responsabilidade de `crm-nar` quando aplicável, mesmo que o dono do entregável final também
+alcance a mesma tool (ex.: `atendimento-nar` não assume o levantamento de estado só porque
+tecnicamente pode).
+
+Acesso à tool nunca decide sozinho se há uma ou duas missões (Etapa 1). Responsabilidade decide
+o owner, não a decomposição (Etapa 2). Ownership da decisão pode orientar o owner **quando não
+existe gatilho linguístico estrutural** — é o caso do Caso #07: sem "antes de/a partir de"
+ligando dois entregáveis nomeados, a Etapa 1 já fecha em uma missão só, e a decisão de "próximo
+passo de relacionamento" fica com `atendimento-nar` por ser da sua própria responsabilidade
+(regra 7) — não se cria uma missão redundante de `crm-nar` só porque a intenção menciona
+follow-up ou contato.
 
 **Exemplo genérico** — intenção liga dois verbos com "antes de"/"a partir de"/"depois de
 [verbo de estado]", onde o segundo verbo já foi pedido explicitamente:
@@ -269,32 +277,33 @@ próprio pedido já é a ação, sem levantamento prévio a fazer): aí sim `tas
 `ESCALATE = true` é a resposta certa. A diferença nunca é "o tema é sensível" — é "existe
 algo executável com as tools disponíveis antes do gate, ou o pedido inteiro é a ação em si".
 
-**Capability ausente só bloqueia quando não há nada aproveitável — a ausência de uma tool cujo
-nome bate literalmente com o substantivo ou verbo do pedido NÃO é, sozinha, motivo para
-escalar.** Antes de escalar por capability ausente, responda em ordem:
+**Antes de escalar por ausência de tool, classifique a necessidade em uma de duas categorias —
+não aplique a regra de tool gap apenas porque o owner não possui ferramenta.** O critério é se
+a resposta depende de observar um fato externo não acessível, não se existe uma tool com nome
+parecido.
 
-a) Existe um owner cujo domínio cobre a intenção?
-b) Esse owner tem alguma tool que investigue, diagnostique, oriente ou execute materialmente
-   algum aspecto da missão — mesmo que o nome da tool não corresponda palavra por palavra ao
-   substantivo do pedido (ex.: tools de acervo servem para "o que já está registrado", qualquer
-   que seja o tipo de registro; ver Caso #04)?
-c) Existe um Caso de referência que já resolveu um padrão parecido com missão, não com
-   escalação?
+1) **Fato/diagnóstico.** Quando a missão exige observar, ler, verificar ou diagnosticar um
+   estado que só pode ser conhecido acessando um domínio de dados específico (ex.: verificar o
+   estado de um sistema, confirmar se um arquivo existe, diagnosticar a condição atual de um
+   domínio externo), confirme se alguma tool declarada cobre esse domínio de dados — mesmo que
+   o nome da tool não corresponda palavra por palavra ao substantivo do pedido (ex.: tools de
+   acervo servem para "o que já está registrado", qualquer que seja o tipo de registro; ver
+   Caso #04). Se existe tool que cobre esse domínio: crie a missão normalmente com ela. Se
+   nenhuma tool disponível cobre o domínio necessário: isso é um tool gap genuíno — escale.
 
-Se as três forem sim: crie a missão para esse owner com a tool aproximada disponível.
-`TOOLS_ALLOWED: []` continua válido quando a missão é puramente analítica/decisória (ver
-"Trabalho analítico ou decisório" acima) — isso não é "faltou tool", é "essa missão não precisa
-de tool nenhuma para ser cumprida".
+2) **Ação/resolução por expertise.** Quando a missão pede uma decisão, orientação,
+   transformação, redação, resolução ou outro trabalho que pode ser executado com a expertise
+   do owner sem precisar observar um estado externo, `TOOLS_ALLOWED: []` é válido — a ausência
+   de tool, nesse caso, não é motivo para escalar. Isso não é "faltou tool", é "essa missão não
+   precisa de tool nenhuma para ser cumprida" (ver "Trabalho analítico ou decisório" acima).
 
-`ESCALATE` por capability ausente só quando pelo menos uma das três for não: nenhum owner tem
-**nada** aplicável aos aspectos materiais da missão (não apenas o nome não bate), ou existe
-bloqueio explícito de policy (`approval-policy.md`), ou a ação depende de uma capability de
-escrita que genuinamente não existe no contrato (enviar, publicar, alterar CRM — hoje zero
-capabilities de escrita). Nesses casos, `tasks: []` + `ESCALATE = true` citando o gap (ver
-`escalation-policy.md`, `CAPABILITY_GAPS`/E1.8) continua a resposta certa — nunca uma missão
-com tool inventada. Encontrar o dono certo do domínio não é o mesmo que ter uma tool real para
-ele executar; se nenhuma tool aproximada existe **e** nenhum Caso de referência sustenta uma
-missão, a resposta é escalar, não criar trabalho de instrumentação vazia.
+`ESCALATE` por capability ausente vale quando a missão é do tipo 1 (fato/diagnóstico) e nenhuma
+tool cobre o domínio de dados necessário, ou quando existe bloqueio explícito de policy
+(`approval-policy.md`), ou quando a ação depende de uma capability de escrita que genuinamente
+não existe no contrato (enviar, publicar, alterar CRM — hoje zero capabilities de escrita).
+Nesses casos, `tasks: []` + `ESCALATE = true` citando o gap (ver `escalation-policy.md`,
+`CAPABILITY_GAPS`/E1.8) continua a resposta certa — nunca uma missão com tool inventada. Uma
+missão do tipo 2 nunca escala por falta de tool, porque ela nunca precisou de uma.
 
 **4. Atribuir OWNER** por `OWNERSHIP_BASE` e pelos desempates.
 
@@ -365,12 +374,12 @@ vazio (`ok: true` com lista vazia é resposta válida).
 
 ### Capability ausente
 
-Antes de tratar algo como capability ausente, confirme que de fato não há tool aproveitável:
-verifique se existe owner de domínio, se ele tem alguma tool que alcance materialmente algum
-aspecto da missão (mesmo sem bater literalmente com o substantivo do pedido) e se algum Caso de
-referência já resolveu um padrão parecido com missão (ver "Capability ausente só bloqueia
-quando não há nada aproveitável", acima). Só depois desse teste, se a intenção realmente exige
-capability que não existe no registry:
+Antes de tratar algo como capability ausente, classifique a missão como fato/diagnóstico ou
+ação/resolução por expertise (ver acima). Se for ação/resolução, capability ausente não se
+aplica — `TOOLS_ALLOWED: []` é a resposta, não escalação. Se for fato/diagnóstico, confirme que
+nenhuma tool declarada cobre o domínio de dados necessário antes de tratar como capability
+ausente. Só depois desse teste, se a intenção realmente exige capability que não existe no
+registry:
 
 1. não crie a capability nem invente nome de tool;
 2. não contorne com tool que "quase serve" — mas não confunda isso com usar uma tool aproximada
@@ -400,8 +409,9 @@ Criar capability é decisão humana e exige alterar o contrato MCP — congelado
 | 11a (controle negativo) | "[Verbo], depois confira se ficou certo" — insumo e entregável do mesmo domínio | Uma missão só, mesmo dono. O padrão "antes de/depois de" só vira duas missões quando os dois verbos pertencem a donos diferentes — não é o conectivo que decide, é o dono de cada parte |
 | 12 | Ação final exige aprovação, mas há levantamento/rascunho possível com tools existentes | Missão(ões) de preparo com `ESCALATE = false`, mais `ESCALATE = true` na resposta nomeando a etapa final que precisa de aprovação. Nunca `tasks: []` só porque a última etapa escala |
 | 12a (controle negativo) | Ação final exige aprovação e o próprio pedido já é a ação, sem levantamento prévio possível | `tasks: []` + `ESCALATE = true`. Aqui sim não há preparo a destacar |
-| 13 | Domínio certo identificado, e o owner tem tool aproximada (mesmo sem bater literalmente com o substantivo do pedido) ou Caso de referência análogo | Missão para esse owner com a tool aproximada. **Não** escale só porque o nome da tool não corresponde palavra por palavra ao pedido — ver teste a/b/c ("Capability ausente só bloqueia quando não há nada aproveitável") |
-| 13a (controle positivo) | Domínio certo identificado, mas nenhum owner tem qualquer tool aplicável aos aspectos materiais da missão, e nenhum Caso de referência sustenta uma missão | `tasks: []` + `ESCALATE = true` citando o gap (`CAPABILITY_GAPS`/E1.8). Nunca missão com `TOOLS_ALLOWED: []` como substituto de tool real, nem tool inventada |
+| 13 | Missão de fato/diagnóstico, e alguma tool declarada cobre o domínio de dados necessário (mesmo sem bater literalmente com o substantivo do pedido) | Missão para esse owner com a tool que cobre o domínio. **Não** escale só porque o nome da tool não corresponde palavra por palavra ao pedido — o critério é o domínio de dados, não o nome |
+| 13a (controle positivo) | Missão de fato/diagnóstico, e nenhuma tool declarada cobre o domínio de dados necessário (ex.: observabilidade de sistema em produção, quando só há tools de acervo) | `tasks: []` + `ESCALATE = true` citando o gap (`CAPABILITY_GAPS`/E1.8) — tool gap genuíno. Nunca missão com `TOOLS_ALLOWED: []` como substituto de tool real, nem tool inventada |
+| 13b (controle negativo) | Missão de ação/resolução por expertise (decisão, orientação, redação, resolução) que não exige observar estado externo | `TOOLS_ALLOWED: []` é válido — não é tool gap, a missão nunca precisou de tool. Não escale por ausência de tool |
 | 14 | Pergunta analítica ou decisória sobre preço, desconto, condição comercial, agenda, compromisso, priorização, arquivamento, classificação ou escolha entre alternativas, sem execução nem comunicação a destinatário nomeado | Missão normal do dono do domínio (avaliação/recomendação/priorização). Não escale só pelo vocabulário sensível — classifique A) análise/decisão, B) execução, C) comunicação externa; só B/C escalam |
 | 14a (controle negativo) | Desconto concreto já definido, mais comunicação a um cliente | `ESCALATE = true` — aqui o `OUTPUT` é a própria ação/decisão, não uma análise |
 
