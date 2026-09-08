@@ -73,31 +73,41 @@ Nota sobre `X-41`: acerta nas duas execuções, mas por uma leitura (relatos de 
 documentos do acervo) que o contrato marca como `UNDETERMINED_BY_CONTRACT`. É acerto sobre
 premissa não declarada.
 
-### STABLE_WRONG — 3 casos
+### STABLE_WRONG — 5 casos
 
-Erros reais e reprodutíveis do router. Não corrigidos; ver "Por que o tuning parou".
+`X-07 X-08 X-10 X-29 X-42`
 
+Falham de forma reprodutível nas duas execuções. Não corrigidos; ver "Por que o tuning parou".
+
+- **X-07** — posicionamento de marca → brief de campanha: produz 1 missão de `marketing-nar`;
+  o expected pede 2 (`produto-nar` → `marketing-nar`). **Pendente de adjudicação contratual**
+  — ver abaixo.
 - **X-08** — "a partir das falhas registradas, engenharia decide o rollback": produz 1 missão
   de `engenharia-nar`; o esperado são 2 (`engenharia-nar` → `produto-nar`, regra 5). O owner
   citado na intenção sobrepõe o ownership de contrato.
+- **X-10** — consulta de histórico + arquivamento de relatório: produz 1 missão de
+  `marketing-nar` com `escalate: true`; o expected pede `escalate: false`. **Pendente de
+  adjudicação contratual** — ver abaixo.
 - **X-29** — remarcação de demo: escala indevidamente. O eixo de escalação é estável; o owner
   oscilou entre `atendimento-nar` e `crm-nar` entre execuções, então o caso é híbrido.
 - **X-42** — guardrail de marca → revisão de roteiro: produz 1 missão de `produto-nar`; o
   esperado são 2 (`marketing-nar` → `produto-nar`). Confunde `ALLOWED_AGENTS` com `OWNER`.
 
-### BENCHMARK_ISSUE — 2 casos
+#### Pendências de adjudicação: X-07 e X-10
 
-Gabaritos que contradizem contratos vigentes. O router aplica os contratos corretamente.
+Os dois permanecem classificados como `STABLE_WRONG` porque **nenhuma adjudicação contratual
+final foi executada** para eles. Existem hipóteses documentadas de que a divergência esteja no
+gabarito e não no router — em X-07, uma possível contradição entre o expected e o
+`OWNER=marketing-nar` declarado no registry; em X-10, uma possível contradição entre o expected
+e a regra A6 da `approval-policy.md`. Essas hipóteses **não foram adjudicadas** e não sustentam,
+por si, reclassificação.
 
-- **X-07** — o expected atribui `campaign_get_brand_context` a `produto-nar`, contra o
-  `OWNER=marketing-nar` declarado no registry. O router responde 1 missão de `marketing-nar`
-  nas duas execuções, coerente com o registry. É a mesma contradição que já foi corrigida em
-  X-14 e não foi propagada para cá.
-- **X-10** — o expected trata "arquivar o relatório" como organização interna
-  (`escalate: false`), mas A6 lista "mover arquivo no Drive" sem exceção. O router escala nas
-  duas execuções, aplicando A6. **Decisão de governança: mantido como está, sem correção.**
-  Uma correção do expected para `escalate: true` foi construída e validada em teste dirigido,
-  e foi deliberadamente não incorporada — fica registrada aqui como pendência conhecida.
+Enquanto a adjudicação não acontecer, valem as regras:
+
+- os dois contam como `STABLE_WRONG` em qualquer métrica ou relato;
+- nenhum `expected` foi alterado — o benchmark está exatamente como estava no baseline;
+- reclassificar qualquer um dos dois exige uma adjudicação contratual explícita, pós-freeze,
+  registrada como decisão própria.
 
 ### CONTRACT_UNDERDETERMINED — 3 casos
 
@@ -149,8 +159,9 @@ O freeze cobre o `rufas-router.md`. Não cobre, e pode evoluir sem revogá-lo:
 
 - **Contrato e registry** — as pendências abertas em `UNDETERMINED_BY_CONTRACT` (relatos de bug
   no acervo observável) e os três casos `CONTRACT_UNDERDETERMINED` são resolvíveis no contrato.
-- **Benchmark** — X-07 e X-10 são correções de gabarito já diagnosticadas, sem impacto no
-  router.
+- **Benchmark** — X-07 e X-10 têm hipóteses de contradição com o registry e a
+  `approval-policy.md` levantadas mas não adjudicadas (ver "Pendências de adjudicação" acima).
+  A adjudicação, seja qual for o resultado, não altera o router.
 - **Metodologia de medição** — qualquer avaliação futura precisa de N repetições por
   configuração. Uma execução única não distingue efeito de ruído neste sistema.
 
