@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Levantar as propostas paradas há mais de 20 dias sem movimento.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["proposal_get_pending"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

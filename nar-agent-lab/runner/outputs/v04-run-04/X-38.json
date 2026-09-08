@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A intenção pede aprovar e já comunicar ao cliente um desconto fixo de 12% no plano anual — condição comercial concreta (E1.1/A3) e comunicação a contato real (E1.4/A1), ambas sem exceção. O OUTPUT pedido é a própria ação (oferta de desconto + comunicação já feita), não uma análise ou recomendação a ser revisada por humano depois — não há preparo/levantamento distinto a destacar como missão, pois o desconto já vem definido e a comunicação é a execução em si. Decisão e envio cabem a humano comercial (A3) e ao aprovador da conta (A1)."
+}

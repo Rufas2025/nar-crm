@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Publicar a página institucional no site é ação externa e irreversível (A2 — publicar conteúdo externo), sem revisão humana intermediária. O pedido em si já é a ação de publicação, sem levantamento ou rascunho prévio pendente que possa virar missão com as tools do registry (nenhum agente possui capability de escrita ou de publicação; produto-nar/marketing-nar teriam apenas leitura de acervo/guardrails, e a intenção não pede revisão de posicionamento, só a publicação). Escala por E1.4 (ação irreversível/externa) e A2 da approval-policy.md — aprovador: humano de marketing."
+}

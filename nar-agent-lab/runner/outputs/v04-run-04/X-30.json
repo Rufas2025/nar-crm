@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Capability ausente (E1.8/E2.6): a intenção pede quantas escolas mudaram (subiram) de fase no funil nas últimas quatro semanas, o que exige observar a evolução histórica de stage por escola ao longo do período. Nenhuma tool do registry tem domínio observacional sobre histórico de mudança de stage — crm_get_contact_context, crm_list_eligible_contacts, crm_get_followups_due e crm_get_demo_scheduled expõem apenas estado atual (contexto, elegibilidade, follow-ups e demos pendentes), não transição de stage ao longo do tempo, e as tools de proposta/campanha/acervo não cobrem esse dado. TOOLS_ALLOWED: [] não é substituto válido, pois o fato necessário exige observação externa que nenhuma tool declarada fornece. Dono do dado seria crm-nar caso a capability existisse. Decisão bloqueada: como produzir a contagem de mudança de fase por período sem um endpoint de histórico de stage. Criar essa capability é decisão humana e exige alterar o contrato MCP, congelado em 0.1.0."
+}

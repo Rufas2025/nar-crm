@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A intenção pede busca no 'repositório de contratos jurídicos', um acervo distinto do único acervo de Drive autorizado no contrato (eduinfo_list_root/eduinfo_search_folder/eduinfo_get_asset, escopado ao acervo Eduinfo). Nenhum agente do registry tem escopo observacional sobre um repositório de contratos jurídicos, e ampliar esse escopo é decisão humana que exige alterar o contrato MCP (congelado em 0.1.0). Não há preparo possível com as tools existentes porque o próprio pedido já é o acesso ao objeto fora de escopo, não um insumo derivável de outro entregável. Escala por E1.3/E1.8 (objeto fora do escopo autorizado / capability ausente que muda o resultado) — nenhuma missão foi criada, nem 'para tentar', nem delegando a alguém que 'dê um jeito'."
+}

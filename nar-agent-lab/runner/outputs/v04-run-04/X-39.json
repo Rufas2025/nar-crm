@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Verificar se cobrar taxa de matrícula fora do período está dentro da política/guardrail vigente.",
+      "OWNER": "produto-nar",
+      "TOOLS_ALLOWED": ["eduinfo_search_folder", "eduinfo_get_asset"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

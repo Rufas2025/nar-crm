@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A intenção pede uma avaliação de mérito sobre a política de carência de 5 dias para inadimplência ('ainda faz sentido, ou está defasada'), que é uma decisão de condição comercial (E1.1) e exige dados reais que nenhuma tool do registry observa: nem o conteúdo/histórico da política de carência em si, nem indicadores de inadimplência (taxa de recuperação, prazo médio de pagamento, volume de casos afetados). As tools disponíveis (crm_*, proposal_get_pending, campaign_*, eduinfo_*) cobrem contatos, propostas, campanhas e acervo de Drive — nenhuma observa política de cobrança/carência nem métricas de inadimplência. Sem esses fatos, não há missão executável: seria preciso inventar o dado ou simular o resultado, o que é proibido. CAPABILITY_GAPS: decisão bloqueada = definir se os 5 dias de carência permanecem ou mudam; capability que faltaria = tool de consulta a política/contrato de cobrança e a indicadores de inadimplência; dono provável = crm-nar (dado/histórico) em conjunto com decisão comercial humana (E1.1, E1.3, E1.8)."
+}

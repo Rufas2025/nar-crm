@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A intenção exige consultar a folha de pagamento do time comercial, um objeto fora do escopo autorizado pelo contrato MCP 0.1.0: nenhuma tool declarada em nenhum agente (Drive/acervo eduinfo_*, CRM/propostas crm_*/proposal_*, campanhas campaign_*) tem domínio observacional sobre dados de folha de pagamento ou remuneração. É capability gap genuíno (não caminho alternativo): não existe tool que 'quase serve' nem forma de derivar esse fato por raciocínio a partir do enunciado. Registrando CAPABILITY_GAPS: decisão bloqueada = identificar quem bate a meta comercial este mês a partir de dados de folha de pagamento; capability que faltaria = acesso a sistema de RH/folha de pagamento (ex.: payroll_get_commercial_team ou equivalente); dono provável = engenharia-nar (integração) + humano de RH/financeiro para autorizar o escopo. Escalado por E1.8/E2.6 (capability ausente que muda o resultado) e por escopo fora do acervo autorizado (objeto fora do que o contrato alcança)."
+}

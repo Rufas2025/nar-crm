@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Capability ausente (E1.8/E2.6, CAPABILITY_GAPS): a missão exige observação externa do histórico de deploys do módulo de matrícula nas últimas duas semanas (estado de sistema em produção), e nenhuma tool do registry 0.1.0 tem domínio observacional sobre deploys ou workflows em produção — engenharia-nar só possui tools de acervo Drive (eduinfo_list_root, eduinfo_search_folder, eduinfo_get_asset), que não observam histórico de deploy. Não há capability equivalente em nenhum outro agente. Gap genuíno: decisão bloqueada é se reverter a última versão do módulo de matrícula; capability que faltaria é algo como 'engenharia_get_deploy_history'; dono seria engenharia-nar. Adicionalmente, a decisão final de reverter é ação material/irreversível sobre ambiente compartilhado (A7), que também exigiria aprovação humana mesmo se o histórico estivesse disponível. Não é possível criar a capability nem simular o resultado; a resposta correta é registrar o gap e escalar a HUMAN."
+}

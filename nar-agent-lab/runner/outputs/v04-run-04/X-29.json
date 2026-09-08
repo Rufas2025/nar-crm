@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Levantar o agendamento atual da demo da escola Tucano e o contexto do contato para preparar a remarcação pedida pelo diretor.",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": ["crm_get_demo_scheduled", "crm_get_contact_context"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Remarcar a demo (alterar compromisso já agendado) é ação que compromete um horário perante terceiro (A5/A4-like, sem capability de escrita no contrato 0.1.0) e depende do novo horário desejado pelo diretor, que não foi informado — decisão material/execução: confirmar o novo horário exige aprovação humana (E1.1/E1.4). O levantamento do agendamento atual e do contexto do contato já é preparo executável e foi emitido como missão."
+}

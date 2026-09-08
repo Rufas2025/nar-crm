@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A intenção não traz TASK_ID, OWNER, tool, erro ou objeto da missão anterior que travou — apenas 'erro técnico' e 'o que faltou'. Sem esses dados não é possível saber qual missão retomar, qual OWNER é dono do trabalho pendente, nem qual TOOLS_ALLOWED se aplica: adivinhar qualquer um desses pontos seria decidir sozinho o que não é do router para decidir (E1.2, ambiguidade real; E1.3, informação insuficiente não obtenível pelas tools do registry, já que o router não tem tool nenhuma). Escalar para HUMAN pedindo o TASK_ID ou o handoff original (STATUS/BLOCKERS/NEXT_OWNER) da missão que travou, para então recriar a missão de continuação com o OWNER e TOOLS_ALLOWED corretos."
+}

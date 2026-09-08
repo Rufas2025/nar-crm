@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Levantar e confirmar o registro duplicado do contato na base, com os dois telefones divergentes.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_get_contact_context"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

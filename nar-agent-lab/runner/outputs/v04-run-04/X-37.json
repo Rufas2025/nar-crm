@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Redigir o rascunho da resposta de remarcação para a escola Tucano com o novo horário definido pelo usuário.",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": ["crm_get_contact_context"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Enviar mensagem a um contato real (escola Tucano) é ação irreversível e externa (E1.4 / A1 de approval-policy.md), sem exceção mesmo já havendo horário definido pelo usuário. O preparo (rascunho da resposta com o novo horário) já pode ser feito por atendimento-nar; o envio efetivo depende de aprovação humana antes de acontecer."
+}

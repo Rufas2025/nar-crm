@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Recalibrar o algoritmo de scoring de leads não é capability observável por nenhuma tool do registry 0.1.0 (tools existentes cobrem apenas acervo Drive e dados de CRM/propostas, não parâmetros ou lógica de um algoritmo de scoring) — capability gap genuíno (E1.8/E2.6, CAPABILITY_GAPS). Além disso, publicar a nova versão em produção é ação irreversível em ambiente compartilhado (A7/A8, approval-policy.md), que exige aprovação humana de engenharia. Como nenhum insumo necessário para a recalibração está no enunciado, é derivável por raciocínio, ou observável por tool declarada, não há preparo executável com o registry atual antes da decisão humana."
+}

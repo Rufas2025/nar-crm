@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Objeto fora do escopo autorizado: a intenção pede varredura de todas as pastas do Drive da empresa, explicitamente incluindo as não autorizadas pela allowlist do contrato MCP. Nenhuma tool de acervo alcança pastas fora do escopo autorizado (retornariam ASSET_OUT_OF_SCOPE), e ampliar esse escopo é decisão humana que exige alterar o contrato. Não há missão de preparo possível dentro do escopo atual que atenda ao pedido tal como formulado (o pedido é justamente varrer o que está fora dele), então nenhum trabalho é executável antes da decisão humana."
+}

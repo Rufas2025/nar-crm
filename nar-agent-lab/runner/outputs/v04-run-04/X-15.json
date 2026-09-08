@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A ação pedida é compartilhar um arquivo no Drive com a equipe comercial — ação externa e irreversível (A6), sem nenhuma capability de escrita no contrato MCP 0.1.0. O próprio pedido já é a ação de compartilhamento, sem levantamento prévio a fazer: não há necessidade de localizar ou validar a planilha antes de decidir compartilhá-la, então não há missão de preparo a destacar. Escala por E1.4/E1.8, citando o gap: capability de compartilhamento no Drive não existe no registry; dono seria engenharia-nar/produto-nar quando essa capability for criada; aprovação cabe ao humano responsável pelo acervo (A6)."
+}

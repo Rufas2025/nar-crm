@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Cancelamento de contrato é ação material, irreversível e externa (A4/E1.1/E1.4) — exige aprovação humana no caminho de execução, que não existe no contrato MCP 0.1.0 (zero capabilities de escrita). A intenção pede a execução em si, sem levantamento prévio a fazer ('sem mais levantamento — a decisão já foi tomada'), então não há missão de preparo a destacar: tasks:[] + ESCALATE:true."
+}

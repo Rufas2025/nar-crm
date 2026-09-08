@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Levantar os follow-ups vencidos.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_get_followups_due"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Diagnosticar por que o acervo está lento exige observar desempenho/latência do sistema do acervo, e nenhuma tool declarada tem esse domínio observacional — eduinfo_list_root, eduinfo_search_folder e eduinfo_get_asset apenas listam ou obtêm conteúdo/estrutura, não medem tempo de resposta ou causa de lentidão. Capability gap genuíno (E1.8/E2.6): a decisão de investigação técnica de performance fica bloqueada; a capability que faltaria seria de observabilidade/telemetria do acervo, cujo dono seria engenharia-nar."
+}
