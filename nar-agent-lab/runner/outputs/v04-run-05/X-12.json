@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Levantar os follow-ups vencidos até a data de referência.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_get_followups_due"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Diagnosticar por que o acervo está lento exige observar telemetria, logs, latência ou desempenho de sistema em produção. Nenhuma tool do registry (eduinfo_list_root, eduinfo_search_folder, eduinfo_get_asset) observa isso — elas só expõem existência, autorização e metadados estáticos de itens do acervo (nome, mimeType, tamanho), não performance. Esse fato está explicitamente listado em 'Não observado por nenhuma tool'. É capability gap genuíno (E1.8/E2.6, CAPABILITY_GAPS): decisão bloqueada é o diagnóstico de causa da lentidão do acervo; capability que faltaria é uma tool de telemetria/latência de sistema; dono seria engenharia-nar quando essa capability existir. Não se cria missão com TOOLS_ALLOWED:[] como substituto, nem se usa tool 'que quase serve' para simular esse dado."
+}

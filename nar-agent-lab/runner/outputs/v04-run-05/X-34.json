@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Capability gap genuíno (E1.8 / CAPABILITY_GAPS): o insumo pedido (histórico de deploys do módulo de matrícula nas últimas duas semanas) é item explicitamente não observado por nenhuma tool do registry ('historico de deploy, versoes publicadas ou rollback aplicado' está listado em 'Não observado por nenhuma tool'). Nenhuma tool de nenhum agente tem domínio observacional sobre deploys/versões publicadas, então não há missão de levantamento possível para nenhum OWNER, mesmo que 'engenharia-nar' seja o dono natural do tema. Além disso, a decisão final que a intenção nomeia — reverter a última versão do módulo de matrícula — é ação irreversível sobre ambiente compartilhado (A7: alterar workflow/ambiente em produção exige aprovação do humano de engenharia, com rollback definido) e decisão material (E1.1/E1.4), portanto exigiria HUMAN de qualquer forma. Como não existe nenhum preparo executável com as tools atuais (o próprio insumo necessário é o gap), a resposta correta é tasks:[] + ESCALATE:true, e não uma missão com TOOLS_ALLOWED:[] como substituto da tool que falta."
+}

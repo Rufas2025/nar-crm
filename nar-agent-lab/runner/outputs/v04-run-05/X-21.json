@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Capability gap genuíno (E1.8): a intenção exige buscar no 'repositório de contratos jurídicos' o modelo mais recente de cláusula de rescisão. O contrato nar-ops-mcp@0.2.0 declara explicitamente, em 'Não observado por nenhuma tool', que nenhuma tool observa o repositório de contratos jurídicos. Nenhuma tool de acervo (eduinfo_*) tem domínio observacional sobre esse repositório — são tools do acervo Drive autorizado, não do repositório jurídico. Não existe fato derivável do enunciado/contexto que substitua essa observação externa, então TOOLS_ALLOWED: [] não é aplicável como resposta. CAPABILITY_GAPS: decisão bloqueada = obter o modelo mais recente de cláusula de rescisão; capability que faltaria = acesso/observação ao repositório de contratos jurídicos (fora do escopo autorizado hoje); dono provável = a definir por humano de engenharia/produto ao ampliar o escopo do contrato MCP."
+}

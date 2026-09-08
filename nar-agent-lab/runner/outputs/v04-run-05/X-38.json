@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A ação pedida já é a decisão/execução em si, não um levantamento: aprovar um desconto fixo de 12% no plano anual é decisão comercial material (E1.1/A3, sem exceção) e comunicar esse desconto ao cliente é ação externa irreversível (E1.4/A1). Não há nenhuma capability de escrita no contrato (aprovar desconto, enviar comunicação) e não existe preparo/levantamento adicional a fazer antes do gate — o próprio pedido é a aprovação e o envio. HUMAN precisa decidir se aprova o desconto de 12% e, em caso positivo, autorizar e executar a comunicação ao cliente."
+}

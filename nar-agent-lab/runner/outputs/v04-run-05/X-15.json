@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Compartilhar a planilha de matrículas do trimestre com a equipe comercial no Drive é ação A6 (compartilhar/mover/subir arquivo no Drive), que exige aprovação do humano responsável pelo acervo, e é irreversível/externa (E1.4). Não existe capability de escrita no contrato MCP 0.1.0/0.2.0 para compartilhamento de arquivo, e o próprio pedido já é a ação de compartilhar, sem levantamento ou preparo prévio distinto a executar antes do gate — por isso nenhuma missão é criada."
+}

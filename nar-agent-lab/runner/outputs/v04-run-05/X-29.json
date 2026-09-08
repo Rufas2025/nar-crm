@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Levantar os dados atuais da demo agendada da escola Tucano (contato, data/hora agendada, stage atual).",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": ["crm_get_demo_scheduled"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Remarcar a demo é alterar um compromisso já agendado com um contato real (A4/A5-like: alteração de compromisso definitivo) — não existe nenhuma capability de escrita no contrato para reagendar, e a decisão de novo horário depende do que o diretor pediu e da disponibilidade, que só um humano pode confirmar e efetivar. O levantamento do agendamento atual é preparo legítimo e já foi encomendado; a remarcação em si fica bloqueada em HUMAN (E1.4 / capability de escrita ausente, E1.8)."
+}

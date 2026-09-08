@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Pergunta pede avaliação/decisão sobre a política de carência para inadimplência (prazo de tolerância) — condição comercial/prazo contratual (E1.1). Não é erro de ferramenta, dado ou posicionamento de marca: nenhuma tool do registry observa política operacional de carência/inadimplência (explicitamente fora do escopo de campaign_get_brand_context, que só cobre posicionamento e guardrails de marca, não políticas operacionais como carência ou prazos contratuais). Não há insumo de estado/histórico a levantar que mude essa avaliação — a pergunta em si já é o pedido de decisão sobre se a condição vigente deve mudar, o que é ação/decisão sobre condição comercial reservada ao humano comercial (approval-policy A3), sem preparo executável com as tools existentes."
+}

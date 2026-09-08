@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Capability gap genuíno (E1.8/CAPABILITY_GAPS): a intenção pede quantas escolas subiram de fase no funil nas últimas quatro semanas, ou seja, transição de stage ao longo do tempo. Nenhuma tool do registry observa isso — crm_list_eligible_contacts e crm_get_contact_context expõem apenas o stage ATUAL (valor único), e o histórico de interação registrado (data/canal/resumo) não permite derivar mudança de fase. O contrato declara explicitamente 'transição de stage ao longo do tempo' como não observado por nenhuma tool em nar-ops-mcp@0.2.0. Não há missão de preparo possível com as tools existentes, pois o próprio pedido é a métrica ausente. Dono que seria responsável pelo dado, se a capability existisse: crm-nar."
+}

@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Capability gap genuíno (E1.8): recalibrar o algoritmo de scoring de leads depende de dado não observado por nenhuma tool do registry (algoritmo de scoring, sua configuração e desempenho estão listados em 'Não observado por nenhuma tool'), e publicar a nova versão em produção exige capability de escrita/deploy que não existe no contrato MCP 0.2.0 (zero capabilities de escrita). Não há levantamento ou preparo executável com as tools disponíveis para nenhuma das duas partes do pedido — o pedido inteiro é a própria ação/gap, sem insumo observável por eduinfo_*, crm_*, campaign_* ou proposal_get_pending. Decisão de negócio bloqueada: recalibração e publicação do scoring de leads. Capability que faltaria: acesso de leitura/escrita ao motor/config de scoring e capability de deploy/publicação em produção. Dono provável: engenharia-nar (workflow/backend), com aprovação de produto/engenharia (A7/A8)."
+}

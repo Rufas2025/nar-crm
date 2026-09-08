@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Decisão material de condição comercial: aprovar desconto de 10% no contrato anual da escola Tucano. Regra E1.1/A3 — preço, desconto e condição comercial exigem aprovação humana, sem exceção, mesmo que já tenha sido sinalizado antes. O próprio pedido já é a ação de aprovação em si (não há levantamento ou rascunho intermediário a preparar antes do gate), então tasks fica vazio e ESCALATE=true."
+}

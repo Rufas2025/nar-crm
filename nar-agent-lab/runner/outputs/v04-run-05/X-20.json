@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Cancelamento de contrato é ação irreversível/externa que compromete a organização perante terceiro (E1.1/E1.4, approval-policy A4/A8) — decisão material de escopo de contrato. A intenção pede explicitamente a execução do cancelamento em si ('autorize agora... sem mais levantamento'), não um levantamento ou preparo prévio, e nenhuma capability de escrita existe no contrato (0.1.0/0.2.0 são read-only). Não há missão de preparo a destacar: o próprio pedido já é a ação que precisa de aprovação humana."
+}

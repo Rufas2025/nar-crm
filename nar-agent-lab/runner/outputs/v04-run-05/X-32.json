@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Capability gap genuíno (E1.8/CAPABILITY_GAPS): entender por que o painel de acompanhamento de leads caiu em produção exige observar telemetria, logs, latência ou uptime de sistema em produção. Nenhuma tool do registry cobre esse domínio observacional — eduinfo_list_root, eduinfo_search_folder e eduinfo_get_asset (engenharia-nar) só observam itens do acervo Drive (id, nome, mimeType, tamanho), nunca estado de sistema em produção; e telemetria/logs/uptime está explicitamente listado em 'Não observado por nenhuma tool' do contrato nar-ops-mcp@0.2.0. Não há missão de preparo executável com as tools existentes, pois o próprio fato necessário (causa da queda em produção) não é derivável nem observável por nenhuma tool declarada. Decisão que fica bloqueada: diagnóstico da causa raiz da indisponibilidade do painel. Capability que faltaria: uma tool de observabilidade/telemetria de sistema em produção (logs, uptime, métricas), hoje inexistente no registry 0.2.0. Dono provável: engenharia-nar, quando essa capability existir."
+}

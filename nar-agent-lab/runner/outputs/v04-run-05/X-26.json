@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "O handoff que voltou já nomeia a decisão pendente: oferecer desconto/condição comercial. Isso é decisão material (approval-policy.md A3; escalation-policy.md E1.1) e A3 não tem exceção — o router não decide desconto nem cria missão para contornar isso. A ação correta é repassar a decisão a HUMAN, mantendo o NEXT_OWNER proposto pelo agente anterior como sugestão, não como delegação já feita. Nenhuma missão nova é necessária: não há trabalho executável pelos agentes especialistas antes dessa decisão, e o router não é OWNER de missão nem pode decidir preço/desconto em lugar do humano."
+}

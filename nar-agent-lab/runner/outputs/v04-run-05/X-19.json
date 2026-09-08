@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Redigir o rascunho da página institucional sobre a certificação recebida, alinhado ao posicionamento e guardrails de marca vigentes.",
+      "OWNER": "marketing-nar",
+      "TOOLS_ALLOWED": ["campaign_get_brand_context"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Publicar no site é ação externa e irreversível (A2/E1.4) e não existe capability de escrita/publicação no contrato — decisão e execução de publicação ficam com humano."
+}

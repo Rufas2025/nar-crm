@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Levantar os contatos com proposta parada há mais de 30 dias, com dias de espera e contexto de status.",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": ["proposal_get_pending"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Enviar lembrete de cobrança a contatos reais é ação irreversível e externa (E1.4 / A1 approval-policy.md), sem capability de escrita/envio no contrato — exige aprovação humana e definição do texto/canal antes de qualquer envio."
+}

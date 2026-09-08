@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A intenção se refere a execuções anteriores dos agentes ('os agentes já responderam tudo que foi pedido; só preciso do resumo final'), mas nenhum payload de handoff (STATUS/TASK_ID/OWNER/SUMMARY/OUTPUT/NEXT_OWNER) foi entregue junto da intenção. Conforme handoff-contract.md, uma intenção que se refere a uma execução anterior não é auto-suficiente: o router não tem memória das execuções passadas e não pode reconstruí-las por inferência, nem simular ou inventar o conteúdo dos handoffs. Sem esse payload, a consolidação é genuinamente indecidável (E1.3 — informação insuficiente para a decisão, não obtenível por nenhuma tool do registry, já que rufas-router não possui tools). Nenhuma missão nova é necessária ou cabível aqui (o trabalho já foi executado pelos agentes); o que falta é o payload dos handoffs para que o router possa consolidar STATUS/SUMMARY/NEXT_OWNER de cada um, sem reprocessar o raciocínio deles."
+}
