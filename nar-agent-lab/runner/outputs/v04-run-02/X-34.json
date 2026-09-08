@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Nenhum agente do registry possui capability que alcance histórico de deploys/versões de workflow (engenharia-nar só tem eduinfo_list_root, eduinfo_search_folder, eduinfo_get_asset — tools de acervo Drive, não de deploy/versionamento). Não há tool aproximada nem Caso de referência que sustente missão de levantamento. CAPABILITY_GAP: falta capability de consulta a histórico de deploy/versão de módulo (ex.: deploy_get_history), dono seria engenharia-nar. Além disso, reverter a última versão é alteração de workflow em ambiente compartilhado (approval-policy.md A7) e exige aprovação humana mesmo se o histórico existisse. Escalar para HUMAN citando o gap (E1.8) e a decisão pendente (reverter ou não a última versão)."
+}

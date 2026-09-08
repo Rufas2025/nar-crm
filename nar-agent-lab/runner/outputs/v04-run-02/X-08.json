@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Levantar no acervo as falhas técnicas já registradas relevantes para esta sprint.",
+      "OWNER": "engenharia-nar",
+      "TOOLS_ALLOWED": ["eduinfo_list_root", "eduinfo_search_folder", "eduinfo_get_asset"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    },
+    {
+      "TASK_ID": "T-20260908-002",
+      "OBJ": "Decidir, a partir das falhas técnicas levantadas, o que precisa de rollback nesta sprint.",
+      "OWNER": "produto-nar",
+      "TOOLS_ALLOWED": [],
+      "DEPENDENCIES": ["T-20260908-001"],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

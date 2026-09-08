@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Levantar o horário atual da demo da escola Tucano e preparar a proposta de novo horário para o diretor.",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": ["crm_get_demo_scheduled", "crm_get_contact_context"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Remarcar a demo é um compromisso externo com o diretor da escola Tucano (novo horário confirmado) — não há capability de escrita no contrato para alterar o agendamento nem enviar a confirmação ao contato (A1/A4, E1.4). O levantamento e a proposta de novo horário já podem ser preparados por atendimento-nar; a confirmação final da remarcação exige aprovação humana."
+}

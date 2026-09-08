@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Identificar e consolidar o registro duplicado do contato, apontando qual telefone é o correto ou como reconciliar os dois.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_get_contact_context", "crm_list_eligible_contacts"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

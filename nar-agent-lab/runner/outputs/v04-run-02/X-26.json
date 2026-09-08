@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "O handoff recebido trouxe uma decisão de desconto/condição comercial pendente. Isso é decisão material (approval-policy.md A3; escalation-policy.md E1.1) e não tem exceção — o router não decide nem cria missão para contornar; repassa a HUMAN a decisão nomeada."
+}

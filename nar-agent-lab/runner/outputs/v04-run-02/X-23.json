@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Nenhum agente do registry tem domínio ou tool que alcance folha de pagamento do time comercial (dado de RH/financeiro interno, fora do escopo do capability registry 0.1.0 — não é CRM, propostas, campanhas nem Drive). Nenhum owner cobre a intenção e nenhuma tool aproximada existe; capability ausente que muda o resultado (E1.8/E2.6). Criar essa capability exige alterar o contrato MCP, decisão humana. Escala para HUMAN citando o gap: decisão bloqueada é identificar quem bateu a meta comercial no mês; capability faltante seria acesso a dados de folha de pagamento/performance de vendas; dono provável seria um futuro agente de RH/financeiro, hoje inexistente."
+}

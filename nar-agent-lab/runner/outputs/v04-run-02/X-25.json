@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Informação insuficiente para decisão material (E1.3/E1.2): a intenção não identifica qual missão travou, qual TASK_ID, qual OWNER, qual tool retornou erro, nem o que exatamente 'faltou' concluir. Sem esses dados não é possível determinar o domínio correto (erro de tool é sempre engenharia-nar, mas isso não pode ser assumido sem evidência do erro técnico real) nem montar uma missão de retomada válida — o router não pode inventar TASK_ID de origem, tool ou escopo. Não há tool no registry que permita ao router descobrir sozinho qual missão anterior travou; esse dado precisa vir do humano ou do handoff original antes de qualquer missão poder ser emitida."
+}

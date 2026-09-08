@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "O objeto da intenção (repositório de contratos jurídicos / cláusulas de rescisão) não corresponde a nenhum acervo dentro do escopo autorizado pelo contrato MCP 0.1.0 — o Drive coberto pelas tools eduinfo_list_root/eduinfo_search_folder/eduinfo_get_asset é o acervo Eduinfo, e nenhum agente do registry tem tool que alcance um repositório de contratos jurídicos. Não há dado ou insumo obtenível pelas tools existentes que sustente uma missão de levantamento, diagnóstico ou preparo. Ampliar o escopo para outro acervo/sistema é decisão humana que exige alterar o contrato. Escala por E2.2/E1.8 (capability e escopo ausentes) — nenhum owner, tool aproximada ou Caso de referência cobre este objeto."
+}

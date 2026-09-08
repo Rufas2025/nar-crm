@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Publicar página institucional no site é ação externa e irreversível (A2 — publicar conteúdo externo; E1.4), e não há nenhuma capability de escrita/publicação no contrato MCP 0.1.0. O próprio pedido já é a ação de publicação, sem levantamento ou rascunho prévio pendente descrito na intenção — não há preparo a destacar como missão. Requer aprovação e execução humana (humano de marketing / engenharia, conforme approval-policy.md A2 e A6)."
+}

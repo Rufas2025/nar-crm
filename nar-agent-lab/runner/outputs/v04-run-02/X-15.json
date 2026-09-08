@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A6 (compartilhar arquivo no Drive) exige aprovação humana e é ação irreversível/externa (E1.4). O pedido inteiro já é a própria ação de compartilhamento - não há entregável distinto de levantamento, diagnóstico ou preparo a destacar como missão antes do gate; localizar a planilha não é um insumo que muda o resultado, é parte da mesma ação de compartilhar que precisa de aprovação do humano responsável pelo acervo."
+}

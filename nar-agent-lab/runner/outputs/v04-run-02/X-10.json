@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Levantar o histórico de campanhas da rede Girassol",
+      "OWNER": "marketing-nar",
+      "TOOLS_ALLOWED": ["campaign_get_history"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Arquivar o relatório antigo é ação de escrita sobre arquivo no Drive (mover/alterar), regra A6 de approval-policy.md, e nenhuma capability de escrita existe no contrato 0.1.0 (todas as tools são read-only) — decisão e execução ficam bloqueadas até aprovação e capability de escrita humana."
+}

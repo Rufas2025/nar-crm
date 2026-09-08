@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Levantar as propostas paradas há mais de 30 dias e o contexto de cada contato, com rascunho do texto de cobrança pronto para aprovação.",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": ["proposal_get_pending", "crm_get_contact_context"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Enviar lembrete de cobrança a contatos reais é ação irreversível e externa (A1 de approval-policy.md, E1.4 de escalation-policy.md) e não existe capability de escrita/envio no contrato MCP 0.1.0. O levantamento das propostas paradas há mais de 30 dias e o rascunho do lembrete podem prosseguir como missão de atendimento-nar; o envio em si aguarda aprovação humana."
+}

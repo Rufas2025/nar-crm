@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Diagnosticar a causa da queda do painel de acompanhamento de leads em produção",
+      "OWNER": "engenharia-nar",
+      "TOOLS_ALLOWED": [],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}

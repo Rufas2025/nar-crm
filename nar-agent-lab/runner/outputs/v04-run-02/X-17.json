@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Levantar os contatos da escola Tucano e identificar quais estão com stage incorreto no CRM.",
+      "OWNER": "crm-nar",
+      "TOOLS_ALLOWED": ["crm_list_eligible_contacts", "crm_get_contact_context"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Corrigir o stage de um contato no CRM é alteração de dado (A5 da approval-policy.md), sem capability de escrita no contrato MCP 0.1.0. O levantamento/diagnóstico dos contatos da escola Tucano com stage incorreto é missão executável agora (crm-nar); a correção em si fica bloqueada aguardando aprovação do humano responsável pelo CRM, que deve confirmar cada correção antes de aplicada."
+}

@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Cancelamento de contrato é ação material, irreversível e de execução (A3/A4/E1.1/E1.4) sem capability de escrita no contrato MCP 0.1.0. O pedido explicitamente dispensa levantamento prévio ('sem mais levantamento — a decisão já foi tomada'), então não há missão de preparo a destacar: o próprio pedido já é a ação de execução. Nenhum agente pode autorizar ou executar cancelamento de contrato; escala para HUMAN antes de qualquer trabalho."
+}

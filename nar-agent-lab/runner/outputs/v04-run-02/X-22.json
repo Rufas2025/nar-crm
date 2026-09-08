@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "A intenção pede varredura de todas as pastas do Drive, explicitamente incluindo as não autorizadas. O contrato MCP delimita o acesso do Drive a uma allowlist de pastas; qualquer objeto fora dela retorna ASSET_OUT_OF_SCOPE e nenhum agente (marketing-nar, produto-nar, engenharia-nar) alcança esse escopo com suas tools. Ampliar o escopo autorizado é decisão humana (exige alterar o contrato). Não há missão de preparo a destacar: o próprio pedido é acessar pastas fora do escopo, não um levantamento dentro dele."
+}

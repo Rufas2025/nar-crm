@@ -1,0 +1,5 @@
+{
+  "tasks": [],
+  "ESCALATE": true,
+  "ESCALATION_REASON": "Recalibrar o algoritmo de scoring de leads não tem capability correspondente no registry: engenharia-nar (dono de backend/workflow/n8n) só possui eduinfo_list_root, eduinfo_search_folder, eduinfo_get_asset (Drive), nenhuma delas alcança lógica de scoring, e nenhum Caso de referência cobre esse padrão (CAPABILITY_GAPS/E1.8) — não há nenhum trabalho de levantamento/preparo executável com as tools existentes para essa etapa. Além disso, publicar a nova versão em produção altera workflow em ambiente compartilhado (approval-policy A7, irreversível sem rollback aprovado) e exige aprovação humana (E1.1/E1.4). Ambas as partes da intenção — recalibrar e publicar — dependem de decisão/capability que não existe hoje no contrato MCP 0.1.0."
+}

@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "TASK_ID": "T-20260908-001",
+      "OBJ": "Organizar a rota de visitas do trimestre com base no histórico de interação de cada escola.",
+      "OWNER": "atendimento-nar",
+      "TOOLS_ALLOWED": ["crm_list_eligible_contacts", "crm_get_contact_context", "crm_get_followups_due", "crm_get_demo_scheduled", "proposal_get_pending"],
+      "DEPENDENCIES": [],
+      "NEXT": null
+    }
+  ],
+  "ESCALATE": false,
+  "ESCALATION_REASON": null
+}
