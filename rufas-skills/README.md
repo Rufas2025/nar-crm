@@ -51,12 +51,13 @@ rufas-skills/
 ├── audit_hermes_skills.sh             — script de auditoria read-only do runtime
 ├── n8n-workflow-engineering/          — skill: engenharia segura de workflows n8n
 ├── automation-incident-recovery/      — skill: diagnóstico e recovery de incidentes operacionais
+├── educational-opportunity-discovery-brazil/  — skill: descoberta e qualificação de sinal comercial (DRAFT)
 └── _archive/                          — skills descontinuadas ou substituídas, preservadas por histórico
 ```
 
 ## Formato real de skill (compatível com o runtime Hermes)
 
-Confirmado a partir de skills reais já em uso (`nar-eco-n8n-ops`, `rufino-linkedin-n8n-ops`): frontmatter YAML com **apenas** `name` e `description` — sem campos de schema/manifest adicionais inventados. `description` é o mecanismo real de ativação: precisa ser específico o bastante para disparar a skill certa e citar explicitamente o que a skill NÃO cobre, para não competir com skills vizinhas.
+Confirmado a partir de skills reais inspecionadas como referência de formato (`nar-eco-n8n-ops`, `rufino-linkedin-n8n-ops`): frontmatter YAML com **apenas** `name` e `description` — sem campos de schema/manifest adicionais inventados. `description` é o mecanismo real de ativação: precisa ser específico o bastante para disparar a skill certa e citar explicitamente o que a skill NÃO cobre, para não competir com skills vizinhas.
 
 Estrutura de arquivos de apoio observada nas skills reais (usada apenas quando agrega valor real, nunca por padrão obrigatório):
 
@@ -70,13 +71,12 @@ Estrutura de arquivos de apoio observada nas skills reais (usada apenas quando a
 └── templates/              — opcional; checklists e templates reutilizáveis
 ```
 
-`n8n-workflow-engineering` e `automation-incident-recovery` seguem esse formato exatamente — nenhum campo de manifest, metadata JSON, ou schema de skill foi inventado além do que já existe nas skills reais observadas.
+`n8n-workflow-engineering`, `automation-incident-recovery` e `educational-opportunity-discovery-brazil` seguem esse formato exatamente — nenhum campo de manifest, metadata JSON, ou schema de skill foi inventado além do que já existe nas skills reais observadas.
 
 ## Skills planejadas (não criadas nesta etapa)
 
 Registradas aqui para não perder o contexto, mas **não implementadas ainda**:
 
-- `educational-opportunity-discovery-brazil`
 - `integration-composio-operator`
 - `commercial-outreach-preparation`
 
