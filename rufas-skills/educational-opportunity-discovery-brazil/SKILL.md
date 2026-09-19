@@ -1,6 +1,6 @@
 ---
 name: educational-opportunity-discovery-brazil
-description: "Use quando houver missão explícita de descoberta de oportunidades comerciais em instituições privadas de ensino no Brasil a partir de sinais públicos (obra, reforma, expansão, nova unidade, investimento em infraestrutura, retrofit, aquisição). Produz candidatos estruturados classificados como ELIGIBLE/REVIEW_REQUIRED/NOT_ELIGIBLE para encaminhamento a prework-educacional-account-intelligence. NÃO executa Pré-Work completo, NÃO faz stakeholder/contact enrichment profundo (isso é prework-educacional-account-intelligence), NÃO controla cron/agenda/limite diário/retry/fila/watermark/persistência/dedupe operacional/Google Sheets/CRM (isso é n8n)."
+description: "Use para descobrir sinais em escolas privadas no Brasil."
 ---
 
 # educational-opportunity-discovery-brazil

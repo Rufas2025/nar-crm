@@ -33,6 +33,8 @@ Cada skill em `rufas-skills/` tem, no seu `SKILL.md` ou em metadata associada:
 - **version** — versão da skill.
 - **last reviewed** — data da última revisão humana.
 
+Toda nova skill deve ter description curta (<60 caracteres), usada apenas como trigger de roteamento. Detalhamento pertence ao corpo do `SKILL.md`.
+
 ## Princípios — não duplicar o SOUL
 
 As skills **referenciam** os princípios centrais do agente (constituição/SOUL do Rufas) — elas nunca copiam ou reescrevem esses princípios dentro de si. Se uma skill precisa de um princípio geral do agente, ela aponta para onde ele vive, não o transcreve. Isso evita que a constituição do agente fique fragmentada e divergente entre skills.
