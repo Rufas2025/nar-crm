@@ -1,6 +1,6 @@
 ---
 name: automation-incident-recovery
-description: "Use sempre que houver um incidente operacional envolvendo n8n, Hermes, Composio, Traefik, relay/proxy, webhooks, HMAC, APIs, containers, filas ou callbacks — algo que estava funcionando parou, um erro intermitente precisa de diagnóstico em camadas, ou uma recuperação precisa acontecer sem perder estado/fila/idempotência. NÃO usar para engenharia de workflow n8n sem incidente em andamento (isso é n8n-workflow-engineering), nem para pesquisa comercial/CRM — isso pertence a outras skills."
+description: "Use para incidentes entre n8n, Hermes e integrações."
 ---
 
 # automation-incident-recovery

@@ -1,6 +1,6 @@
 ---
 name: n8n-workflow-engineering
-description: "Use sempre que Rufas precisar construir, revisar, corrigir ou evoluir um workflow n8n com segurança — diagnóstico de node com falha, alteração estrutural de workflow, validação antes de ativar, HTTP Request retornando erro de serialização/transporte (ex.: circular structure, TLSSocket, EnvProxyHttpAgent), decisão sobre versão de node compatível, backup antes de mudança, ou qualquer situação onde uma alteração em n8n possa quebrar produção. NÃO usar para diagnóstico de incidente multi-camada além do n8n (isso é automation-incident-recovery), nem para pesquisa comercial/CRM/Pré-Work — isso pertence a outras skills."
+description: "Use para construir ou corrigir workflows n8n."
 ---
 
 # n8n-workflow-engineering
